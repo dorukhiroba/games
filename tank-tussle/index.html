@@ -118,6 +118,24 @@ button:focus-visible,input:focus-visible{outline:4px solid #fff;outline-offset:2
 .tsup,.thid{font-size:9px;border:2px solid var(--ink);border-radius:6px;padding:0 4px 1px;line-height:1.1;text-shadow:none}
 .tsup{background:var(--gold);color:var(--ink);animation:glow .6s ease-in-out infinite alternate}
 .thid{background:var(--leaf);color:#fff}
+.tally{font-size:9px;border:2px solid var(--ink);border-radius:6px;padding:0 4px 1px;line-height:1.1;text-shadow:none;background:#fff;color:var(--ink)}
+.teams{flex:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.team{background:var(--navy-lo);border:2px solid var(--ink);border-radius:12px;padding:6px 8px;display:flex;flex-direction:column;gap:4px;box-shadow:inset 4px 0 0 var(--c)}
+.team.mine{border-color:var(--c)}
+.team .th{display:flex;justify-content:space-between;align-items:center;font-family:var(--display);font-size:15px;color:var(--c)}
+.team .seat{display:grid;grid-template-columns:10px 1fr auto;gap:6px;align-items:center;font-family:var(--display);font-size:14px;min-height:22px}
+.team .seat .sw{width:10px;height:10px;border-radius:3px;border:2px solid var(--ink);background:var(--c)}
+.team .seat .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.team .seat small{font-family:var(--body);font-weight:800;font-size:10px;color:var(--muted);margin-left:4px}
+.team .seat.empty{color:var(--muted)}
+.team .seat>span:last-child{display:flex;gap:4px}
+.team .tjoin{font-family:var(--display);font-size:12px;border:2px solid var(--ink);border-radius:8px;background:linear-gradient(#7ef08a,#2fb34a);padding:1px 8px 2px;cursor:pointer;color:var(--ink)}
+.seg{flex:none;display:flex;border:3px solid var(--ink);border-radius:12px;overflow:hidden}
+.seg button{flex:1;font-family:var(--display);font-size:15px;padding:6px 10px 7px;border:0;background:var(--navy-lo);color:var(--muted);cursor:pointer}
+.seg button+button{border-left:3px solid var(--ink)}
+.seg button.on{background:linear-gradient(#ffe066,#ffb21a);color:var(--ink)}
+.seg button:disabled{cursor:default}
+#lb li.tm{grid-template-columns:10px 1fr auto}
 @keyframes glow{to{background:#fff3b0}}
 .hp{position:relative;width:66px;height:13px;border:2.5px solid var(--ink);border-radius:7px;background:#4a3b4f;overflow:hidden}
 .hpf{position:absolute;inset:0 auto 0 0;background:var(--c);transition:width .12s}
@@ -308,7 +326,7 @@ kbd{font-family:var(--display);font-size:12px;color:var(--ink);background:#f2f3f
   <div class="inner">
     <header style="display:flex;flex-direction:column;align-items:center;gap:6px">
       <h1 class="logo">Tank<span>Tussle</span></h1>
-      <p class="tagline">Up to 10 tanks · online with friends · first to 10 KOs</p>
+      <p class="tagline">Up to 10 tanks · free-for-all or duos · online with friends</p>
     </header>
     <div class="showcase" id="showcase"></div>
     <div class="join panel">
@@ -350,7 +368,7 @@ const store={get(k,d){try{const v=localStorage.getItem('tt.'+k);return v==null?d
 function seeded(seed){let s=seed;return()=>{s=(s*16807)%2147483647;return s/2147483647;};}
 
 /* ================= DATA ================= */
-const PROTO=4,MAXP=10,WIN_KOS=10,MATCH_T=180,COUNT_T=3.5,RESULT_T=10;
+const PROTO=5,MAXP=10,WIN_KOS=10,MATCH_T=180,COUNT_T=3.5,RESULT_T=10;
 const COLORS=[
   {name:'Blue',hex:0x2f8cff,css:'#2f8cff'},{name:'Red',hex:0xff4b4b,css:'#ff4b4b'},
   {name:'Green',hex:0x35c95a,css:'#35c95a'},{name:'Yellow',hex:0xffc21a,css:'#ffc21a'},
@@ -363,6 +381,14 @@ const EMOTES=['GG!','Nice shot!','Oops!','Come at me!'];
 const BOT_EMOTES=['Too easy!','Beep boop!','GG!','Bonk!'];
 const KEYS=['bulldog','viper','boomer','frosty'];
 const KI={bulldog:0,viper:1,boomer:2,frosty:3};
+/* Duos mode: five teams of two. A team is a fixed pair of colour slots, so teammates share a colour family. */
+const TEAMS=[[0,6],[1,5],[2,8],[4,7],[3,9]];
+const TEAM_OF=[0,1,2,4,3,1,0,3,2,4];
+const TEAM_NAMES=['Blue','Red','Green','Purple','Gold'];
+const TEAM_CSS=TEAMS.map(p=>COLORS[p[0]].css);
+const TEAM_SPAWNS=[[0,6],[1,9],[2,7],[4,8],[5,3]];
+const TEAM_WIN=15;
+const teamSpawn=slot=>{const tm=TEAM_OF[slot];return TEAM_SPAWNS[tm][TEAMS[tm].indexOf(slot)];};
 const KINDS={
   bulldog:{name:'Bulldog',role:'Bruiser',accent:'#ff7a2f',hp:180,speed:5.8,reload:0.95,cd:0.32,superCost:150,pref:3.5,range:7.2,bspeed:22,
     attack:'Scrap Shotgun',attackDesc:'Four short-range pellets.',sup:'Bumper Rush',supDesc:'Charge ahead, smash crates and ram tanks away.'},
@@ -1227,7 +1253,7 @@ function hostInit(fromS){
   Hs.on=true;Hs.tanks=new Map();Hs.ev=[];Hs.seq=fromS?fromS.sq+1:1;Hs.ph='L';Hs.phT=0;Hs.ck=MATCH_T;
   Hs.nb=fromS?fromS.nb:(NET.mode==='demo'?6:NET.mode==='local'?5:4);
   Hs.bullets=[];Hs.lobs=[];Hs.cubes=[];Hs.cubeId=1;Hs.box=null;Hs.boxT=6;Hs.time=0;Hs.pubT=0;
-  Hs.ep=Date.now()+'.'+Math.floor(Math.random()*1e6);Hs.winner=-1;Hs.timers=[];Hs.lastPub=null;
+  Hs.ep=Date.now()+'.'+Math.floor(Math.random()*1e6);Hs.winner=-1;Hs.timers=[];Hs.lastPub=null;Hs.md=fromS?(fromS.md|0):0;
   Hs.cells=DEST.map(d=>d.type===3?30:55);
   if(fromS){
     Hs.ph=fromS.ph;Hs.ck=(fromS.ck||0)/10;Hs.phT=(fromS.pt||0)/10;Hs.winner=fromS.wn;
@@ -1245,7 +1271,45 @@ function hostInit(fromS){
   for(let i=0;i<DEST.length;i++)destAlive[i]=Hs.cells[i]>0?1:0;
 }
 function hEv(arr){Hs.ev.push({s:Hs.seq++,t:Hs.time,d:arr});}
-function hFreeSlot(){const used=new Set([...Hs.tanks.values()].map(t=>t.slot));for(let i=0;i<MAXP;i++)if(!used.has(i))return i;return -1;}
+function hFreeSlot(pref){
+  const used=new Set([...Hs.tanks.values()].map(t=>t.slot));
+  if(Hs.md===1){
+    // Duos: the asked-for team first, then teams with one tank (so it gets a partner), then empty teams
+    const order=pref>=0&&pref<TEAMS.length?[...TEAMS[pref]]:[];
+    const cnt=TEAMS.map(p=>p.filter(s=>used.has(s)).length);
+    for(const want of [1,0])TEAMS.forEach((p,i)=>{if(cnt[i]===want)order.push(...p);});
+    for(const s of order)if(!used.has(s))return s;
+    return -1;
+  }
+  for(let i=0;i<MAXP;i++)if(!used.has(i))return i;return -1;
+}
+const hAlly=(a,b)=>Hs.md===1&&!!a&&!!b&&a!==b&&TEAM_OF[a.slot]===TEAM_OF[b.slot];
+const hTeamScore=tm=>[...Hs.tanks.values()].reduce((s,t)=>s+(TEAM_OF[t.slot]===tm?t.score:0),0);
+function hTeamTidy(){
+  if(Hs.md!==1||Hs.ph!=='L')return;
+  const bySlot=new Map([...Hs.tanks.values()].map(t=>[t.slot,t]));
+  const moveTo=(t,s)=>{bySlot.delete(t.slot);t.slot=s;bySlot.set(s,t);hRespawn(t,null);};
+  // humans who picked a team move there, bumping a bot if both seats are taken
+  for(const t of [...Hs.tanks.values()]){
+    if(!t.human||!(t.wantTeam>=0&&t.wantTeam<TEAMS.length)||TEAM_OF[t.slot]===t.wantTeam)continue;
+    const pair=TEAMS[t.wantTeam];
+    let s=pair.find(x=>!bySlot.has(x));
+    if(s===undefined){const b=pair.map(x=>bySlot.get(x)).find(o=>!o.human);if(!b)continue;Hs.tanks.delete(b.id);bySlot.delete(b.slot);s=b.slot;}
+    moveTo(t,s);
+  }
+  // give every lone tank a bot partner: move a lone bot, or split an all-bot team
+  for(let guard=0;guard<MAXP;guard++){
+    const teams=TEAMS.map(p=>p.map(x=>bySlot.get(x)).filter(Boolean));
+    const lone=teams.filter(m=>m.length===1).map(m=>m[0]);
+    const loneHuman=lone.find(o=>o.human);
+    let bot=lone.find(o=>!o.human&&lone.some(m=>m!==o));
+    if(!bot&&loneHuman){const full=teams.find(m=>m.length===2&&m.every(o=>!o.human));if(full)bot=full[1];}
+    if(!bot)break;
+    const mate=loneHuman||lone.find(o=>o!==bot);
+    if(!mate||TEAM_OF[mate.slot]===TEAM_OF[bot.slot])break;
+    moveTo(bot,TEAMS[TEAM_OF[mate.slot]].find(x=>!bySlot.has(x)));
+  }
+}
 function hNewTank(id,slot,kind,human){
   const K=KINDS[kind];
   return{id,slot,kind,human,x:0,z:0,vx:0,vz:0,kx:0,kz:0,hull:0,tur:0,hp:K.hp,maxHp:K.hp,alive:true,respT:0,rs:1,sp:slot,score:0,deaths:0,sup:0,shield:0,shieldT:0,slowT:0,freezeT:0,overT:0,inv:1.5,
@@ -1253,7 +1317,7 @@ function hNewTank(id,slot,kind,human){
     bot:human?null:{thinkT:0,target:null,mode:'roam',path:[],strafe:Math.random()<0.5?1:-1,fireCD:rand(0.3,1),stuckT:0,lx:0,lz:0,unstuck:0,uDir:0,crate:-1,jit:0,goal:null,goalPt:null}};
 }
 function hPickSpawn(t){
-  const cands=SPAWNS.map((s,i)=>{let md=60;for(const o of Hs.tanks.values())if(o!==t&&o.alive)md=Math.min(md,Math.hypot(o.x-s[0],o.z-s[1]));return{i,md:md+rand(0,4)};});
+  const cands=SPAWNS.map((s,i)=>{let md=60;for(const o of Hs.tanks.values())if(o!==t&&o.alive&&!hAlly(o,t))md=Math.min(md,Math.hypot(o.x-s[0],o.z-s[1]));return{i,md:md+rand(0,4)};});
   cands.sort((a,b)=>b.md-a.md);return cands[0].i;
 }
 function hRespawn(t,sp){
@@ -1274,15 +1338,16 @@ function hSyncHumans(peers){
   for(const {p,pr} of hum){
     const id=p.peer;present.add(id);
     let t=Hs.tanks.get(id);
+    const wantTeam=Number.isInteger(pr.tm)?pr.tm:-1;
     if(!t){
       if(humanCount>=MAXP)continue;
-      let slot=hFreeSlot();
+      let slot=hFreeSlot(wantTeam);
       if(slot<0){const bots=[...Hs.tanks.values()].filter(b=>!b.human).sort((a,b)=>b.slot-a.slot);if(!bots.length)continue;slot=bots[0].slot;Hs.tanks.delete(bots[0].id);}
       t=hNewTank(id,slot,KEYS[clamp(pr.k|0,0,3)],true);Hs.tanks.set(id,t);humanCount++;
       hRespawn(t,null);
       hEv([14,slot]);
     }
-    t.ready=pr.rd?1:0;
+    t.ready=pr.rd?1:0;t.wantTeam=wantTeam;
     const want=KEYS[clamp(pr.k|0,0,3)];
     if(want!==t.kind&&want!==t.wantKind){
       t.wantKind=want;
@@ -1314,9 +1379,11 @@ function hSyncHumans(peers){
 }
 function hFillBots(){
   const humans=[...Hs.tanks.values()].filter(t=>t.human).length;
-  const target=clamp(Math.min(Hs.nb,MAXP-humans),0,MAXP);
+  let target=clamp(Math.min(Hs.nb,MAXP-humans),0,MAXP);
+  if(Hs.md===1&&(humans+target)%2)target=Math.min(MAXP-humans,target+1); // Duos: no one left without a partner
   let bots=[...Hs.tanks.values()].filter(t=>!t.human);
-  while(bots.length>target){bots.sort((a,c)=>c.slot-a.slot);const b=bots.shift();Hs.tanks.delete(b.id);}
+  const keep=b=>{if(Hs.md!==1)return 0;const mate=[...Hs.tanks.values()].find(o=>o!==b&&TEAM_OF[o.slot]===TEAM_OF[b.slot]);return mate?(mate.human?2:1):0;};
+  while(bots.length>target){bots.sort((a,c)=>keep(a)-keep(c)||c.slot-a.slot);const b=bots.shift();Hs.tanks.delete(b.id);}
   while(bots.length<target){
     const slot=hFreeSlot();if(slot<0)break;
     const counts=KEYS.map(k=>[...Hs.tanks.values()].filter(t=>t.kind===k).length);
@@ -1326,7 +1393,7 @@ function hFillBots(){
   }
 }
 function hHurt(t,dmg,src,o={}){
-  if(!t.alive||t.inv>0||dmg<=0)return;
+  if(!t.alive||t.inv>0||dmg<=0||hAlly(t,src))return;
   let d=dmg;
   if(t.shield>0){const a=Math.min(t.shield,d);t.shield-=a;d-=a;}
   t.hp-=d;t.revealUntil=Hs.time+1;
@@ -1344,9 +1411,13 @@ function hKill(t,src){
   hEv([6,t.slot,src&&src!==t?src.slot:-1]);
   if(Math.random()<0.5)hSpawnCube(t.x,t.z);
   if(src&&!src.human&&src!==t&&Math.random()<0.3)hEv([13,src.slot,Math.floor(Math.random()*BOT_EMOTES.length)]);
-  if(Hs.ph==='P'&&src&&src!==t&&src.score>=WIN_KOS)hEnd(src);
+  if(Hs.ph==='P'&&src&&src!==t){
+    if(Hs.md===1){const tm=TEAM_OF[src.slot];if(hTeamScore(tm)>=TEAM_WIN)hEnd(tm);}
+    else if(src.score>=WIN_KOS)hEnd(src);
+  }
 }
-function hEnd(w){Hs.ph='O';Hs.phT=RESULT_T;Hs.winner=w?w.slot:-1;Hs.bullets.length=0;Hs.lobs.length=0;Hs.timers.length=0;}
+// w is the winning tank, or in Duos the winning team index; null/-1 is a draw
+function hEnd(w){Hs.ph='O';Hs.phT=RESULT_T;Hs.winner=typeof w==='number'?w:w?w.slot:-1;Hs.bullets.length=0;Hs.lobs.length=0;Hs.timers.length=0;}
 function hDamageCell(i,dmg,src){
   if(i<0||Hs.cells[i]<=0)return;
   Hs.cells[i]-=dmg;
@@ -1384,7 +1455,7 @@ function hRail(t,x,z,ang){
   const dx=Math.sin(ang),dz=Math.cos(ang),L=beamLength(x,z,ang);
   hEv([3,t.slot,r10(x),r10(z),r100(ang),r10(L)]);
   for(const o of Hs.tanks.values()){
-    if(o===t||!o.alive)continue;
+    if(o===t||!o.alive||hAlly(o,t))continue;
     const px=o.x-x,pz=o.z-z,proj=px*dx+pz*dz;if(proj<0||proj>L)continue;
     if(Math.abs(px*dz-pz*dx)<1.05)hHurt(o,72,t,{knock:[dx*9,dz*9]});
   }
@@ -1438,7 +1509,7 @@ function hUpdateProjectiles(dt){
       if(k===-2){dead=true;break;}
       if(k>=0){dead=true;hDamageCell(k,b.dmg,b.owner);break;}
       for(const o of Hs.tanks.values()){
-        if(o===b.owner||!o.alive)continue;
+        if(o===b.owner||!o.alive||hAlly(o,b.owner))continue; // shots pass through teammates
         if(Math.hypot(o.x-b.x,o.z-b.z)<1.0){dead=true;hHurt(o,b.dmg,b.owner,{slow:b.slow,knock:[b.dx*2.2,b.dz*2.2]});break;}
       }
     }
@@ -1459,7 +1530,7 @@ function hHidden(o,viewer){
 function hBotThink(t){
   const B=t.bot,K=KINDS[t.kind],hpf=t.hp/t.maxHp;
   let best=null,bs=1e9;
-  for(const o of Hs.tanks.values()){if(o===t||!o.alive||o.inv>0.8||hHidden(o,t))continue;const d=Math.hypot(o.x-t.x,o.z-t.z);if(d>30)continue;const s=d+(o.hp/o.maxHp)*5+(o===B.target?-3:0);if(s<bs){bs=s;best=o;}}
+  for(const o of Hs.tanks.values()){if(o===t||!o.alive||o.inv>0.8||hAlly(o,t)||hHidden(o,t))continue;const d=Math.hypot(o.x-t.x,o.z-t.z);if(d>30)continue;const s=d+(o.hp/o.maxHp)*5+(o===B.target?-3:0);if(s<bs){bs=s;best=o;}}
   B.target=best;
   let goal=null,mode='roam';
   const dT=best?Math.hypot(best.x-t.x,best.z-t.z):99;
@@ -1570,7 +1641,7 @@ function hDashChecks(){
     const ang=t.human?t.hull:t.dashAng;
     DEST.forEach((d,i)=>{if(Hs.cells[i]>0&&sdist(d,t.x,t.z)<1.15)hDamageCell(i,999,t);});
     for(const o of Hs.tanks.values()){
-      if(o===t||!o.alive||t.dashHit.has(o))continue;
+      if(o===t||!o.alive||t.dashHit.has(o)||hAlly(o,t))continue;
       if(Math.hypot(o.x-t.x,o.z-t.z)<2.0){t.dashHit.add(o);hEv([16,t.slot,o.slot,r100(ang)]);hHurt(o,46,t,{knock:[Math.sin(ang)*22,Math.cos(ang)*22]});}
     }
   }
@@ -1591,19 +1662,23 @@ function hStartCount(){
   if(Hs.ph!=='L')return;
   Hs.ph='C';Hs.phT=COUNT_T;Hs.winner=-1;Hs.bullets.length=0;Hs.lobs.length=0;Hs.cubes=[];Hs.box=null;Hs.boxT=6;Hs.timers.length=0;
   hResetCells();
-  for(const t of Hs.tanks.values()){t.score=0;t.deaths=0;t.sup=0;hRespawn(t,t.slot);}
+  for(const t of Hs.tanks.values()){t.score=0;t.deaths=0;t.sup=0;hRespawn(t,Hs.md===1?teamSpawn(t.slot):t.slot);}
 }
 function hostStep(dt){
   Hs.time+=dt;
   for(let i=Hs.timers.length-1;i>=0;i--){const tm=Hs.timers[i];if(!tm)continue;tm.t-=dt;if(tm.t<=0){if(Hs.timers[i]===tm)Hs.timers.splice(i,1);tm.fn();}}
   hSyncHumans(getPeers());
   if(Hs.ph!=='O')hFillBots();
+  hTeamTidy();
   const live=Hs.ph==='L'||Hs.ph==='P';
   if(Hs.ph==='L'){
     const hum=[...Hs.tanks.values()].filter(t=>t.human);
     if(hum.length>=2&&hum.every(t=>t.ready))hStartCount();
   }else if(Hs.ph==='C'){Hs.phT-=dt;if(Hs.phT<=0){Hs.ph='P';Hs.ck=MATCH_T;}}
-  else if(Hs.ph==='P'){Hs.ck-=dt;if(Hs.ck<=0){const ts=[...Hs.tanks.values()];const top=Math.max(0,...ts.map(t=>t.score));const lead=ts.filter(t=>t.score===top);hEnd(lead.length===1?lead[0]:null);}}
+  else if(Hs.ph==='P'){Hs.ck-=dt;if(Hs.ck<=0){
+    if(Hs.md===1){const sc=TEAMS.map((p,i)=>[...Hs.tanks.values()].some(t=>TEAM_OF[t.slot]===i)?hTeamScore(i):-1);const top=Math.max(...sc);const lead=sc.filter(s=>s===top).length;hEnd(lead===1?sc.indexOf(top):-1);}
+    else{const ts=[...Hs.tanks.values()];const top=Math.max(0,...ts.map(t=>t.score));const lead=ts.filter(t=>t.score===top);hEnd(lead.length===1?lead[0]:null);}
+  }}
   else if(Hs.ph==='O'){Hs.phT-=dt;if(Hs.phT<=0){Hs.ph='L';hResetCells();for(const t of Hs.tanks.values())if(!t.alive)hRespawn(t,null);}}
   for(const t of Hs.tanks.values()){
     t.inv=Math.max(0,t.inv-dt);t.slowT=Math.max(0,t.slowT-dt);t.freezeT=Math.max(0,t.freezeT-dt);t.overT=Math.max(0,t.overT-dt);
@@ -1622,7 +1697,7 @@ function hFlags(t){
 function hPublish(){
   const tk=[...Hs.tanks.values()].map(t=>[t.id,t.slot,KI[t.kind],r10(t.x),r10(t.z),r100(t.hull),r100(t.tur),Math.max(0,Math.ceil(t.hp)),hFlags(t),t.score,t.deaths,Math.floor(t.sup*100),Math.ceil(t.shield),t.rs,t.sp,t.ready]);
   while(Hs.ev.length&&Hs.ev[0].t<Hs.time-0.7)Hs.ev.shift();
-  const s={v:PROTO,ep:Hs.ep,ph:Hs.ph,ck:Math.ceil(Hs.ck*10),pt:Math.ceil(Hs.phT*10),nb:Hs.nb,tk,cr:Hs.cells.map(h=>h>0?1:0).join(''),bx:Hs.box?1:0,cu:Hs.cubes.map(c=>[c.id,r10(c.x),r10(c.z)]),ev:Hs.ev.map(e=>[e.s,...e.d]),sq:Hs.seq-1,wn:Hs.winner};
+  const s={v:PROTO,ep:Hs.ep,ph:Hs.ph,ck:Math.ceil(Hs.ck*10),pt:Math.ceil(Hs.phT*10),nb:Hs.nb,tk,cr:Hs.cells.map(h=>h>0?1:0).join(''),bx:Hs.box?1:0,cu:Hs.cubes.map(c=>[c.id,r10(c.x),r10(c.z)]),ev:Hs.ev.map(e=>[e.s,...e.d]),sq:Hs.seq-1,wn:Hs.winner,md:Hs.md};
   let js=JSON.stringify(s);
   while(js.length>3300&&s.ev.length>1){s.ev.splice(0,Math.ceil(s.ev.length/4));js=JSON.stringify(s);}
   Hs.lastPub=s;
@@ -1634,9 +1709,9 @@ const C={myId:null,mySlot:-1,S:null,ep:null,lastSeq:-1,ph:'L',tanks:new Map(),by
 const ME={x:0,z:0,vx:0,vz:0,kx:0,kz:0,hull:0,tur:0,aim:0,ammo:3,shotCD:0,dashT:0,dashAng:0,chargeT:0,chargeAng:0,rs:-1,alive:false,seq:0,acts:[],supLock:0,pred:new Set(),em:0,lastPubT:0,lastSup:0};
 function makeTag(v){
   const el=document.createElement('div');el.className='tag'+(v.isMe?' me':'');el.style.setProperty('--c',COLORS[v.slot].css);
-  el.innerHTML=`<div class="tname st"><span class="nm"></span><span class="thid" hidden>HIDDEN</span><span class="tsup" hidden>SUPER</span></div><div class="hp"><div class="hpf"></div><div class="shf"></div><span class="hpn st"></span></div>`;
+  el.innerHTML=`<div class="tname st"><span class="tally" hidden>ALLY</span><span class="nm"></span><span class="thid" hidden>HIDDEN</span><span class="tsup" hidden>SUPER</span></div><div class="hp"><div class="hpf"></div><div class="shf"></div><span class="hpn st"></span></div>`;
   tagsEl.appendChild(el);
-  return{el,nm:el.querySelector('.nm'),hpf:el.querySelector('.hpf'),shf:el.querySelector('.shf'),hpn:el.querySelector('.hpn'),sup:el.querySelector('.tsup'),hid:el.querySelector('.thid'),lh:-1,ls:-1,lsup:null,lhid:null,lnm:null,bub:null};
+  return{el,nm:el.querySelector('.nm'),hpf:el.querySelector('.hpf'),shf:el.querySelector('.shf'),hpn:el.querySelector('.hpn'),sup:el.querySelector('.tsup'),hid:el.querySelector('.thid'),al:el.querySelector('.tally'),lh:-1,ls:-1,lsup:null,lhid:null,lal:null,lnm:null,bub:null};
 }
 function makeV(id,slot,kind,human){
   const col=COLORS[slot];
@@ -1665,6 +1740,10 @@ function sampleBuf(v,rt){
 }
 const dispName=v=>v.isMe?(cleanName(NET.myPres.nm)||'You'):v.human?(v.nm||'Player'):BOTNAMES[v.slot];
 const nmHtml=v=>v?`<b style="color:${COLORS[v.slot].css}">${esc(v.isMe?'You':dispName(v))}</b>`:'';
+const duo=()=>!!C.S&&C.S.md===1;
+const cAlly=(sa,sb)=>duo()&&sa>=0&&sb>=0&&sa!==sb&&TEAM_OF[sa]===TEAM_OF[sb];
+const teamScore=tm=>[...C.tanks.values()].reduce((s,v)=>s+(TEAM_OF[v.slot]===tm?v.score:0),0);
+const teamHtml=tm=>`<b style="color:${TEAM_CSS[tm]}">Team ${TEAM_NAMES[tm]}</b>`;
 function reveal(slot,t){const v=C.bySlot[slot];if(v)v.revealT=Math.max(v.revealT,t);if(slot===C.mySlot)C.myRevealT=Math.max(C.myRevealT,t);}
 
 function resetClient(){
@@ -1823,7 +1902,7 @@ function updateVProjectiles(dt){
         wallHitFx(b.x-b.dx*0.3,b.z-b.dz*0.3,b.dx,b.dz,k>=0?(DEST[k].type===2?0xffb35a:0xff6a5a):0xfff1c8);
         break;}
       for(const v of C.tanks.values()){
-        if(v.slot===b.slot||!v.alive)continue;
+        if(v.slot===b.slot||!v.alive||cAlly(v.slot,b.slot))continue;
         if(Math.hypot(v.x-b.x,v.z-b.z)<1.0){dead=true;
           puff(b.x,0.95,b.z,b.shard?0xd9fbff:0xffffff,0.35,0.15,0,0,0,0,2);tankHitFx(b.x,b.z,b.dx,b.dz,b.shard?0xbff6ff:BRIGHT[b.slot]);
           for(let k2=0;k2<3;k2++)puff(b.x,0.95,b.z,b.shard?0xa8f2ff:COLORS[b.slot].hex,0.14,0.35,rand(-4,4),rand(1,4),rand(-4,4),12,1);break;}
@@ -2100,7 +2179,7 @@ function updateVisibility(dt){
   for(const v of C.tanks.values()){
     v.revealT=Math.max(0,v.revealT-dt);
     v.bush=v.alive?bushAt(v.x,v.z):-1;
-    if(v.isMe||!meAlive||NET.mode==='demo')v.vis=true;
+    if(v.isMe||!meAlive||NET.mode==='demo'||cAlly(v.slot,C.mySlot))v.vis=true;
     else v.vis=v.bush<0||v.revealT>0||Math.hypot(v.x-ME.x,v.z-ME.z)<3.6||(C.myBush>=0&&C.myBush===v.bush);
   }
   for(let p=0;p<PATCHES;p++){
@@ -2194,6 +2273,7 @@ function updateTags(){
     const sh=Math.round(v.shield);if(sh!==g.ls){g.ls=sh;g.shf.style.width=Math.min(100,sh/v.maxHp*100)+'%';}
     const sr=(v.isMe&&ME.supLock>0)?false:v.sup>=1;if(sr!==g.lsup){g.lsup=sr;g.sup.hidden=!sr;}
     const hd=v.isMe&&v.bush>=0&&C.myRevealT<=0;if(hd!==g.lhid){g.lhid=hd;g.hid.hidden=!hd;}
+    const al=cAlly(v.slot,C.mySlot);if(al!==g.lal){g.lal=al;g.al.hidden=!al;}
   }
 }
 
@@ -2234,7 +2314,9 @@ function updateHUD(){
   if(pill.textContent!==pt)pill.textContent=pt;
   pill.classList.toggle('warm',C.ph==='L');
   pill.classList.toggle('low',C.ph==='P'&&!!C.S&&C.S.ck<=150);
-  const ms=$('#myscore');const mst=v&&C.ph==='P'?`${v.score} KO${v.score===1?'':'s'} · first to ${WIN_KOS}`:'';if(ms.textContent!==mst)ms.textContent=mst;
+  const ms=$('#myscore');let mst='';
+  if(v&&C.ph==='P'){if(duo()){const ts=teamScore(TEAM_OF[v.slot]);mst=`Team ${TEAM_NAMES[TEAM_OF[v.slot]]}: ${ts} KO${ts===1?'':'s'} · first to ${TEAM_WIN}`;}else mst=`${v.score} KO${v.score===1?'':'s'} · first to ${WIN_KOS}`;}
+  if(ms.textContent!==mst)ms.textContent=mst;
   for(let i=0;i<3;i++){const f=clamp(ME.ammo-i,0,1);ammoB[i].style.width=(f*100)+'%';ammoB[i].classList.toggle('full',f>=1);}
   const sup=v?(ME.supLock>0?0:v.sup):0;
   supArcEl.style.strokeDashoffset=163.4*(1-clamp(sup,0,1));
@@ -2264,14 +2346,29 @@ function updateHUD(){
   const showBoard=!!KEY.Tab&&inGame();$('#board').hidden=!showBoard;if(showBoard&&now()-C.boardT>0.3){C.boardT=now();$('#boardList').innerHTML=rankRows();}
   if(now()-C.miniT>0.07){C.miniT=now();drawMini();}
 }
-function rankList(){return[...C.tanks.values()].sort((a,b)=>b.score-a.score||a.deaths-b.deaths||a.slot-b.slot);}
+function teamRank(){
+  const tms=[...new Set([...C.tanks.values()].map(v=>TEAM_OF[v.slot]))];
+  return tms.map(tm=>({tm,score:teamScore(tm),mine:C.mySlot>=0&&TEAM_OF[C.mySlot]===tm,members:[...C.tanks.values()].filter(v=>TEAM_OF[v.slot]===tm).sort((a,b)=>b.score-a.score||a.slot-b.slot)}))
+    .sort((a,b)=>b.score-a.score||a.tm-b.tm);
+}
+function rankList(){
+  if(duo())return teamRank().flatMap(t=>t.members);
+  return[...C.tanks.values()].sort((a,b)=>b.score-a.score||a.deaths-b.deaths||a.slot-b.slot);
+}
 function rankRows(){
+  if(duo()){
+    return teamRank().map((t,i)=>t.members.map(v=>`<li class="${v.isMe?'me':''}" style="--c:${COLORS[v.slot].css}"><span class="pos">${i+1}</span><span class="sw"></span><span class="nm">${esc(dispName(v))}<small>Team ${TEAM_NAMES[t.tm]} · ${t.score} · ${KINDS[v.kind].name}${v.human?'':' · bot'}</small></span><span class="kos">${v.score} KO</span><span class="dt">${v.deaths} down</span></li>`).join('')).join('');
+  }
   return rankList().map((v,i)=>`<li class="${v.isMe?'me':''}" style="--c:${COLORS[v.slot].css}"><span class="pos">${i+1}</span><span class="sw"></span><span class="nm">${esc(dispName(v))}<small>${KINDS[v.kind].name}${v.human?'':' · bot'}</small></span><span class="kos">${v.score} KO</span><span class="dt">${v.deaths} down</span></li>`).join('');
 }
 function renderLB(){
   const el=$('#lb');
   if(C.ph!=='P'&&C.ph!=='C'){el.hidden=true;return;}
   el.hidden=false;
+  if(duo()){
+    el.innerHTML=teamRank().map((t,i)=>`<li class="tm ${t.mine?'me':''}" style="--c:${TEAM_CSS[t.tm]}"><span class="sw"></span><span class="n sts">${t.mine?'Your team':'Team '+TEAM_NAMES[t.tm]}</span><span class="k sts">${t.score}</span></li>`).join('');
+    return;
+  }
   const list=rankList();const rows=list.slice(0,5);const me=list.find(v=>v.isMe);if(me&&!rows.includes(me))rows.push(me);
   el.innerHTML=rows.map(v=>`<li class="${v.isMe?'me':''}" style="--c:${COLORS[v.slot].css}"><span class="r">${list.indexOf(v)+1}</span><span class="sw"></span><span class="n sts">${esc(v.isMe?'You':dispName(v))}</span><span class="k sts">${v.score}</span></li>`).join('');
 }
@@ -2291,16 +2388,26 @@ function renderLobby(){
   const rd=NET.myPres.rd?1:0;
   const maxBots=MAXP-humans.length;
   const nb=Math.min(amHost?Hs.nb:C.S.nb,maxBots);
-  const key=JSON.stringify([amHost,C.hostPeer,roster.map(v=>[v.id,v.slot,v.kind,v.human,v.nm,v.rdy]),rd,NET.myPres.k,nb,NET.myPres.nm]);
+  const md=amHost?Hs.md:(C.S.md|0);
+  const key=JSON.stringify([amHost,C.hostPeer,roster.map(v=>[v.id,v.slot,v.kind,v.human,v.nm,v.rdy]),rd,NET.myPres.k,nb,NET.myPres.nm,md]);
   if(key===C.lobbyKey)return;C.lobbyKey=key;
   const K=KINDS[KEYS[clamp(NET.myPres.k|0,0,3)]];
   const online=NET.mode==='online';
   const allReady=humans.length>=2&&humans.every(v=>v.rdy);
   const p=$('#lobbyPanel');const keepScroll=p.scrollTop;
+  const seatStatus=v=>v.human?`${online&&v.id===C.hostPeer?'<span class="st2 host">Host</span>':''}${online?`<span class="st2 ${v.rdy?'rd':''}">${v.rdy?'Ready':'Not ready'}</span>`:''}`:'<span class="st2">Bot</span>';
+  const meV=C.tanks.get(C.myId),myTeam=meV?TEAM_OF[meV.slot]:-1;
+  const teamsHtml=()=>`<div class="teams">${TEAMS.map((pair,i)=>{
+    const seats=pair.map(s=>C.bySlot[s]&&C.tanks.has(C.bySlot[s].id)?C.bySlot[s]:null);
+    const canJoin=myTeam!==i&&seats.some(v=>!v||!v.human);
+    return `<div class="team ${myTeam===i?'mine':''}" style="--c:${TEAM_CSS[i]}"><div class="th"><span class="st">Team ${TEAM_NAMES[i]}</span>${canJoin?`<button class="tjoin" data-tm="${i}">Join</button>`:myTeam===i?'<span class="st2">Your team</span>':''}</div>
+      ${seats.map((v,j)=>v?`<div class="seat" style="--c:${COLORS[pair[j]].css}"><span class="sw"></span><span class="nm">${esc(dispName(v))}${v.isMe?' (you)':''}<small>${KINDS[v.kind].name}</small></span><span>${seatStatus(v)}</span></div>`:`<div class="seat empty"><span></span><span>Open seat</span><span></span></div>`).join('')}</div>`;}).join('')}</div>`;
   p.innerHTML=`
     <div class="ph st"><span>${online?'Warm-up lobby':'Practice'}</span><button class="btn sm blue" id="lbHide">Hide</button></div>
     ${online?`<p class="sub">Arena <span class="code">${esc(NET.code)}</span> · ${humans.length} player${humans.length===1?'':'s'}. Friends join by opening this page and entering the same code. Fights here don't count.</p>`:`<p class="sub">You against bots. Drive around, try the tanks and the bushes, then start the match when you're ready.</p>`}
-    <ul class="roster">${roster.map(v=>`<li style="--c:${COLORS[v.slot].css}"><span class="sw"></span><span class="nm">${esc(dispName(v))}${v.isMe?' (you)':''}<small>${KINDS[v.kind].name}</small></span>${v.human?(online&&v.id===C.hostPeer?'<span class="st2 host">Host</span>':'<span></span>'):'<span class="st2">Bot</span>'}${v.human&&online?`<span class="st2 ${v.rdy?'rd':''}">${v.rdy?'Ready':'Not ready'}</span>`:'<span></span>'}</li>`).join('')}</ul>
+    <div class="seg" id="modeSeg"><button data-m="0" class="${md===0?'on':''}" ${amHost?'':'disabled'}>Free-for-all</button><button data-m="1" class="${md===1?'on':''}" ${amHost?'':'disabled'}>Duos · teams of 2</button></div>
+    <p class="sub">${md===1?`Teams of two, no friendly fire: your shots pass through your teammate. First team to ${TEAM_WIN} KOs wins. Press Join to pick a team; bots fill the open seats.`:`Everyone for themselves. First to ${WIN_KOS} KOs wins.`}${amHost?'':' The host picks the mode.'}</p>
+    ${md===1?teamsHtml():`<ul class="roster">${roster.map(v=>`<li style="--c:${COLORS[v.slot].css}"><span class="sw"></span><span class="nm">${esc(dispName(v))}${v.isMe?' (you)':''}<small>${KINDS[v.kind].name}</small></span>${v.human?(online&&v.id===C.hostPeer?'<span class="st2 host">Host</span>':'<span></span>'):'<span class="st2">Bot</span>'}${v.human&&online?`<span class="st2 ${v.rdy?'rd':''}">${v.rdy?'Ready':'Not ready'}</span>`:'<span></span>'}</li>`).join('')}</ul>`}
     <div style="font-family:var(--display);font-size:16px">Your tank</div>
     <div class="picker" id="lobbyPicker"></div>
     <p class="pkinfo"><b>${K.attack}:</b> ${K.attackDesc}<br><b class="sup">Super, ${K.sup}:</b> ${K.supDesc}</p>
@@ -2313,6 +2420,8 @@ function renderLobby(){
   const pk=$('#lobbyPicker');pk.dataset.key='';renderPicker(pk);
   $('#lbHide').onclick=()=>{C.lobbyHidden=true;C.lobbyKey='';};
   $('#lbLeave').onclick=leaveGame;
+  if(amHost)p.querySelectorAll('#modeSeg button').forEach(b=>b.onclick=()=>{Hs.md=+b.dataset.m;SFX.beep(520);C.lobbyKey='';});
+  p.querySelectorAll(".tjoin").forEach(b=>b.onclick=()=>{setPres({tm:+b.dataset.tm});SFX.beep(600);C.lobbyKey='';});
   if(amHost){
     $('#botMinus').onclick=()=>{Hs.nb=clamp(Math.min(Hs.nb,maxBots)-1,0,maxBots);C.lobbyKey='';};
     $('#botPlus').onclick=()=>{Hs.nb=clamp(Math.min(Hs.nb,maxBots)+1,0,maxBots);C.lobbyKey='';};
@@ -2323,8 +2432,21 @@ function renderLobby(){
 $('#lobbyTab').onclick=()=>{C.lobbyHidden=false;C.lobbyKey='';};
 function showResults(){
   const S=C.S;
-  const w=S&&S.wn>=0?C.bySlot[S.wn]:null;
   const t=$('#wTitle');
+  if(duo()){
+    const wt=S.wn>=0&&S.wn<TEAMS.length?S.wn:-1;
+    const mine=wt>=0&&C.mySlot>=0&&TEAM_OF[C.mySlot]===wt;
+    if(wt>=0){
+      const names=[...C.tanks.values()].filter(v=>TEAM_OF[v.slot]===wt).map(v=>v.isMe?'You':dispName(v));
+      t.textContent=mine?'Your team wins!':`Team ${TEAM_NAMES[wt]} wins!`;t.style.setProperty('--c',TEAM_CSS[wt]);
+      $('#wSub').textContent=`${teamScore(wt)} KOs · ${names.join(' & ')}`;
+    }else{t.textContent='Draw!';t.style.setProperty('--c','#fff');$('#wSub').textContent='Time ran out on a tie';}
+    $('#podium').innerHTML=rankRows();
+    $('#results').hidden=false;
+    if(mine)SFX.win();else SFX.beep(330);
+    return;
+  }
+  const w=S&&S.wn>=0?C.bySlot[S.wn]:null;
   if(w){t.textContent=w.isMe?'You win!':`${dispName(w)} wins!`;t.style.setProperty('--c',COLORS[w.slot].css);$('#wSub').textContent=`${w.score} KOs with ${KINDS[w.kind].name}`;}
   else{t.textContent='Draw!';t.style.setProperty('--c','#fff');$('#wSub').textContent='Time ran out on a tie';}
   $('#podium').innerHTML=rankRows();
