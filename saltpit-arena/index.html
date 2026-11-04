@@ -909,6 +909,7 @@ function updateEffects(dt){
     q.m.rotation.x+=q.spin.x*dt;q.m.rotation.y+=q.spin.y*dt;q.m.rotation.z+=q.spin.z*dt;
     if(q.m.position.y<.02&&q.v.y<0){q.m.position.y=.02;q.v.y*=-.35;q.v.x*=.6;q.v.z*=.6;q.spin.multiplyScalar(.5)}
     if(q.t>q.life)q.m.visible=false}
+  if(GOLD_GLINT)GOLD_GLINT.offset.x=(now*.00032)%1;
   xLight.intensity=Math.max(0,xLight.intensity-dt*14);mLight.intensity=Math.max(0,mLight.intensity-dt*40);
   updateProjectiles(dt);updateDnums(dt);
 }
@@ -1030,13 +1031,34 @@ function camoCanvas(i){
   return CAMO_CANVAS[i]=cv;
 }
 const CAMO_MATS={};
+// polished gold: true metal reflecting a warm studio (bright top, dark floor, softbox streaks) plus a moving glint
+let GOLD_GLINT=null;
+function goldEnv(){
+  const faces=[];
+  for(let i=0;i<6;i++){
+    const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');
+    if(i===2){g.fillStyle='#fffaf0';g.fillRect(0,0,64,64)}
+    else if(i===3){g.fillStyle='#160f05';g.fillRect(0,0,64,64)}
+    else{const gr=g.createLinearGradient(0,0,0,64);gr.addColorStop(0,'#fff6dc');gr.addColorStop(.42,'#d9a957');gr.addColorStop(.55,'#4a3414');gr.addColorStop(1,'#100a03');g.fillStyle=gr;g.fillRect(0,0,64,64);
+      g.fillStyle='rgba(255,255,255,.95)';g.fillRect(8+i*9,4,7,30);g.fillRect(46-i*4,8,4,20)}
+    faces.push(c);
+  }
+  const t=new T.CubeTexture(faces);t.needsUpdate=true;return t;
+}
+function glintTex(){
+  const c=document.createElement('canvas');c.width=256;c.height=32;const g=c.getContext('2d');g.fillStyle='#000';g.fillRect(0,0,256,32);
+  const gr=g.createLinearGradient(80,0,140,0);gr.addColorStop(0,'rgba(255,255,255,0)');gr.addColorStop(.5,'rgba(255,250,225,1)');gr.addColorStop(1,'rgba(255,255,255,0)');
+  g.fillStyle=gr;g.fillRect(80,0,60,32);
+  const t=new T.CanvasTexture(c);t.wrapS=t.wrapT=T.RepeatWrapping;return t;
+}
 function camoMat(i){
   if(i===0)return mat('#2c3641');
   if(CAMO_MATS[i])return CAMO_MATS[i];
   const C=CAMOS[i],tex=new T.CanvasTexture(camoCanvas(i));tex.wrapS=tex.wrapT=T.RepeatWrapping;tex.repeat.set(2,2);
-  return CAMO_MATS[i]=C.gold
-    ?new T.MeshStandardMaterial({map:tex,color:'#ffffff',metalness:.35,roughness:.28,emissive:'#6a4a08',emissiveIntensity:.45,flatShading:true})
-    :new T.MeshStandardMaterial({map:tex,color:'#ffffff',roughness:.85,flatShading:true});
+  if(C.gold){GOLD_GLINT=glintTex();
+    return CAMO_MATS[i]=new T.MeshStandardMaterial({color:'#f0bb45',metalness:1,roughness:.16,envMap:goldEnv(),envMapIntensity:1.4,
+      emissive:'#ffd889',emissiveMap:GOLD_GLINT,emissiveIntensity:.95,flatShading:true})}
+  return CAMO_MATS[i]=new T.MeshStandardMaterial({map:tex,color:'#ffffff',roughness:.85,flatShading:true});
 }
 function applyCamo(w){const m=camoMat(camoData.sel[w]);for(const o of VMS[w].body)o.material=m}
 WEAPONS.forEach((_,w)=>applyCamo(w));
@@ -1748,7 +1770,7 @@ function updateTeamBot(b,dt){
     if(b.lastPos.distanceTo(b.pos)<.25){b.stuckT+=.15;if(b.stuckT>1.2){b.wp=randomPoint();b.stuckT=0}}else b.stuckT=0;
     b.lastPos.copy(b.pos);
   }
-  if(!b.wp||Math.hypot(b.wp.x-b.pos.x,b.wp.z-b.pos.z)<1)b.wp=OBJ&&botGoal(b)?b.wp:randomPoint();
+  if(!b.wp||Math.hypot(b.wp.x-b.pos.x,b.wp.z-b.pos.z)<1){const g=OBJ&&botGoal(b);b.wp=g?g.clone():randomPoint()}
   const dx=b.wp.x-b.pos.x,dz=b.wp.z-b.pos.z,dl=Math.hypot(dx,dz)||1,arrived=dl<1.2;
   b.ia=mode==='snd'&&arrived&&V.sd.ph<2&&((b.tm===V.sd.atk&&V.sd.ph===0)||(b.tm!==V.sd.atk&&V.sd.ph===1));
   if(!arrived&&!b.ia){const sp=b.sees?2.4:4.4;b.pos.x+=dx/dl*sp*dt;b.pos.z+=dz/dl*sp*dt;collide(b.pos,R,H)}
@@ -1759,7 +1781,7 @@ function updateTeamBot(b,dt){
   if(b.tgt&&b.dist<BW[2]&&now>b.nextShot&&!roundOver){
     b.nextShot=now+BW[0]+Math.random()*BW[1];
     const t=b.tgt,from=muzzleOf(b.av),to=new V3(t.pos.x,t.pos.y+t.y-.05,t.pos.z),vol=clamp(1-to.distanceTo(camera.position)/60,0,1)*.6;
-    const chance=b.w===2?.7:clamp(.5-b.dist/70,.12,.45)*(t.me?1-.25*P.crouchK:1),hit=Math.random()<chance,head=hit&&b.w!==2&&Math.random()<.15;
+    const chance=b.w===2?.7:t.me?clamp(.5-b.dist/70,.12,.45)*(1-.25*P.crouchK):clamp(.62-b.dist/60,.22,.55),hit=Math.random()<chance,head=hit&&b.w!==2&&Math.random()<.15;
     const dmg=b.w===2?Math.round(36*falloff(WEAPONS[2],b.dist)):head?BW[4]:BW[3];
     if(!hit){to.x+=(Math.random()-.5)*2.4;to.y+=(Math.random()-.3)*1.4;to.z+=(Math.random()-.5)*2.4}
     tracer(from,to,WEAPONS[b.w].tr);shotSound(vol,b.w);
@@ -2126,7 +2148,7 @@ function updateNukeFx(dt){
   const wr2=Math.max(.01,(t-.6)*44);F.wave2.scale.setScalar(wr2);F.wave2.material.opacity=t>.6?Math.max(0,.9-wr2/140):0;
   F.dust.scale.set(wr,dh,wr);F.dust.position.y=dh/2;F.dust.material.opacity=Math.max(0,.55-wr/170);
   // the sky burns orange, then settles
-  const tint=e(0,.25)*(1-e(2,12)*.6);scene.background.lerpColors(F.bg0,NUKE_SKY,tint*.85);scene.fog.color.copy(scene.background);hemi.intensity=F.hemi0+tint*1.3;
+  const tint=e(0,.25)*(1-e(2,12)*.6);scene.background.lerpColors(F.bg0,NUKE_SKY,tint*.85);scene.fog.color.copy(scene.background);hemi.intensity=F.hemi0+tint*.55;
   sky.material.color.lerpColors(NK_WHITE,NUKE_SKY,tint*.9);
   xLight.position.set(0,24,0);xLight.intensity=Math.max(xLight.intensity,(1-e(0,3))*9);
   // whatever the wave passes dies
@@ -2177,8 +2199,8 @@ function updateVehicles(dt){
 const stick={id:null,ox:0,oy:0,x:0,y:0}, look={id:null,lx:0,ly:0};
 // wide shot of the arena for everyone: the whole break between rounds, and the nuke from detonation on
 function overviewCam(dt){
-  const nk=!!nukeFx;ovT+=dt*(nk?.035:.07);const r=nk?110:64,h=nk?28:40;
-  camera.position.set(Math.sin(ovT)*r,h,Math.cos(ovT)*r);camera.lookAt(0,nk?26:0,0);
+  const nk=!!nukeFx;ovT+=dt*(nk?.035:.07);const r=nk?92:64,h=nk?58:40;
+  camera.position.set(Math.sin(ovT)*r,h,Math.cos(ovT)*r);camera.lookAt(0,nk?30:0,0);
   if(camera.fov!==60){camera.fov=60;camera.updateProjectionMatrix()}
   P.shake=Math.max(0,P.shake-dt*.6);const sh=reduceMotion?0:P.shake*P.shake;
   if(sh){camera.rotation.x+=(Math.random()-.5)*sh*.025;camera.rotation.z+=(Math.random()-.5)*sh*.03}
