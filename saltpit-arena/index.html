@@ -40,8 +40,13 @@ h1 span{color:var(--hazard)}
 .sub{margin:0;font-size:15px;line-height:1.45;color:#2f3a46;max-width:40ch}
 .field{display:grid;gap:6px}
 .lbl{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--slate)}
-#nick{font:600 17px var(--f-body);padding:10px 12px;border:2px solid var(--ink);border-radius:2px;background:#fff;color:var(--ink);width:100%;box-sizing:border-box}
-#nick:focus-visible{outline:3px solid var(--hazard);outline-offset:1px}
+#nick,#room{font:600 17px var(--f-body);padding:10px 12px;border:2px solid var(--ink);border-radius:2px;background:#fff;color:var(--ink);width:100%;box-sizing:border-box}
+#nick:focus-visible,#room:focus-visible{outline:3px solid var(--hazard);outline-offset:1px}
+#room{font-family:var(--f-mono);text-transform:uppercase;letter-spacing:.08em}
+#room::placeholder{text-transform:none;letter-spacing:0;font-family:var(--f-body);color:#8a939c}
+.fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,9.5em);gap:10px}
+#roomhint{margin:-6px 0 0}
+#roomhint.bad{color:var(--blood)}
 #swatches{display:flex;flex-wrap:wrap;gap:7px}
 #swatches button{width:30px;height:30px;border-radius:50%;border:2px solid transparent;padding:0;cursor:pointer;box-shadow:inset 0 0 0 2px rgba(255,255,255,.35)}
 #swatches button[aria-pressed="true"]{border-color:var(--ink);transform:scale(1.08)}
@@ -216,7 +221,11 @@ kbd{font:700 11px var(--f-mono);background:#fff;border:1px solid rgba(23,32,42,.
       <div class="eyebrow"><span>Quarry 7 · Pit B</span><span>FFA · 10 max</span></div>
       <h1>Salt<span>pit</span></h1>
       <p class="sub">A low-poly free-for-all in an abandoned salt quarry. Everyone fights everyone. First to 15 eliminations takes the round.</p>
-      <div class="field"><label class="lbl" for="nick">Callsign</label><input id="nick" maxlength="14" autocomplete="off" spellcheck="false"></div>
+      <div class="fields">
+        <div class="field"><label class="lbl" for="nick">Callsign</label><input id="nick" maxlength="14" autocomplete="off" spellcheck="false"></div>
+        <div class="field"><label class="lbl" for="room">Room code</label><input id="room" maxlength="8" placeholder="Optional" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="roomhint"></div>
+      </div>
+      <p class="note" id="roomhint">Leave empty for a public arena, or type a code and share it so friends land in your private room.</p>
       <div class="field"><span class="lbl" id="colLbl">Suit colour</span><div id="swatches" role="group" aria-labelledby="colLbl"></div></div>
       <button class="primary" id="play" type="button"><span id="playTxt">Drop in</span><i>▶</i></button>
       <div class="status"><span class="dot" id="mdot"></span><span id="mstatus">Finding an arena…</span></div>
@@ -701,8 +710,11 @@ function tick(freq,vol,dur=.06,delay=0){
 
 /* ================= state ================= */
 let myName='Miner-'+(100+Math.floor(Math.random()*900)), myColor=Math.floor(Math.random()*6);
-try{const s=JSON.parse(localStorage.getItem('saltpit')||'null');if(s){if(typeof s.n==='string'&&s.n.trim())myName=s.n.slice(0,14);if(Number.isInteger(s.c))myColor=clamp(s.c,0,9)}}catch(e){}
-function savePrefs(){try{localStorage.setItem('saltpit',JSON.stringify({n:myName,c:myColor}))}catch(e){}}
+// private room code: 3–8 lowercase letters/numbers, '' = public numbered arena
+const normCode=v=>String(v||'').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,8);
+let roomCode='';
+try{const s=JSON.parse(localStorage.getItem('saltpit')||'null');if(s){if(typeof s.n==='string'&&s.n.trim())myName=s.n.slice(0,14);if(Number.isInteger(s.c))myColor=clamp(s.c,0,9);const rc=normCode(s.r);if(rc.length>=3)roomCode=rc}}catch(e){}
+function savePrefs(){try{localStorage.setItem('saltpit',JSON.stringify({n:myName,c:myColor,r:roomCode}))}catch(e){}}
 
 const P={pos:new V3(0,0,30),vel:new V3(),vy:0,yaw:0,pitch:0,onGround:true,hp:100,dead:false,respawnAt:0,protect:0,kills:0,deaths:0,ds:0,kb:null,
   w:0,ammoBy:WEAPONS.map(W=>W.mag),swapT:-1e9,lastFireT:-1e9,scoped:false,scopeK:0,recoil:0,shake:0,land:0,streak:0,lastHitW:null,lastHitHead:false,kw:null,kh:false,
@@ -775,7 +787,9 @@ function updateBot(b,dt){
 }
 
 /* ================= networking (room capability) ================= */
-let lobby=null, net=null, myPeer=null, arenaNo=0, netMode='connecting', netUp=false;
+let lobby=null, net=null, myPeer=null, arenaNo=0, joinedCode='', joinGen=0, netMode='connecting', netUp=false;
+// how the current room is named in the UI
+const roomLabel=()=>joinedCode?'Room '+joinedCode.toUpperCase():'Arena '+arenaNo;
 const remotes=new Map();
 const TERMINAL=['revoked','not_granted','capability_disabled','capability_removed','transform_error'];
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -792,20 +806,36 @@ async function connect(){
   await sleep(1300);
   await joinArena();
 }
+function clearRemotes(){for(const [,s] of remotes)disposeAvatar(s.av);remotes.clear()}
+// joins the room for the current roomCode: a private 'saltpit-c-<code>' room, or the first public arena with space.
+// Calling it again (code changed) leaves the old room first; joinGen drops any join that finished too late.
 async function joinArena(){
   if(!lobby||netMode==='offline')return;
-  const counts={};
-  for(const p of lobby.peers()){if(p.sameTab)continue;const a=p.presence&&p.presence.a;if(Number.isInteger(a))counts[a]=(counts[a]||0)+1}
-  let pick=1;while((counts[pick]||0)>=MAXP&&pick<40)pick++;
+  const g=++joinGen, code=roomCode, switching=!!net;
+  if(net&&net!==lobby){const old=net;old.leave().catch(()=>{})}
+  net=null;netUp=false;myPeer=null;clearRemotes();netMode='connecting';updateNetUI();
+  if(switching){round=1;if(playing)newRound(1)}
+  let pick=0;
+  if(!code){
+    const counts={};
+    for(const p of lobby.peers()){if(p.sameTab)continue;const a=p.presence&&p.presence.a;if(Number.isInteger(a))counts[a]=(counts[a]||0)+1}
+    pick=1;while((counts[pick]||0)>=MAXP&&pick<40)pick++;
+  }
   try{
-    const r=await lobby.join('saltpit-'+pick);net=r;arenaNo=pick;
-    r.onConnection(c=>{if(net===r){netUp=c;updateNetUI()}},onRoomErr);
+    const r=await lobby.join(code?'saltpit-c-'+code:'saltpit-'+pick);
+    if(g!==joinGen){if(r!==lobby)r.leave().catch(()=>{});return}
+    net=r;arenaNo=pick;joinedCode=code;
+    r.onConnection(c=>{if(net===r){netUp=c;updateNetUI()}},e=>{if(net===r)onRoomErr(e)});
     netUp=r.connected();
   }catch(e){
+    if(g!==joinGen)return;
     if(e&&TERMINAL.includes(e.code)){goOffline();return}
-    net=lobby;arenaNo=0;netUp=lobby.connected();
+    // private rooms never fall back to the shared lobby; just try again shortly
+    if(code){setTimeout(()=>{if(g===joinGen)joinArena()},2000);return}
+    net=lobby;arenaNo=0;joinedCode='';netUp=lobby.connected();
   }
-  lobby.presence({a:pick}).catch(()=>{});
+  // only public arenas are advertised, so private rooms don't count toward arena numbers
+  lobby.presence({a:code?null:pick}).catch(()=>{});
   netMode='live';updateNetUI();
 }
 let lastSend=0;
@@ -1122,7 +1152,7 @@ function renderBoard(){
     const k=document.createElement('td');k.className='n';k.textContent=e.k;const d=document.createElement('td');d.className='n';d.textContent=e.d;
     tr.append(td,k,d);body.append(tr);
   }
-  $('#boardSub').textContent=(practice?'Practice':'Arena '+arenaNo)+' · Round '+round;
+  $('#boardSub').textContent=(practice?(joinedCode?roomLabel()+' · Practice':'Practice'):roomLabel())+' · Round '+round;
 }
 function updateHUD(){
   if(!playing)return;
@@ -1150,18 +1180,38 @@ function updateNetUI(){
   const dot=$('#mdot'),hd=$('#netdot');
   let msg,cls='',pill;
   const others=remotes.size;
-  if(netMode==='connecting'){msg='Finding an arena…';pill='Connecting'}
+  const lbl=roomLabel(), CODE=joinedCode.toUpperCase();
+  if(netMode==='connecting'){msg=roomCode?'Joining room '+roomCode.toUpperCase()+'…':'Finding an arena…';pill='Connecting'}
   else if(netMode==='offline'){msg='Couldn’t connect to other players, so you’ll practise against bots. Check your connection and reload to try again.';cls='off';pill='Offline · bots'}
-  else if(!netUp){msg='Reconnecting to arena '+arenaNo+'…';pill='Reconnecting'}
+  else if(!netUp){msg='Reconnecting to '+(joinedCode?'room '+CODE:'arena '+arenaNo)+'…';pill='Reconnecting'}
   else{cls='live';
-    msg=others===0?'Arena '+arenaNo+' is empty. Bots keep you busy until someone drops in — share this page to invite people.':'Arena '+arenaNo+' · '+others+' player'+(others>1?'s':'')+' fighting now.';
-    pill=(others===0?'Practice · bots':'Arena '+arenaNo+' · '+(others+1)+'/'+MAXP)}
+    msg=others===0?(joinedCode
+        ?'Room '+CODE+' is empty. Bots keep you busy until friends arrive — send them this page and the code '+CODE+'.'
+        :'Arena '+arenaNo+' is empty. Bots keep you busy until someone drops in — share this page to invite people, or pick a room code and share that too to play privately.')
+      :lbl+' · '+others+' player'+(others>1?'s':'')+' fighting now.';
+    pill=(others===0?(joinedCode?lbl+' · bots':'Practice · bots'):lbl+' · '+(others+1)+'/'+MAXP)}
   dot.className='dot '+cls;hd.className='dot '+cls;setText('mstatus',msg);setText('nettxt',pill);
 }
 
 /* ================= menu ================= */
 const nick=$('#nick');nick.value=myName;
 nick.addEventListener('input',()=>{myName=nick.value.replace(/[\u0000-\u001f]/g,'').slice(0,14)||'Miner';savePrefs()});
+// room code: typing settles for a moment, then we move to that room (or back to a public arena when cleared)
+const roomIn=$('#room');roomIn.value=roomCode;
+let roomTimer=0;
+function applyRoom(){
+  clearTimeout(roomTimer);
+  const code=normCode(roomIn.value), hint=$('#roomhint');
+  if(code&&code.length<3){hint.textContent='Room codes are 3–8 letters or numbers.';hint.classList.add('bad');return}
+  hint.classList.remove('bad');
+  hint.textContent=code?'Private room '+code.toUpperCase()+' — friends who type the same code join you.':'Leave empty for a public arena, or type a code and share it so friends land in your private room.';
+  if(code===roomCode)return;
+  roomCode=code;savePrefs();
+  if(lobby&&netMode!=='offline')joinArena();
+}
+roomIn.addEventListener('input',()=>{const v=normCode(roomIn.value);if(roomIn.value!==v)roomIn.value=v;clearTimeout(roomTimer);roomTimer=setTimeout(applyRoom,600)});
+roomIn.addEventListener('change',applyRoom);
+if(roomCode)applyRoom();
 const sw=$('#swatches');
 COLORS.forEach((c,i)=>{const b=document.createElement('button');b.type='button';b.style.background=c;b.setAttribute('aria-label','Colour '+(i+1));b.setAttribute('aria-pressed',String(i===myColor));
   b.addEventListener('click',()=>{myColor=i;savePrefs();[...sw.children].forEach((x,j)=>x.setAttribute('aria-pressed',String(j===i)))});sw.appendChild(b)});
@@ -1174,7 +1224,7 @@ function requestLock(){
 }
 function hintNoLock(){if(playing)toast('Mouse lock unavailable here — drag to aim, hold the button to fire')}
 function startPlay(){
-  initAudio();myName=(nick.value.replace(/[\u0000-\u001f]/g,'').trim()||'Miner').slice(0,14);savePrefs();
+  initAudio();myName=(nick.value.replace(/[\u0000-\u001f]/g,'').trim()||'Miner').slice(0,14);savePrefs();applyRoom();
   $('#menu').hidden=true;$('#hud').hidden=false;$('#touch').hidden=!isTouch;
   if(!playing){playing=true;respawn();if(practice)resetBots()}
   paused=false;vm.visible=!P.dead;canvas.focus();requestLock();
@@ -1233,7 +1283,7 @@ addEventListener('mousemove',e=>{
 });
 canvas.addEventListener('wheel',e=>{if(!playing||paused||wmOpen)return;e.preventDefault();switchWeapon((P.w+(e.deltaY>0?1:-1)+WEAPONS.length)%WEAPONS.length)},{passive:false});
 addEventListener('keydown',e=>{
-  if(e.target===nick){if(e.key==='Enter')startPlay();return}
+  if(e.target===nick||e.target===roomIn){if(e.key==='Enter')startPlay();return}
   if(!playing)return;
   if(e.code==='Tab'||e.code==='Space'||e.code.startsWith('Arrow'))e.preventDefault();
   if(wmOpen&&(e.code==='Escape'||e.code==='KeyB')){e.preventDefault();closeWM(true);return}
