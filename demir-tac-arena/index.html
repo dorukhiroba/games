@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demir Taç Arena</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Manrope:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="style.css">
+<script src="../quit.js" data-lang="tr"></script>
+</head>
+<body>
+<div id="app">
+
+  <!-- ===== BAŞLIK ===== -->
+  <section id="scr-title" class="screen active">
+    <canvas id="title-bg"></canvas>
+    <div class="title-wrap">
+      <div class="eyebrow">Gladyatör Arenası</div>
+      <h1 class="logo">DEMİR TAÇ</h1>
+      <p class="tagline">Kumdan çık. Kalabalığı kazan. Tacı al.</p>
+      <div class="menu">
+        <button id="btn-new" class="btn btn-gold">Yeni Gladyatör</button>
+        <button id="btn-continue" class="btn btn-ghost" hidden>Devam Et</button>
+        <button id="btn-title-online" class="btn btn-ghost" hidden>⚔ Online Düello</button>
+      </div>
+      <p class="hint">Sesli oyun · Dövüşte klavye kısayolları 1-8</p>
+    </div>
+  </section>
+
+  <!-- ===== KARAKTER OLUŞTUR ===== -->
+  <section id="scr-create" class="screen">
+    <div class="panel create-panel">
+      <header class="panel-head">
+        <h2>Gladyatörünü Yarat</h2>
+        <span class="pill" id="create-points">Puan: 10</span>
+      </header>
+      <div class="create-grid">
+        <div class="preview-col">
+          <canvas id="create-preview" width="260" height="300"></canvas>
+          <label class="field">
+            <span>İsim</span>
+            <input id="inp-name" maxlength="16" value="Aras" autocomplete="off">
+          </label>
+          <div class="swatches">
+            <div><span class="lbl">Ten</span><div id="sw-skin" class="sw-row"></div></div>
+            <div><span class="lbl">Saç</span><div id="sw-hair" class="sw-row"></div></div>
+            <div><span class="lbl">Pelerin</span><div id="sw-cape" class="sw-row"></div></div>
+          </div>
+        </div>
+        <div class="stats-col">
+          <div id="create-stats" class="stat-list"></div>
+          <div class="derived" id="create-derived"></div>
+          <button id="btn-create-done" class="btn btn-gold wide">Arenaya Gir</button>
+          <button id="btn-create-back" class="btn btn-ghost wide">Geri</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MERKEZ (ŞEHİR) ===== -->
+  <section id="scr-hub" class="screen">
+    <div class="town-stage">
+      <canvas id="town"></canvas>
+      <header class="topbar town-top">
+        <div class="who" id="hub-who" role="button" tabindex="0" title="Gladyatör sayfası">
+          <canvas id="hub-portrait" width="64" height="64"></canvas>
+          <div>
+            <div class="who-name" id="hub-name">—</div>
+            <div class="who-sub" id="hub-sub">—</div>
+          </div>
+        </div>
+        <div class="bars">
+          <div class="xpbar"><div id="hub-xp"></div></div>
+          <div class="who-sub" id="hub-xptext"></div>
+        </div>
+        <div class="timechip" id="hub-time" title="Gün döngüsü: her dövüş zamanı ilerletir"></div>
+        <button class="btn btn-ghost rm-btn" id="btn-roadmap" title="Yol Haritası">⚑ <span>Yol Haritası</span></button>
+        <div class="gold"><span class="coin"></span><b id="hub-gold">0</b></div>
+        <button class="icon-btn mute-btn" title="Sesi aç/kapat" aria-label="Sesi aç/kapat">♪</button>
+      </header>
+      <button id="btn-back-town" class="btn btn-ghost back-btn" hidden>← Meydana Dön</button>
+      <div class="town-hint" id="town-hint">Bir binaya tıklayarak içeri gir</div>
+      <button class="pan-btn left" id="pan-l" aria-label="Sola kaydır">‹</button>
+      <button class="pan-btn right" id="pan-r" aria-label="Sağa kaydır">›</button>
+
+      <aside id="pp-arena" class="pp pp-right" hidden>
+        <h3>Turnuvalar</h3>
+        <p class="pp-sub">Üç tur arka arkaya. Canın turlar arasında taşınır, finalde ünlü bir rakip bekler.</p>
+        <div id="tourneys" class="tour-list"></div>
+        <h3 style="margin-top:8px">Şampiyonluk Merdiveni</h3>
+        <p class="pp-sub">On basamağı çık, Demir Taç senin olsun.</p>
+        <div id="ladder" class="ladder-list"></div>
+        <button id="btn-exhibition" class="btn btn-ghost wide">Gösteri Maçı <small>(altın + XP)</small></button>
+        <button id="btn-online" class="btn btn-gold wide">⚔ Online Düello <small style="color:#2a1a08">(2 kişi)</small></button>
+      </aside>
+
+      <aside id="pp-barracks" class="pp pp-right sheet" hidden>
+        <button class="pp-close" id="sheet-close" aria-label="Kapat">×</button>
+        <div class="sheet-head">
+          <canvas id="sheet-fig" width="220" height="270"></canvas>
+          <div class="sheet-id">
+            <div class="eyebrow" id="sheet-rank"></div>
+            <h3 id="sheet-name"></h3>
+            <div class="who-sub" id="sheet-lvl"></div>
+            <canvas id="sheet-radar" width="260" height="230"></canvas>
+          </div>
+        </div>
+        <div class="sec-row"><span class="sec">Nitelikler</span><span class="pill" id="char-points"></span></div>
+        <div id="char-stats" class="stat-list"></div>
+        <div class="sec">Savaş Değerleri</div>
+        <div class="gauges" id="sheet-gauges"></div>
+        <div class="sec">Ekipman</div>
+        <div id="char-equip" class="equip-grid"></div>
+        <div class="sec">Çanta</div>
+        <div id="char-bag" class="bag-row"></div>
+        <div class="record" id="char-record"></div>
+        <button id="btn-reset" class="btn btn-danger-ghost wide">Kaydı Sil</button>
+      </aside>
+
+      <aside id="pp-tavern" class="pp pp-right pp-tavern" hidden>
+        <h3>Kızıl Kupa Hanı</h3>
+        <p class="pp-sub" id="tav-time"></p>
+        <nav class="seg" id="tav-tabs">
+          <button data-tt="jobs">Görev Panosu</button><button data-tt="food">Yemek</button><button data-tt="rumor">Söylentiler</button>
+        </nav>
+        <div id="tav-body" class="tav-body"></div>
+        <button id="tav-wait" class="btn btn-ghost wide">Bir içki iç, zaman geçsin</button>
+      </aside>
+
+      <aside id="pp-shop" class="pp pp-shop" hidden>
+        <button class="pp-close" id="pp-shop-close" aria-label="Kapat">×</button>
+        <div class="shop-top"><canvas id="shop-icon" width="140" height="140"></canvas>
+          <div><div class="tier" id="shop-tier"></div><h3 id="shop-name"></h3></div></div>
+        <div id="shop-compare" class="compare"></div>
+        <div id="shop-req" class="req"></div>
+        <button id="shop-btn" class="btn btn-gold wide"></button>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ===== DÖVÜŞ ===== -->
+  <section id="scr-fight" class="screen">
+    <div class="hud">
+      <div class="hud-side" id="hud-p">
+        <div class="hud-name"></div>
+        <div class="bar hp"><div></div><span></span></div>
+        <div class="bar st"><div></div><span></span></div>
+      </div>
+      <div class="hud-mid">
+        <div class="round" id="hud-turn">Tur 1</div>
+        <button class="icon-btn mute-btn small" title="Sesi aç/kapat" aria-label="Sesi aç/kapat">♪</button>
+        <div class="hype"><div id="hud-hype"></div></div>
+        <div class="hype-lbl">Kalabalık Coşkusu</div>
+      </div>
+      <div class="hud-side right" id="hud-e">
+        <div class="hud-name"></div>
+        <div class="bar hp"><div></div><span></span></div>
+        <div class="bar st"><div></div><span></span></div>
+      </div>
+    </div>
+    <div class="stage">
+      <canvas id="arena3d"></canvas>
+      <canvas id="arena"></canvas>
+      <div id="bag-pop" class="bag-pop" hidden></div>
+      <div id="ring" class="ring"></div>
+      <div id="log" class="log"></div>
+      <div id="banner" class="banner" hidden></div>
+    </div>
+    <div class="actions" id="actions"></div>
+    <div class="action-info" id="action-info">Bir hamle seç.</div>
+  </section>
+
+  <!-- ===== SONUÇ MODAL ===== -->
+  <div id="modal" class="modal" hidden>
+    <div class="modal-card">
+      <div class="eyebrow" id="m-eyebrow"></div>
+      <h2 id="m-title"></h2>
+      <div id="m-body"></div>
+      <div class="modal-btns" id="m-btns"></div>
+    </div>
+  </div>
+
+  <div id="online" class="rm" hidden>
+    <div class="rm-card ol-card">
+      <header class="rm-head">
+        <div><div class="eyebrow">İki kişilik</div><h2>Online Düello</h2>
+          <div class="who-sub">Kendi gladyatörünle bir arkadaşına karşı dövüş. Hamleler sırayla yapılır, oda sahibi başlar.</div></div>
+        <button class="pp-close" id="ol-close" aria-label="Kapat">×</button>
+      </header>
+      <div id="ol-start" class="ol-grid">
+        <div class="ol-box">
+          <h3>Oda Kur</h3>
+          <p>Bir oda kodu al ve arkadaşına gönder. O katılınca dövüşü sen başlatırsın.</p>
+          <button id="ol-host" class="btn btn-gold wide">Oda Kur</button>
+        </div>
+        <div class="ol-box">
+          <h3>Odaya Katıl</h3>
+          <p>Arkadaşının gönderdiği 6 haneli kodu yaz.</p>
+          <input id="ol-code" maxlength="6" placeholder="ÖRN: K7Q2XM" autocomplete="off" spellcheck="false">
+          <button id="ol-join" class="btn btn-gold wide">Katıl</button>
+        </div>
+      </div>
+      <div id="ol-room" hidden>
+        <div class="ol-code-row" id="ol-code-row"><span>Oda kodu</span><b id="ol-code-show"></b><button id="ol-copy" class="btn btn-ghost">Kopyala</button></div>
+        <div class="ol-vs"><div class="ol-f" id="ol-me"></div><div class="ol-x">VS</div><div class="ol-f" id="ol-op"></div></div>
+        <button id="ol-go" class="btn btn-gold wide" hidden>Dövüşü Başlat</button>
+      </div>
+      <div id="ol-status" class="ol-status"></div>
+      <p class="who-sub ol-note">İki oyuncu da internete bağlı olmalı. Bağlantı tarayıcılar arasında doğrudan kurulur. Bazı kurumsal ve okul ağları bu tür bağlantıları engelleyebilir.</p>
+    </div>
+  </div>
+
+  <div id="roadmap" class="rm" hidden>
+    <div class="rm-card">
+      <header class="rm-head">
+        <div><div class="eyebrow">Gladyatörün yolu</div><h2>Yol Haritası</h2><div class="who-sub" id="rm-progress"></div></div>
+        <nav class="seg" id="rm-tabs"><button data-rt="map">Yol</button><button data-rt="ach">Başarımlar</button><button data-rt="soon">Yakında</button></nav>
+        <button class="pp-close" id="rm-close" aria-label="Kapat">×</button>
+      </header>
+      <div id="rm-map" class="rm-pane rm-mapwrap"><canvas id="rm-canvas" width="1100" height="560"></canvas><div class="rm-goal" id="rm-goal"></div></div>
+      <div id="rm-ach" class="rm-pane ach-grid" hidden></div>
+      <div id="rm-soon" class="rm-pane" hidden></div>
+    </div>
+  </div>
+
+  <div id="reveal" class="reveal" hidden>
+    <div class="reveal-rays"></div>
+    <div class="reveal-card">
+      <div class="eyebrow" id="rv-eyebrow">Yeni eşya</div>
+      <canvas id="rv-icon" width="300" height="300"></canvas>
+      <div class="rv-tier" id="rv-tier"></div>
+      <h2 id="rv-name"></h2>
+      <div id="rv-stats" class="rv-stats"></div>
+      <button class="btn btn-gold" id="rv-ok">Harika!</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+</div>
+
+<script src="lib/three.min.js"></script>
+<script src="lib/peerjs.min.js"></script>
+<script src="audio.js"></script>
+<script src="data.js"></script>
+<script src="render.js"></script>
+<script src="arena3d.js"></script>
+<script src="town.js"></script>
+<script src="world.js"></script>
+<script src="interiors2.js"></script>
+<script src="progress.js"></script>
+<script src="online.js"></script>
+<script src="fight.js"></script>
+<script src="game.js"></script>
+<script>
+  // "Quit to games" (back to the arcade launcher): on the title menu, and in the town top bar.
+  // Progress is saved after every action, so leaving from either place loses nothing.
+  if (window.KQuit) {
+    document.querySelector('#scr-title .menu').append(KQuit.button('btn btn-ghost'));
+    const q = KQuit.button('icon-btn', '⏏');
+    q.title = KQuit.LABEL;
+    q.setAttribute('aria-label', KQuit.LABEL);
+    document.querySelector('.town-top .mute-btn').after(q);
+  }
+</script>
+</body>
+</html>
