@@ -446,8 +446,8 @@ const WEAPONS=[
     kick:.045,vmKick:.18,shake:.25,speed:1.05,tr:{w:.026,life:.08},desc:'Six heavy rounds. Rewards a steady hand.',st:[.7,.45,.75,.75]},
   {id:'launcher',name:'Salt Launcher',short:'Launcher',auto:false,rate:950,mag:3,reload:2600,dmg:105,head:105,pellets:1,splash:4.2,projSpeed:32,spread:.004,moveSpread:.01,airSpread:.02,bloomAdd:0,bloomMax:0,range:200,
     kick:.05,vmKick:.25,shake:.4,speed:.88,tr:{w:.03,life:.1},desc:'Lobbed blast charges. Fire at your feet to rocket-jump.',st:[.9,.15,.55,.45]},
-  {id:'knife',name:'Butterfly Knife',short:'Knife',melee:true,auto:true,rate:520,mag:1,reload:0,dmg:100,head:100,pellets:1,spread:0,moveSpread:0,airSpread:0,bloomAdd:0,bloomMax:0,range:2.7,
-    kick:0,vmKick:-.32,shake:.1,speed:1.15,tr:{w:.02,life:.05},desc:'One stab drops anyone. You just have to get close.',st:[1,.5,.04,1]},
+  {id:'knife',name:'Bayonet',short:'Bayonet',melee:true,auto:true,rate:520,mag:1,reload:0,dmg:100,head:100,pellets:1,spread:0,moveSpread:0,airSpread:0,bloomAdd:0,bloomMax:0,range:2.7,
+    kick:0,vmKick:-.32,shake:.1,speed:1.15,tr:{w:.02,life:.05},desc:'One stab drops anyone. Saw-backed blade; get close.',st:[1,.5,.04,1]},
 ];
 const LAUNCHER=5, KNIFE=6;
 function falloff(W,dist){if(!W.fall)return 1;const [a,b,m]=W.fall;return dist<=a?1:dist>=b?m:1-(1-m)*(dist-a)/(b-a)}
@@ -812,7 +812,7 @@ function nameSprite(text,color){
   sp.scale.set(2,.45,1);return sp;
 }
 // third-person gun sizes per weapon: [width, height, length]
-const GUN3P=[[.09,.12,.66],[.08,.12,.46],[.11,.13,.8],[.07,.1,1.02],[.07,.12,.38],[.17,.17,.8],[.035,.06,.32]];
+const GUN3P=[[.09,.12,.66],[.08,.12,.46],[.11,.13,.8],[.07,.1,1.02],[.07,.12,.38],[.17,.17,.8],[.035,.07,.4]];
 const XRAY_GEO=new T.BoxGeometry(.7,1.75,.45).translate(0,.875,0);
 function ownMat(hex){return new T.MeshStandardMaterial({color:hex,flatShading:true,roughness:.93,metalness:0,emissive:'#000'})}
 function makeAvatar(ci,name){
@@ -960,10 +960,10 @@ const VMS=(function(){
     const add=(geo,m,x,y,z,name)=>{const o=new T.Mesh(geo,m);o.position.set(x,y,z);g.add(o);if(name)bits[name]=o;return o};
     build(add);
     // the dark body parts are the ones a camo repaints
-    const body=[];g.traverse(o=>{if(o.isMesh&&o.material===dark)body.push(o)});
+    const body=[],blade=[];g.traverse(o=>{if(!o.isMesh)return;if(o.material===dark)body.push(o);if(o.userData.blade)blade.push(o)});
     const flash=new T.Mesh(new T.IcosahedronGeometry(.08*flashS,0),flashMat);flash.position.set(0,.02,flashZ);flash.visible=false;g.add(flash);
     const eject=new T.Object3D();eject.position.set(.06,.04,-.02);g.add(eject);
-    g.visible=false;vm.add(g);return {g,flash,eject,bits,body,base:new V3(...base)};
+    g.visible=false;vm.add(g);return {g,flash,eject,bits,body,blade,base:new V3(...base)};
   }
   return [
     model([.23,-.21,-.46],-.56,1,add=>{
@@ -991,12 +991,24 @@ const VMS=(function(){
     model([.25,-.25,-.5],-.5,1.8,add=>{
       add(cylZ(.085,.8),dark,0,0,-.1);add(cylZ(.092,.08),orange,0,0,-.42);add(cylZ(.092,.06),mid,0,0,.24);
       add(new T.BoxGeometry(.06,.15,.08),dark,0,-.14,.02);add(new T.BoxGeometry(.03,.07,.05),orange,0,.11,-.1)}),
-    // butterfly knife: blade plus two handle halves that flip around it when you draw it
-    model([.2,-.19,-.32],-.3,.01,add=>{
-      const steel=mat('#c9d2db');
-      add(new T.BoxGeometry(.016,.05,.2),steel,0,.004,-.19);add(new T.BoxGeometry(.01,.03,.06),steel,0,.014,-.31);
-      add(new T.BoxGeometry(.018,.034,.15),dark,.019,-.004,-.02,'h1');add(new T.BoxGeometry(.018,.034,.15),dark,-.019,-.004,-.02,'h2');
-      add(new T.BoxGeometry(.05,.012,.022),orange,0,-.004,.055)}),
+    // bayonet: ridged grip and pommel, cross-guard with a muzzle ring, and a coated blade with a bright
+    // bevelled edge, saw teeth along the spine, a clipped point and a hex cut-out
+    model([.2,-.2,-.3],-.3,.01,add=>{
+      const coat=mat('#33383f'),edge=mat('#dfe4e8'),hole=mat('#14181c');
+      // blade profiles drawn side-on (x = distance from the guard, y = height), then turned to point forward
+      const prof=pts=>{const sh=new T.Shape();sh.moveTo(pts[0][0],pts[0][1]);for(const [x,y] of pts.slice(1))sh.lineTo(x,y);return sh};
+      const slab=(pts,th)=>{const g=new T.ExtrudeGeometry(prof(pts),{depth:th,bevelEnabled:false});g.rotateY(Math.PI/2);g.translate(-th/2,0,0);return g};
+      const bl=(geo,m,x,y,z)=>{const o=add(geo,m,x,y,z);o.userData.blade=true;o.userData.orig=m;return o};
+      bl(slab([[0,.022],[.17,.022],[.2,.016],[.25,-.004],[.215,-.018],[.16,-.022],[0,-.022]],.007),coat,0,0,-.056);
+      bl(slab([[0,-.011],[.16,-.011],[.215,-.007],[.25,-.004],[.215,-.018],[.16,-.022],[0,-.022]],.0078),edge,0,0,-.056);
+      for(let i=0;i<8;i++){const t=bl(new T.BoxGeometry(.0072,.011,.008),coat,0,.025,-.1-i*.0135);t.rotation.x=.55}
+      add(new T.CylinderGeometry(.0075,.0075,.0085,6).rotateZ(Math.PI/2),hole,0,.002,-.246);
+      add(new T.BoxGeometry(.022,.1,.01),dark,0,.012,-.05);
+      add(new T.TorusGeometry(.012,.0045,6,12),dark,0,.06,-.05);
+      add(new T.BoxGeometry(.024,.032,.13),dark,0,0,.02);
+      for(let i=0;i<5;i++)add(new T.BoxGeometry(.031,.041,.02),dark,0,0,-.03+i*.026);
+      add(new T.BoxGeometry(.034,.045,.026),dark,0,-.002,.103);
+      add(new T.BoxGeometry(.036,.008,.03),orange,0,-.026,.103)}),
   ];
 })();
 
@@ -1039,7 +1051,7 @@ function goldEnv(){
     const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');
     if(i===2){g.fillStyle='#fffaf0';g.fillRect(0,0,64,64)}
     else if(i===3){g.fillStyle='#160f05';g.fillRect(0,0,64,64)}
-    else{const gr=g.createLinearGradient(0,0,0,64);gr.addColorStop(0,'#fff6dc');gr.addColorStop(.42,'#d9a957');gr.addColorStop(.55,'#4a3414');gr.addColorStop(1,'#100a03');g.fillStyle=gr;g.fillRect(0,0,64,64);
+    else{const gr=g.createLinearGradient(0,0,0,64);gr.addColorStop(0,'#fff6dc');gr.addColorStop(.45,'#f0c46e');gr.addColorStop(.72,'#8a6424');gr.addColorStop(1,'#241806');g.fillStyle=gr;g.fillRect(0,0,64,64);
       g.fillStyle='rgba(255,255,255,.95)';g.fillRect(8+i*9,4,7,30);g.fillRect(46-i*4,8,4,20)}
     faces.push(c);
   }
@@ -1060,7 +1072,11 @@ function camoMat(i){
       emissive:'#ffd889',emissiveMap:GOLD_GLINT,emissiveIntensity:.95,flatShading:true})}
   return CAMO_MATS[i]=new T.MeshStandardMaterial({map:tex,color:'#ffffff',roughness:.85,flatShading:true});
 }
-function applyCamo(w){const m=camoMat(camoData.sel[w]);for(const o of VMS[w].body)o.material=m}
+function applyCamo(w){
+  const sel=camoData.sel[w],m=camoMat(sel);for(const o of VMS[w].body)o.material=m;
+  // Gold goes over everything, blade included; other camos leave the blade steel
+  for(const o of VMS[w].blade)o.material=CAMOS[sel].gold?m:o.userData.orig;
+}
 WEAPONS.forEach((_,w)=>applyCamo(w));
 // a headshot kill (or any knife kill) with weapon w; announces a camo when it unlocks
 function camoKill(w){
@@ -2270,10 +2286,8 @@ function updatePlayer(dt){
   if(V.bits.pump){const k=since>.2&&since<.5?Math.sin((since-.2)/.3*Math.PI):0;V.bits.pump.position.z=-.34+k*.1}
   if(V.bits.bolt){const k=since>.3&&since<.85?Math.sin((since-.3)/.55*Math.PI):0;V.bits.bolt.position.z=.13+k*.09;V.bits.bolt.rotation.z=k*1.2}
   if(V.bits.cyl){V.bits.cyl.rotation.z+=((P.shotSeq*(Math.PI/3))-V.bits.cyl.rotation.z)*Math.min(1,dt*18)}
-  if(V.bits.h1){
-    const a=swap>0?(1-swap)*Math.PI*4:0,r=.019;
-    V.bits.h1.position.set(Math.cos(a)*r,-.004+Math.sin(a)*r,-.02);V.bits.h2.position.set(-Math.cos(a)*r,-.004-Math.sin(a)*r,-.02);
-    V.bits.h1.rotation.z=V.bits.h2.rotation.z=a;
+  if(P.w===KNIFE){
+    vm.rotation.z+=swap*Math.PI*2-.55;vm.rotation.y+=.3; // held tilted to show the flat of the blade; a quick spin as you draw it
     const sl=since<.25?Math.sin(since/.25*Math.PI):0,dir=(P.slash||0)%2?1:-1;
     vm.rotation.y+=sl*.9*dir;vm.rotation.z+=sl*.5*dir;vm.position.x-=sl*.06*dir;
   }
@@ -2496,7 +2510,7 @@ const ICONS=[
   [[4,13,72,7],[76,14,40,3],[30,6,34,5],[44,5,6,7,1],[40,20,6,9],[2,13,16,10]],
   [[34,10,24,10],[58,11,30,5],[40,9,16,12,1],[30,19,9,13]],
   [[10,8,92,14],[60,7,8,16,1],[40,22,6,9],[24,4,6,4]],
-  [[18,15,46,4],[64,13,26,8],[40,19,24,5,1],[90,14,10,5]],
+  [[6,13,30,8],[4,12,4,10,1],[36,6,4,22],[40,13,56,8],[96,15,14,5]],
 ];
 const wmGrid=$('#wmgrid');
 WEAPONS.forEach((W,i)=>{
