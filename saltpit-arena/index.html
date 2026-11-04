@@ -190,9 +190,19 @@ kbd{font:700 11px var(--f-mono);background:#fff;border:1px solid rgba(23,32,42,.
 #acHud .acret i:nth-child(3),#acHud .acret i:nth-child(4){top:44px;height:2px;width:30px}
 #acHud .acret i:nth-child(3){left:-34px}#acHud .acret i:nth-child(4){right:-34px}
 #acHud .acinfo{position:absolute;left:50%;bottom:calc(9% + env(safe-area-inset-bottom,0px));transform:translateX(-50%);font:700 13px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
-#nukeHud{position:absolute;left:50%;top:14%;transform:translateX(-50%);display:grid;justify-items:center;gap:2px;background:rgba(226,72,61,.85);color:#fff;padding:8px 22px 10px;border-radius:3px;font:600 14px var(--f-body)}
-#nukeHud .lbl{color:#fff}
-#nukeHud b{font:900 54px/.9 var(--f-display)}
+#nukeHud{position:absolute;inset:0}
+#nukeHud .nk-vig{position:absolute;inset:0;box-shadow:inset 0 0 180px 50px rgba(226,40,30,.7);animation:nkpulse 1s ease-in-out infinite}
+@keyframes nkpulse{50%{box-shadow:inset 0 0 120px 20px rgba(226,40,30,.35)}}
+#nukeHud .nk-box{position:absolute;left:50%;top:11%;transform:translateX(-50%);width:min(540px,calc(100vw - 32px));background:rgba(23,32,42,.93);color:#fff;border-radius:3px;overflow:hidden;box-shadow:0 18px 40px -18px rgba(0,0,0,.8)}
+#nukeHud .tape{height:8px;background:repeating-linear-gradient(-45deg,#ffd23a 0 12px,#17202a 12px 24px)}
+#nukeHud .nk-in{display:flex;gap:16px;align-items:center;padding:10px 18px}
+#nukeHud .nk-sym{font-size:46px;line-height:1;color:#ffd23a;animation:nkspin 3s linear infinite}
+@keyframes nkspin{to{transform:rotate(360deg)}}
+#nukeHud .nk-t{display:block;font:900 clamp(22px,4.6vw,32px)/.95 var(--f-display);letter-spacing:.08em;text-transform:uppercase;color:#ff5a3c}
+#nukeBy{display:block;margin-top:3px;font:600 14px var(--f-body);color:rgba(241,235,224,.8)}
+#nukeT{margin-left:auto;font:900 clamp(48px,9vw,68px)/.85 var(--f-display);color:#ffd23a;font-variant-numeric:tabular-nums}
+#nukeHud.final .nk-box{animation:nkshake .12s linear infinite}
+@keyframes nkshake{50%{transform:translateX(calc(-50% + 3px))}}
 #flash{position:absolute;inset:0;background:#fff;opacity:0}
 .ksinfo{padding-top:10px;border-top:1px dashed rgba(23,32,42,.25)}
 .ksinfo ol{list-style:none;margin:6px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 14px;font-size:13px}
@@ -216,7 +226,7 @@ kbd{font:700 11px var(--f-mono);background:#fff;border:1px solid rgba(23,32,42,.
   .hud-tc{top:calc(52px + env(safe-area-inset-top,0px))}
   #toast{top:calc(108px + env(safe-area-inset-top,0px))}
 }
-@media (prefers-reduced-motion:reduce){ .feed,#toast{transition:none} }
+@media (prefers-reduced-motion:reduce){ .feed,#toast{transition:none} #nukeHud *,.ks.top{animation:none!important} }
 </style>
 
 <canvas id="game" tabindex="-1" aria-label="Saltpit Arena game view"></canvas>
@@ -231,7 +241,12 @@ kbd{font:700 11px var(--f-mono);background:#fff;border:1px solid rgba(23,32,42,.
   <div id="kspop"><h3 id="ksT">—</h3><p id="ksS"></p></div>
   <div id="acHud" hidden><div class="acframe"></div><div class="acret"><i></i><i></i><i></i><i></i></div>
     <div class="acinfo plate"><b>AC-130</b> · <span id="acTime">25s</span> · <span id="acHeavy">105mm ready</span></div></div>
-  <div id="nukeHud" hidden><span class="lbl">Tactical nuke</span><b id="nukeT">10</b><span id="nukeBy">—</span></div>
+  <div id="nukeHud" hidden>
+    <div class="nk-vig"></div>
+    <div class="nk-box"><div class="tape"></div>
+      <div class="nk-in"><span class="nk-sym" aria-hidden="true">☢</span><div><span class="nk-t">Tactical nuke incoming</span><span id="nukeBy">—</span></div><b id="nukeT">10</b></div>
+    <div class="tape"></div></div>
+  </div>
   <div id="flash"></div>
   <div class="hud-tr" id="feed"></div>
   <div id="vignette"></div>
@@ -1277,7 +1292,7 @@ function respawn(){
 }
 function newRound(r){
   round=r;ensureMap();roundOver=false;P.kills=0;P.deaths=0;P.streak=0;$('#banner').hidden=true;
-  P.owned=[];P.wallhack=false;endAC();endHeli();nuke=null;$('#nukeHud').hidden=true;removeCrates('');timers.length=0;
+  P.owned=[];P.wallhack=false;endAC();endHeli();nuke=null;endNukeFx();$('#nukeHud').hidden=true;removeCrates('');timers.length=0;
   if(practice)resetBots();if(playing){respawn();toast('Round '+r+' · '+MAPS[mapIdx].name)}
 }
 function scoreEntries(){
@@ -1334,7 +1349,16 @@ function useStreak(i){
 // --- sounds
 function jetSound(){if(!actx)return;const t=actx.currentTime;noiseHit(t,.35,600,2600,1.4,'bandpass',.9);noiseHit(t+1.2,.3,2600,300,1.8,'bandpass',.9)}
 function heliGun(from){const d=from.distanceTo(camera.position);shotSound(clamp(1-d/80,0,1)*.35,1)}
-function siren(n){tick(n%2?880:660,.12,.32);tick(n%2?660:880,.06,.2,.22)}
+// nuke alarm: a rising-falling klaxon every second, doubled in the last three
+function klaxon(n){
+  if(!actx)return;const t=actx.currentTime,reps=n<=3?2:1;
+  for(let r=0;r<reps;r++){const t0=t+r*.45,o=actx.createOscillator(),f=actx.createBiquadFilter(),g=actx.createGain();
+    o.type='sawtooth';o.frequency.setValueAtTime(380,t0);o.frequency.linearRampToValueAtTime(780,t0+.2);o.frequency.linearRampToValueAtTime(380,t0+.42);
+    f.type='lowpass';f.frequency.value=1800;g.gain.setValueAtTime(.0001,t0);g.gain.linearRampToValueAtTime(.09,t0+.03);g.gain.linearRampToValueAtTime(.0001,t0+.42);
+    o.connect(f);f.connect(g);g.connect(actx.destination);o.start(t0);o.stop(t0+.45)}
+}
+function nukeRumble(){if(!actx)return;const t=actx.currentTime;noiseHit(t,1,500,35,4.5);thump(t,1,70,18,3);noiseHit(t+.05,.6,3000,200,1.2)}
+function whoosh(){if(!actx)return;const t=actx.currentTime;noiseHit(t,.8,2400,90,1.8,'bandpass',.5);thump(t,.7,55,22,1.2)}
 
 // --- care package
 const crateGeo=new T.BoxGeometry(1.1,1.1,1.1), chuteGeo=new T.SphereGeometry(1.6,10,6,0,Math.PI*2,0,Math.PI/2);
@@ -1486,24 +1510,74 @@ function acShell(heavy){
 }
 
 // --- tactical nuke: 10 s countdown everywhere, then everyone but the caller dies and the round ends
+// Sequence: 10 s warning (alarm + full-screen UI), then a flash and fireball over the centre; the mushroom
+// cloud rises while a shockwave sweeps outward, and whatever the wave passes dies. The caller wins the round.
 function callNuke(){pushFx({k:'nuke'});startNuke('me',myName,true);ksAnnounce('Tactical nuke inbound','10 seconds')}
 function startNuke(ownerId,ownerName,mine){
-  if(nuke||roundOver)return;nuke={at:now+10000,ownerId,ownerName,mine,lastSec:-1};
-  $('#nukeHud').hidden=false;$('#nukeBy').textContent=mine?'You called it':ownerName+' called it';
+  if(nuke||nukeFx||roundOver)return;nuke={at:now+10000,ownerId,ownerName,mine,lastSec:-1};
+  $('#nukeHud').hidden=false;$('#nukeHud').classList.remove('final');
+  $('#nukeBy').textContent=mine?'You called it. Everyone else is about to die.':'Called by '+ownerName+'. Nowhere to hide.';
 }
 function updateNuke(){
+  updateNukeFx();
   if(!nuke)return;const left=Math.max(0,Math.ceil((nuke.at-now)/1000));
-  if(left!==nuke.lastSec){nuke.lastSec=left;$('#nukeT').textContent=left;siren(left)}
+  if(left!==nuke.lastSec){nuke.lastSec=left;$('#nukeT').textContent=left;klaxon(left);$('#nukeHud').classList.toggle('final',left<=3)}
+  if(left<=3)P.shake=Math.max(P.shake,(3-(nuke.at-now)/1000)*.12);
   if(now>=nuke.at)detonateNuke();
 }
 function detonateNuke(){
   const n=nuke;nuke=null;$('#nukeHud').hidden=true;flashT=now;
-  explosion(new V3(0,6,0),n.mine,5);boom(1);P.shake=1.2;
-  if(n.mine){if(practice)for(const b of bots)if(!b.dead)damageBot(b,999,false,KSW.nuke)}
-  else if(playing&&!P.dead){P.lastHitW=KSW.nuke;P.lastHitHead=false;die(n.ownerId)}
-  endAC();
-  if(playing&&!roundOver){roundOver=true;roundResetAt=now+8000;roundWinner=n.ownerName;firing=false;
-    $('#bannerT').textContent=n.mine?'You nuked the pit':n.ownerName+' nuked the pit';$('#banner').hidden=false}
+  endAC();nukeRumble();P.shake=1.2;startNukeFx(n);
+}
+let nukeFx=null;
+const NK_WHITE=new T.Color('#ffffff'),NUKE_SKY=new T.Color('#ff8a3d'),NK_HOT=new T.Color('#fff6d0'),NK_FIRE=new T.Color('#ff6a24'),NK_GLOW=new T.Color('#ff7a30'),NK_ASH=new T.Color('#6f625c');
+function startNukeFx(n){
+  const g=new T.Group();scene.add(g);
+  const mk=(geo,col)=>{const m=new T.Mesh(geo,new T.MeshBasicMaterial({color:col,transparent:true,fog:false,depthWrite:false,side:T.DoubleSide}));g.add(m);return m};
+  // the cloud is lit and faceted so it reads as a solid billowing mass; its glow fades as it cools
+  const cloud=(geo)=>{const m=new T.Mesh(jitterGeo(geo,.12,Math.random),new T.MeshStandardMaterial({color:'#ff7a30',emissive:'#ff5a1a',emissiveIntensity:1,flatShading:true,roughness:1,transparent:true,fog:false}));g.add(m);return m};
+  const fire=mk(new T.SphereGeometry(1,20,14),'#fff6d0');fire.position.set(0,6,0);
+  const stem=cloud(new T.CylinderGeometry(1,1.5,1,14,4,true));
+  const cap=cloud(new T.SphereGeometry(1,16,10));
+  const rim=cloud(new T.TorusGeometry(1,.42,8,22));rim.rotation.x=Math.PI/2;
+  const wave=mk(new T.RingGeometry(.9,1,72),'#fff1d6');wave.rotation.x=-Math.PI/2;wave.position.y=.4;
+  const dust=mk(new T.CylinderGeometry(1,1,1,48,1,true),'#e7d3b8');
+  nukeFx={g,fire,stem,cap,rim,wave,dust,t0:now,n,bg0:scene.background.clone(),hemi0:hemi.intensity,whoosh:false,roundSet:false};
+  xLight.distance=220;
+}
+function endNukeFx(){
+  if(!nukeFx)return;scene.remove(nukeFx.g);nukeFx.g.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose()});
+  const M=MAPS[mapIdx];scene.background.set(M.fog[0]);scene.fog.color.set(M.fog[0]);hemi.intensity=M.hemi[2];sky.material.color.set('#ffffff');xLight.distance=22;nukeFx=null;
+}
+function updateNukeFx(){
+  const F=nukeFx;if(!F)return;const t=(now-F.t0)/1000;
+  const e=(a,b)=>clamp((t-a)/(b-a),0,1),ease=x=>1-(1-x)*(1-x)*(1-x);
+  // fireball swells and climbs, white-hot to orange
+  F.fire.scale.setScalar(2+ease(e(0,1.2))*15);F.fire.position.y=6+e(.5,4.5)*26;
+  F.fire.material.color.lerpColors(NK_HOT,NK_FIRE,e(.2,2));F.fire.material.opacity=1-e(2.5,5);
+  // stem and mushroom cap, cooling from glow to ash
+  const h=Math.max(.01,ease(e(.6,4.5))*44),w=3.5+e(1,5)*3,cr=Math.max(.01,ease(e(1,5.2))*21);
+  F.stem.scale.set(w,h,w);F.stem.position.y=h/2;
+  F.cap.scale.set(cr,cr*.55,cr);F.cap.position.y=h+cr*.12;F.cap.rotation.y+=.01;
+  F.rim.scale.setScalar(cr*.8);F.rim.position.y=h-cr*.08;
+  const ash=e(2,7);for(const m of [F.stem,F.cap,F.rim]){m.material.color.lerpColors(NK_GLOW,NK_ASH,ash);m.material.emissiveIntensity=1.1*(1-ash)}
+  F.stem.material.opacity=F.cap.material.opacity=F.rim.material.opacity=1-e(7.5,9.5);
+  // shockwave ring and dust wall racing outward across the map
+  const wr=Math.max(.01,t*58),dh=4+e(0,2)*6;F.wave.scale.setScalar(wr);F.wave.material.opacity=Math.max(0,1-wr/150);
+  F.dust.scale.set(wr,dh,wr);F.dust.position.y=dh/2;F.dust.material.opacity=Math.max(0,.55-wr/170);
+  // the sky burns orange, then settles
+  const tint=e(0,.25)*(1-e(1.5,8));scene.background.lerpColors(F.bg0,NUKE_SKY,tint*.85);scene.fog.color.copy(scene.background);hemi.intensity=F.hemi0+tint*1.3;
+  sky.material.color.lerpColors(NK_WHITE,NUKE_SKY,tint*.9);
+  xLight.position.set(0,24,0);xLight.intensity=Math.max(xLight.intensity,(1-e(0,3))*9);
+  // whatever the wave passes dies
+  const meD=Math.hypot(P.pos.x,P.pos.z);
+  if(!F.whoosh&&wr>=meD-10){F.whoosh=true;whoosh();P.shake=1.2}
+  if(F.n.mine){if(practice)for(const b of bots)if(!b.dead&&Math.hypot(b.pos.x,b.pos.z)<=wr)damageBot(b,999,false,KSW.nuke)}
+  else if(playing&&!P.dead&&meD<=wr){P.lastHitW=KSW.nuke;P.lastHitHead=false;die(F.n.ownerId)}
+  if(!F.roundSet&&wr>80){F.roundSet=true;
+    if(playing&&!roundOver){roundOver=true;roundResetAt=now+9000;roundWinner=F.n.ownerName;firing=false;
+      $('#bannerT').textContent=F.n.mine?'You win · Tactical nuke':F.n.ownerName+' wins · Tactical nuke';$('#banner').hidden=false;tick(660,.12,.15);tick(990,.12,.2,.15)}}
+  if(t>10)endNukeFx();
 }
 
 // --- other players' killstreaks
@@ -1546,7 +1620,9 @@ function updatePlayer(dt){
     $('#respawn').textContent='Back in '+Math.max(0,Math.ceil((P.respawnAt-now)/1000));
     if(now>P.respawnAt&&!roundOver)respawn();
     P.scopeK=0;if(camera.fov!==FOV){camera.fov=FOV;camera.updateProjectionMatrix()}
-    camera.position.set(P.pos.x,P.pos.y+3.2,P.pos.z);camera.rotation.set(-.6,P.yaw,0);return;
+    camera.position.set(P.pos.x,P.pos.y+3.2,P.pos.z);camera.rotation.set(-.6,P.yaw,0);
+    if(nukeFx){camera.position.set(P.pos.x,P.pos.y+5,P.pos.z);camera.lookAt(0,22,0)}
+    return;
   }
   const W=curW();
   if(P.reloading&&now>P.reloadEnd){P.reloading=false;P.ammoBy[P.w]=W.mag;tick(520,.07,.04)}
