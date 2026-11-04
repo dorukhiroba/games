@@ -21,6 +21,18 @@
 
   function go() { location.href = LAUNCHER; }
 
+  // Tell the launcher's "Continue playing" row that this game was opened.
+  if (onSite) {
+    try {
+      const slug = location.pathname.split('/').filter(Boolean).filter(s => !/\.html?$/.test(s)).pop();
+      if (slug) {
+        const list = (JSON.parse(localStorage.getItem('kral-recent') || '[]') || []).filter(s => s !== slug);
+        list.unshift(slug);
+        localStorage.setItem('kral-recent', JSON.stringify(list.slice(0, 8)));
+      }
+    } catch (e) {}
+  }
+
   // A button that goes back to the launcher. Pass the game's own classes so it
   // matches the menu it sits in; inline styles are only a fallback.
   function button(cls, label) {
