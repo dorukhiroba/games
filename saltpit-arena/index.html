@@ -55,6 +55,9 @@ h1 span{color:var(--hazard)}
 .primary:hover{background:#25313e}
 .primary:focus-visible{outline:3px solid var(--hazard);outline-offset:2px}
 .primary i{font-style:normal;color:var(--hazard)}
+.secondary{font:800 18px/1 var(--f-display);letter-spacing:.06em;text-transform:uppercase;background:transparent;color:var(--ink);border:2px solid var(--ink);border-radius:2px;padding:11px 18px;margin-top:8px;width:100%;cursor:pointer;text-align:left}
+.secondary:hover{background:#17202a14}
+.secondary:focus-visible{outline:3px solid var(--hazard);outline-offset:2px}
 .status{display:flex;gap:9px;align-items:flex-start;font-size:14px;line-height:1.4;color:#2f3a46}
 .dot{flex:none;width:9px;height:9px;border-radius:50%;margin-top:5px;background:var(--slate)}
 .dot.live{background:var(--ok);box-shadow:0 0 0 4px rgba(63,191,143,.2)}
@@ -253,6 +256,7 @@ kbd{font:700 11px var(--f-mono);background:#fff;border:1px solid rgba(23,32,42,.
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="../net.js"></script>
+<script src="../quit.js"></script>
 <script>
 (function(){
 'use strict';
@@ -1240,6 +1244,7 @@ function startPlay(){
 }
 function pause(){if(!playing)return;closeWM(false);paused=true;firing=false;P.scoped=false;keys.clear();$('#playTxt').textContent='Resume';$('#menu').hidden=false;$('#touch').hidden=true}
 $('#play').addEventListener('click',startPlay);
+if(window.KQuit)$('#play').after(KQuit.button('secondary'));
 
 /* ---------- B menu: weapon picker ---------- */
 // little side-on silhouettes for the cards, drawn as rects in a 120x34 box: [x,y,w,h,isAccent]

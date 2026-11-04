@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="../quit.js"></script></head><body>
 <title>Word Calm</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -593,6 +593,7 @@ $("#playBtn").addEventListener("click",()=>{sfx.tap();startLevel(currentLevelInd
 $("#levelsBtn").addEventListener("click",()=>{sfx.tap();show("levels")});
 $("#settingsBtn").addEventListener("click",()=>{sfx.tap();openSettings()});
 $("#menuSettings").addEventListener("click",()=>{sfx.tap();openSettings()});
+if(window.KQuit)$(".menu-actions").appendChild(KQuit.button("btn glass"));
 
 /* ---------- level select ---------- */
 const thumbs=[];
@@ -707,12 +708,13 @@ $("#shuffle").addEventListener("click",()=>{if(dragging||winning)return;wheelOrd
   const sb=$("#shuffle");sb.classList.toggle("spin");const[cx,cy]=rel(wheelEl);ring(cx,cy,wheelEl.clientWidth*.45,"rgba(255,255,255,.6)",.6);persist()});
 document.addEventListener("keydown",e=>{
   if(!overlay.hidden){if(e.key==="Escape"){const b=overlay.querySelector("#closeCard");b&&b.click()}return}
+  if(e.key==="Escape"&&screen==="menu"&&run&&!e.repeat){$("#playBtn").click();return}
   if(screen!=="play"||e.metaKey||e.ctrlKey||e.altKey||dragging||winning)return;const k=e.key.toUpperCase();
   if(/^[A-Z]$/.test(k)){const i=wheelOrder.find(li=>L.letters[li]===k&&!path.includes(li));
     if(i!==undefined)addToPath(i);else animClass(pill,"bad",420);e.preventDefault()}
   else if(e.key==="Backspace"&&path.length){path.pop();drawLines();setPill(path.map(x=>L.letters[x]).join(""));e.preventDefault()}
   else if(e.key==="Enter"&&path.length){submit();e.preventDefault()}
-  else if(e.key==="Escape"){path=[];drawLines();setPill("")}});
+  else if(e.key==="Escape"){if(path.length||e.repeat){path=[];drawLines();setPill("")}else $("#homeBtn").click()}});
 
 /* pill, toast, combo */
 function setPill(text,mode){clearTimeout(pillTimer);pill.className="pill"+(text?"":" empty")+(mode==="msg"?" msg":"");if(text)pill.textContent=text}

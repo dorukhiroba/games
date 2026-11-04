@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="../quit.js"></script></head><body>
 <title>City Block Smash</title>
 <style>
 /* Fonts embedded so the playable works offline: Lilita One (display) + Baloo 2 ExtraBold (UI), both with Turkish glyphs */
@@ -557,7 +557,8 @@ function fail(){state='fail';stateT=1.15;ballG.visible=false;glow.material.opaci
 function ignite(){fireMode=true;fireT=FIRE_TIME;heat=1;sfx.ignite();showBanner(TXT[lang].fire,'small fire');shake=Math.max(shake,0.18);fovKick=1;ring(0,ball.y-BR,BALL_Z,0.4,3.2,0.45,0xff8a1a,0.75);for(let k=0;k<40;k++){const a=Math.random()*TAU,sp=rand(2,6);emit(0,ball.y,BALL_Z-0.35,Math.cos(a)*sp,rand(1,6),Math.sin(a)*sp,rand(0.3,0.6),0,rand(0.5,0.9),-1,2,true);}try{navigator.vibrate&&navigator.vibrate(30);}catch(e){}}
 
 /* ================= input ================= */
-function down(e){if(e&&e.target&&e.target.closest&&e.target.closest('button,a,#end'))return;if(state==='end'||state==='fail')return;audioInit();holding=true;if(state==='ready'){state='play';elTut.classList.add('hide');}if(e&&e.cancelable)e.preventDefault();}
+let paused=false; // Esc menu open (see KQuit.menu at the bottom)
+function down(e){if(paused||e&&e.target&&e.target.closest&&e.target.closest('button,a,#end,.kquit-ov'))return;if(state==='end'||state==='fail')return;audioInit();holding=true;if(state==='ready'){state='play';elTut.classList.add('hide');}if(e&&e.cancelable)e.preventDefault();}
 function up(){holding=false;}
 window.addEventListener('pointerdown',down,{passive:false});window.addEventListener('pointerup',up);window.addEventListener('pointercancel',up);window.addEventListener('blur',up);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)up();});
@@ -666,7 +667,7 @@ function update(dt){
   if(comboPop>0.99){elCnum.innerHTML='<b>x</b>'+combo;elCword.textContent=comboWord;}
   comboPop=Math.max(0,comboPop-dt*1.4);elCombo.style.opacity=Math.min(1,comboPop*2.5).toFixed(3);elCombo.style.transform=`scale(${(0.9+comboPop*0.3).toFixed(3)}) rotate(-6deg)`;
 }
-function loop(now){const dt=Math.min((now-last)/1000,1/30);last=now;update(dt);renderer.render(scene,camera);requestAnimationFrame(loop);}
+function loop(now){const dt=Math.min((now-last)/1000,1/30);last=now;if(!paused)update(dt);renderer.render(scene,camera);requestAnimationFrame(loop);}
 
 /* ================= boot ================= */
 function start(data){
@@ -678,6 +679,8 @@ function start(data){
 window.__cbs={get s(){return{state,heat,fireMode,topIndex,score,level,ball:ball.y};},hold(v){v?down(null):up();},ignite(){if(state==='play')ignite();},end(k){showEnd(k||'win');}};
 try{window.claude&&window.claude.hot&&window.claude.hot.snapshot&&window.claude.hot.snapshot(()=>({level,score:levelStartScore,lang,levelsCleared,winEndShown}));}catch(e){}
 window.claude?.hot?.ready?window.claude.hot.ready(start):start(window.claude?.hot?.data??{});
+// Esc menu: freeze update() (ball, tower spin, fire/heat timers) while open and drop any held smash.
+window.KQuit&&KQuit.menu({pause(){paused=true;up();},resume(){paused=false;}});
 })();
 </script>
 

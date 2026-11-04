@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="../quit.js"></script></head><body>
 <title>Orchard Drop</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -314,6 +314,7 @@ new ResizeObserver(resize).observe(stage);
 /* ---------- state ---------- */
 let engine, fruits = [], mergeQ = [], particles = [], popups = [];
 let score = 0, best = 0, cur = 0, next = 0, aimX = W / 2, canDropAt = 0, overT = 0, state = 'play', maxTier = 0;
+let pausedAt = null; // set while the Esc menu is open
 try { best = +localStorage.getItem('orchard-drop-best') || 0; } catch(e) {}
 
 function pickNext(){ let s = SPAWN_W.reduce((a, b) => a + b), x = Math.random() * s; for (let i = 0; i < SPAWN_W.length; i++){ x -= SPAWN_W[i]; if (x < 0) return i; } return 0; }
@@ -349,7 +350,7 @@ function addFruit(t, x, y, now){
 }
 
 function drop(){
-  if (state !== 'play') return;
+  if (pausedAt != null || state !== 'play') return;
   const now = performance.now(); if (now < canDropAt) return;
   const r = FRUITS[cur].r, x = clamp(aimX, r + 1, W - r - 1);
   addFruit(cur, x, HOLD_Y, now); sfx('drop');
@@ -512,6 +513,7 @@ function updateFx(dt){
 let last = performance.now(), acc = 0;
 function frame(now){
   const dt = Math.min(100, now - last); last = now;
+  if (pausedAt != null){ render(now); requestAnimationFrame(frame); return; } // Esc menu open: no physics, aim or fx
   const dir = (keys['arrowright'] || keys['d'] ? 1 : 0) - (keys['arrowleft'] || keys['a'] ? 1 : 0);
   if (dir) aimX = clamp(aimX + dir * .38 * dt, 0, W);
   if (state === 'play'){
@@ -541,6 +543,18 @@ function start(data){
 }
 window.claude?.hot?.snapshot?.(snapshot);
 window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+
+// Esc menu: stop matter.js stepping while it is open, then shift the game's timestamps
+// (drop grace period, pop animation, drop cooldown) so paused time doesn't count.
+window.KQuit && KQuit.menu({
+  pause(){ if (pausedAt == null) pausedAt = performance.now(); for (const k in keys) keys[k] = false; },
+  resume(){
+    if (pausedAt == null) return;
+    const d = performance.now() - pausedAt; pausedAt = null;
+    for (const f of fruits){ f.dropAt += d; if (f.popAt) f.popAt += d; }
+    if (canDropAt) canDropAt += d;
+  }
+});
 })();
 </script>
 

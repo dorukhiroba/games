@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="../quit.js"></script></head><body>
 <title>Wordfield</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -407,7 +407,8 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   }
 
   const fmt = ms => { const s = Math.floor(ms / 1000); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
-  function now() { return S.started ? (S.done ? S.elapsed : Date.now() - S.started) : 0; }
+  let pausedAt = null; // set while the Esc menu is open; the clock reads as frozen at this moment
+  function now() { return S.started ? (S.done ? S.elapsed : (pausedAt ?? Date.now()) - S.started) : 0; }
   function renderStats() {
     $("found").textContent = `${S.found.size}/${S.placed.length}`;
     $("time").textContent = fmt(now());
@@ -545,6 +546,21 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   buildControls();
   newPuzzle();
+
+  // Esc menu: stop the clock while it is open (shift the start so paused time isn't counted)
+  // and drop any half-finished drag so it can't land a word while paused.
+  window.KQuit && KQuit.menu({
+    pause() {
+      if (pausedAt == null) pausedAt = Date.now();
+      sel = null; selLine.style.display = "none";
+    },
+    resume() {
+      if (pausedAt == null) return;
+      if (S.started && !S.done) S.started += Date.now() - pausedAt;
+      pausedAt = null;
+      renderStats();
+    }
+  });
 })();
 </script>
 

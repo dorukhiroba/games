@@ -1,5 +1,6 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Epoch Clash</title>
+<script src="../quit.js"></script>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1081,6 +1082,7 @@ $('startCpu').addEventListener('click', () => startGame(true));
 $('resumeBtn').addEventListener('click', () => setPause(false));
 $('restartBtn').addEventListener('click', () => startGame(S.cpu));
 $('menuBtn').addEventListener('click', () => { pauseOv.hidden = true; S = null; menu.hidden = false; });
+if (window.KQuit) $('menuBtn').after(KQuit.button('cta ghost'));
 $('rematchBtn').addEventListener('click', () => startGame(S.cpu));
 $('endMenuBtn').addEventListener('click', () => { endOv.hidden = true; S = null; menu.hidden = false; });
 $('pauseBtn').addEventListener('click', () => { if (S) setPause(!S.paused); });
@@ -1093,7 +1095,7 @@ window.addEventListener('keydown', e => {
   if (GAME_KEYS.has(k) && S) e.preventDefault();
   if (e.repeat) return;
   if (k === 'm'){ toggleMute(); return; }
-  if (k === ' ' || k === 'escape'){ if (S && !S.over) setPause(!S.paused); return; }
+  if (k === ' ' || k === 'escape'){ if (S && !S.over && menu.hidden) setPause(!S.paused); return; }
   const m = KEYS[k];
   if (m && S){ audioInit(); press(m[0], m[1]); }
 });

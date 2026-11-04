@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="../quit.js" data-lang="tr"></script></head><body>
 <title>Aradaki 7 Fark</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -315,7 +315,9 @@ function loadBest(){try{return JSON.parse(localStorage.getItem('yedifark-best')|
 function saveBest(b){try{localStorage.setItem('yedifark-best',JSON.stringify(b));}catch(e){}}
 
 function now(){return performance.now();}
-function totalSec(){const run=S.done?S.runMs:(now()-S.t0);return run/1000+S.penalty;}
+let pausedAt=null; // set while the Esc menu is open; the clock reads as frozen at this moment
+function clockNow(){return pausedAt??now();}
+function totalSec(){const run=S.done?S.runMs:(clockNow()-S.t0);return run/1000+S.penalty;}
 
 function start(data){
   data=data||{};
@@ -327,7 +329,7 @@ function start(data){
     updateBar();
     if(S.done)showResult(false);
   }else newGame(0,Math.floor(Math.random()*1e9),true);
-  window.claude?.hot?.snapshot?.(()=>({S:S&&{scene:S.scene,seed:S.seed,found:S.found,misses:S.misses,hints:S.hints,penalty:S.penalty,done:S.done,runMs:S.done?S.runMs:now()-S.t0}}));
+  window.claude?.hot?.snapshot?.(()=>({S:S&&{scene:S.scene,seed:S.seed,found:S.found,misses:S.misses,hints:S.hints,penalty:S.penalty,done:S.done,runMs:S.done?S.runMs:clockNow()-S.t0}}));
 }
 
 function newGame(si,seed){
@@ -427,6 +429,12 @@ document.addEventListener('keydown',e=>{
 });
 
 window.claude?.hot?.ready?window.claude.hot.ready(start):start(window.claude?.hot?.data??{});
+
+// Esc menu (Devam et / Oyunlardan çık): stop the clock while it is open, then shift t0 so paused time isn't counted.
+window.KQuit&&KQuit.menu({
+  pause(){if(pausedAt==null)pausedAt=now();},
+  resume(){if(pausedAt==null)return;if(S)S.t0+=now()-pausedAt;pausedAt=null;if(S)updateBar();}
+});
 })();
 </script>
 

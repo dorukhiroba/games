@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="../quit.js"></script></head><body>
 <title>Mochi Tower</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -481,9 +481,10 @@ function act(){
   else if(mode==='play'&&moving)place();
   else if(mode==='over'&&overShown&&performance.now()>canRestartAt)restart();
 }
+let paused=false; // Esc menu open (see KQuit.menu at the bottom)
 window.addEventListener('pointerdown',e=>{
-  if(e.button!==undefined&&e.button>0)return;
-  if(e.target.closest&&e.target.closest('button'))return;
+  if(paused||e.button!==undefined&&e.button>0)return;
+  if(e.target.closest&&e.target.closest('button,.kquit-ov'))return;
   act();
 });
 window.addEventListener('keydown',e=>{
@@ -653,13 +654,16 @@ function update(dt,time){
 
 let last=performance.now(),time=0;
 function frame(now){
-  const dt=Math.min((now-last)/1000,0.05);last=now;time+=dt;
-  update(dt,time);renderer.render(scene,cam);
+  const dt=Math.min((now-last)/1000,0.05);last=now;
+  if(!paused){time+=dt;update(dt,time);}
+  renderer.render(scene,cam);
   requestAnimationFrame(frame);
 }
 M.g.position.set(0,0,0);
 half=baseHalf();placeCamera();updateSky();
 requestAnimationFrame(frame);
+// Esc menu: freeze update() (sliding block, falling debris, camera) while it is open.
+window.KQuit&&KQuit.menu({pause(){paused=true;},resume(){paused=false;}});
 })();
 </script>
 
