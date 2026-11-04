@@ -4,129 +4,291 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Kral Oyun Arcade</title>
-<meta name="description" content="A collection of browser games — pick one and play.">
-<meta name="theme-color" content="#14121f">
+<meta name="description" content="13 free browser games: solo puzzles, 2-player couch battles and online arenas for up to 10 friends.">
+<meta name="theme-color" content="#0f0c1d">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Figtree:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Figtree:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #14121f;
-    --card: #1f1c30;
-    --card-hover: #29253f;
-    --text: #f4f1ff;
-    --muted: #a9a3c7;
-    --chip: #322d4d;
+    --bg: #0f0c1d;
+    --bg-2: #171329;
+    --card: #1d1833;
+    --card-2: #262043;
+    --line: #2f2850;
+    --text: #f6f3ff;
+    --muted: #a49dc4;
+    --solo: #3fd0b6;
+    --duo: #ffb43d;
+    --online: #ff5d8f;
+    --gold: #ffd25c;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: 80px; }
   body {
+    margin: 0;
     background: var(--bg);
     color: var(--text);
     font-family: Figtree, system-ui, sans-serif;
     min-height: 100vh;
-    padding: max(24px, env(safe-area-inset-top)) 16px 48px;
+    overflow-x: hidden;
   }
-  header { text-align: center; max-width: 960px; margin: 0 auto 28px; }
+  a { color: inherit; }
+
+  /* ---------- hero ---------- */
+  .hero {
+    position: relative;
+    padding: max(48px, env(safe-area-inset-top)) 16px 36px;
+    text-align: center;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .hero::before {
+    content: "";
+    position: absolute; inset: -40% -10% auto;
+    height: 160%;
+    background:
+      radial-gradient(40% 50% at 20% 40%, color-mix(in srgb, var(--solo) 28%, transparent), transparent 70%),
+      radial-gradient(35% 45% at 50% 20%, color-mix(in srgb, var(--duo) 26%, transparent), transparent 70%),
+      radial-gradient(40% 50% at 80% 40%, color-mix(in srgb, var(--online) 28%, transparent), transparent 70%);
+    filter: blur(10px);
+    z-index: -1;
+  }
+  .hero::after {
+    content: "";
+    position: absolute; inset: 0;
+    background-image: radial-gradient(#ffffff14 1px, transparent 1px);
+    background-size: 22px 22px;
+    mask-image: linear-gradient(#000, transparent 85%);
+    z-index: -1;
+  }
+  .crown { width: 64px; height: 48px; display: block; margin: 0 auto 6px; filter: drop-shadow(0 6px 14px #ffd25c55); }
   h1 {
     font-family: "Lilita One", system-ui, sans-serif;
     font-weight: 400;
-    font-size: clamp(2.2rem, 8vw, 3.6rem);
-    margin: 8px 0 4px;
-    letter-spacing: .02em;
+    font-size: clamp(2.6rem, 10vw, 5rem);
+    line-height: .95;
+    margin: 0;
+    letter-spacing: .01em;
+    text-shadow: 0 4px 0 #00000055;
   }
-  header p { color: var(--muted); margin: 0; font-size: 1.05rem; }
+  h1 span { color: var(--gold); }
+  .tagline { color: var(--muted); font-size: clamp(1rem, 2.6vw, 1.2rem); margin: 12px auto 0; max-width: 34ch; font-weight: 600; }
+
+  /* ---------- category nav ---------- */
+  .nav {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+    padding: 12px 16px;
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav a {
+    --c: var(--muted);
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    text-decoration: none;
+    font-weight: 700; font-size: .92rem;
+    transition: background .15s, border-color .15s, transform .15s;
+  }
+  .nav a:hover, .nav a:focus-visible { border-color: var(--c); background: var(--card-2); transform: translateY(-1px); outline: none; }
+  .nav a .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--c); }
+  .nav a .n { color: var(--muted); font-weight: 600; }
+
+  /* ---------- sections ---------- */
+  main { max-width: 1120px; margin: 0 auto; padding: 8px 16px 40px; }
+  section { margin-top: 40px; }
+  .sec-head { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+  .sec-icon {
+    flex: none; width: 48px; height: 48px; border-radius: 14px;
+    display: grid; place-items: center;
+    background: color-mix(in srgb, var(--c) 18%, var(--card));
+    border: 1px solid color-mix(in srgb, var(--c) 45%, transparent);
+    color: var(--c);
+  }
+  .sec-icon svg { width: 26px; height: 26px; }
+  .sec-head h2 { font-family: "Lilita One", system-ui, sans-serif; font-weight: 400; font-size: clamp(1.5rem, 4.5vw, 2rem); margin: 0; letter-spacing: .01em; }
+  .sec-head p { margin: 2px 0 0; color: var(--muted); font-size: .95rem; font-weight: 600; }
+  .live { display: inline-flex; align-items: center; gap: 6px; margin-left: 8px; padding: 2px 8px; border-radius: 999px; font-family: Figtree, sans-serif; font-size: .72rem; font-weight: 800; letter-spacing: .06em; vertical-align: middle; color: var(--online); background: color-mix(in srgb, var(--online) 16%, transparent); }
+  .live::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--online); animation: pulse 1.6s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
+
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 14px;
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 0;
-    list-style: none;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 18px;
+    list-style: none; margin: 0; padding: 0;
   }
+  .grid.wide { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+  .grid.pair { grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); }
+
+  /* ---------- cards ---------- */
   .card {
-    display: flex;
-    gap: 14px;
-    align-items: center;
-    padding: 16px;
-    border-radius: 16px;
-    background: var(--card);
-    color: inherit;
-    text-decoration: none;
-    border: 1px solid transparent;
-    transition: background .15s, transform .15s, border-color .15s;
+    display: flex; flex-direction: column;
     height: 100%;
+    border-radius: 18px;
+    overflow: hidden;
+    background: var(--card);
+    border: 1px solid var(--line);
+    text-decoration: none;
+    transition: transform .2s, border-color .2s, box-shadow .2s;
   }
   .card:hover, .card:focus-visible {
-    background: var(--card-hover);
-    border-color: var(--accent);
-    transform: translateY(-2px);
+    transform: translateY(-4px);
+    border-color: var(--c);
+    box-shadow: 0 14px 34px -12px color-mix(in srgb, var(--c) 60%, transparent);
     outline: none;
   }
-  .icon {
-    flex: none;
-    width: 56px; height: 56px;
-    border-radius: 14px;
+  .thumb { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: var(--bg-2); }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .35s; }
+  .card:hover .thumb img, .card:focus-visible .thumb img { transform: scale(1.05); }
+  .play {
+    position: absolute; right: 12px; bottom: 12px;
+    width: 46px; height: 46px; border-radius: 50%;
     display: grid; place-items: center;
-    font-family: "Lilita One", system-ui, sans-serif;
-    font-size: 1.5rem;
-    color: #fff;
-    background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 55%, #000));
+    background: var(--c); color: #120f22;
+    box-shadow: 0 6px 16px #0007;
+    opacity: 0; transform: translateY(6px) scale(.9);
+    transition: opacity .2s, transform .2s;
   }
-  .info { min-width: 0; }
-  .info h2 { margin: 0 0 3px; font-size: 1.12rem; font-weight: 700; }
-  .info p { margin: 0 0 8px; color: var(--muted); font-size: .92rem; line-height: 1.35; }
-  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-  .chip {
-    font-size: .72rem; font-weight: 600;
-    padding: 3px 8px; border-radius: 999px;
-    background: var(--chip); color: var(--muted);
+  .play svg { width: 18px; height: 18px; margin-left: 3px; }
+  .card:hover .play, .card:focus-visible .play { opacity: 1; transform: none; }
+  .badge {
+    position: absolute; left: 10px; top: 10px;
+    padding: 4px 9px; border-radius: 999px;
+    font-size: .72rem; font-weight: 800; letter-spacing: .03em;
+    background: #0f0c1dcc; color: var(--text);
+    backdrop-filter: blur(4px);
   }
-  footer { text-align: center; color: var(--muted); font-size: .85rem; margin-top: 36px; }
+  .info { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .info h3 { margin: 0; font-size: 1.15rem; font-weight: 800; }
+  .info p { margin: 0; color: var(--muted); font-size: .93rem; line-height: 1.4; font-weight: 500; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; padding-top: 6px; }
+  .chip { font-size: .72rem; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: var(--card-2); color: var(--muted); }
+  .chip.hi { color: var(--c); background: color-mix(in srgb, var(--c) 15%, var(--card)); }
+
+  footer { text-align: center; color: var(--muted); font-size: .88rem; padding: 24px 16px max(32px, env(safe-area-inset-bottom)); border-top: 1px solid var(--line); }
+  footer b { color: var(--text); }
+
+  /* phones: two compact columns */
+  @media (max-width: 560px) {
+    .grid, .grid.wide, .grid.pair { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .info { padding: 10px 11px 12px; gap: 4px; }
+    .info h3 { font-size: .98rem; }
+    .info p { font-size: .8rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .chip { font-size: .66rem; padding: 2px 7px; }
+    .badge { font-size: .64rem; left: 7px; top: 7px; padding: 3px 7px; }
+    .play { display: none; }
+    .sec-icon { width: 42px; height: 42px; }
+    .nav a { padding: 7px 11px; font-size: .84rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+    html { scroll-behavior: auto; }
+  }
 </style>
 </head>
 <body>
-<header>
-  <h1>Kral Oyun Arcade</h1>
-  <p>Pick a game and play — right in your browser.</p>
+
+<header class="hero">
+  <svg class="crown" viewBox="0 0 64 48" aria-hidden="true">
+    <path d="M4 14 L18 26 L32 6 L46 26 L60 14 L54 42 H10 Z" fill="#ffd25c" stroke="#b8862a" stroke-width="3" stroke-linejoin="round"/>
+    <circle cx="4" cy="14" r="4" fill="#ff5d8f"/><circle cx="32" cy="6" r="4" fill="#3fd0b6"/><circle cx="60" cy="14" r="4" fill="#ffb43d"/>
+  </svg>
+  <h1>Kral Oyun <span>Arcade</span></h1>
+  <p class="tagline">Free browser games. No downloads, no logins. Pick one and play.</p>
 </header>
 
-<ul class="grid" id="games"></ul>
+<nav class="nav" id="nav" aria-label="Game categories"></nav>
 
-<footer>13 games · works on phone and desktop</footer>
+<main id="sections"></main>
+
+<footer>
+  <b>13 games</b> · works on phone and desktop · online games connect you straight to your friends
+</footer>
 
 <script>
-  const GAMES = [
-    { slug: "aradaki-7-fark",   name: "Aradaki 7 Fark",   desc: "İki resim arasındaki 7 farkı bul.",          tags: ["Puzzle", "Türkçe"],   color: "#e9774f" },
-    { slug: "city-block-smash", name: "City Block Smash", desc: "Smash your way through the city.",           tags: ["3D", "Action"],      color: "#4f8de9" },
-    { slug: "epoch-clash",      name: "Epoch Clash",      desc: "Head-to-head battle across the ages.",       tags: ["2 players"],         color: "#c94fe9" },
-    { slug: "gem-mosaic",       name: "Gem Mosaic",       desc: "Sort the jewels. Restore the picture.",      tags: ["Puzzle"],            color: "#2fb7a3" },
-    { slug: "kaboom-arena",     name: "Kaboom Arena",     desc: "Last one standing takes the crown.",         tags: ["Online", "3D", "Arena"],       color: "#f2563b" },
-    { slug: "kafa-kafaya",      name: "Kafa Kafaya",      desc: "İki oyunculu kafa kafaya mücadele.",         tags: ["2 players", "Türkçe"], color: "#e9b84f" },
-    { slug: "loop-blaster",     name: "Loop Blaster",     desc: "Fast-paced blasting action.",                tags: ["Arcade"],            color: "#e94f8d" },
-    { slug: "mochi-tower",      name: "Mochi Tower",      desc: "Stack the sweets. Keep the mochi on top.",   tags: ["3D", "Stacking"],    color: "#f28bb5" },
-    { slug: "orchard-drop",     name: "Orchard Drop",     desc: "Drop fruit with real physics.",              tags: ["Physics"],           color: "#6cbf3f" },
-    { slug: "saltpit-arena",    name: "Saltpit Arena",    desc: "Low-poly free-for-all in a salt quarry.",    tags: ["Online", "3D", "Arena"],       color: "#c9a77a" },
-    { slug: "tank-tussle",      name: "Tank Tussle",      desc: "Pick your tank and roll into battle.",       tags: ["Online", "3D", "Action"],      color: "#7a9a4f" },
-    { slug: "word-calm",        name: "Word Calm",        desc: "Swipe letters. Fill the valley.",            tags: ["Word"],              color: "#4fb0e9" },
-    { slug: "wordfield",        name: "Wordfield",        desc: "A field of words to discover.",              tags: ["Word"],              color: "#8d6cf2" },
+  const ICONS = {
+    solo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>',
+    duo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="3.4"/><circle cx="17" cy="9" r="2.8"/><path d="M2 20c0-3.6 2.7-6 6-6s6 2.4 6 6"/><path d="M15 14.3c3.3-.6 7 1.4 7 5.7"/></svg>',
+    online: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z"/></svg>',
+  };
+
+  const CATEGORIES = [
+    {
+      id: "online", label: "Online · 10 players", short: "Online", color: "var(--online)", live: true,
+      blurb: "Send your friends the link, join the same room and battle. Bots fill empty spots.",
+      games: [
+        { slug: "kaboom-arena",  name: "Kaboom Arena",  desc: "Drop bombs, blast crates and be the last one standing.", badge: "Up to 10", tags: ["Bomber", "Also local"] },
+        { slug: "tank-tussle",   name: "Tank Tussle",   desc: "Pick a tank, roll into the arena and race to 10 KOs.",   badge: "Up to 10", tags: ["3D", "Arena"] },
+        { slug: "saltpit-arena", name: "Saltpit Arena", desc: "Low-poly free-for-all in a salt quarry. First to 15 wins.", badge: "Up to 10", tags: ["3D", "Shooter"] },
+      ],
+    },
+    {
+      id: "duo", label: "2 players · same device", short: "2 Players", color: "var(--duo)",
+      blurb: "Share one keyboard or tablet and go head to head. Each one also has a computer opponent.",
+      games: [
+        { slug: "kafa-kafaya", name: "Kafa Kafaya", desc: "Mahalle ligi: 1'e 1 kafa topu. Zıpla, vur, gol at!", badge: "2P", tags: ["Football", "Türkçe"] },
+        { slug: "epoch-clash", name: "Epoch Clash", desc: "Train troops, hold the lane and evolve through five ages.", badge: "2P", tags: ["Strategy", "vs CPU"] },
+      ],
+    },
+    {
+      id: "solo", label: "1 player", short: "1 Player", color: "var(--solo)",
+      blurb: "Puzzles, word games and quick arcade fun to play on your own.",
+      games: [
+        { slug: "mochi-tower",      name: "Mochi Tower",      desc: "Stack the sweets. Keep the mochi on top.",           tags: ["Stacking", "3D"] },
+        { slug: "orchard-drop",     name: "Orchard Drop",     desc: "Match two of a kind and keep the fruit below the line.", tags: ["Merge", "Physics"] },
+        { slug: "loop-blaster",     name: "Loop Blaster",     desc: "Send blasters around the belt to clear the board.", tags: ["Puzzle"] },
+        { slug: "gem-mosaic",       name: "Gem Mosaic",       desc: "Sort the jewels. Restore the picture.",              tags: ["Puzzle"] },
+        { slug: "city-block-smash", name: "City Block Smash", desc: "Smash your way down a giant brick tower.",           tags: ["Arcade", "3D"] },
+        { slug: "aradaki-7-fark",   name: "Aradaki 7 Fark",   desc: "İki resim arasındaki 7 farkı bul.",                   tags: ["Puzzle", "Türkçe"] },
+        { slug: "word-calm",        name: "Word Calm",        desc: "Swipe letters. Fill the valley.",                    tags: ["Word"] },
+        { slug: "wordfield",        name: "Wordfield",        desc: "Find hidden words across, down and diagonally.",     tags: ["Word"] },
+      ],
+    },
   ];
 
-  const list = document.getElementById("games");
-  for (const g of GAMES) {
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <a class="card" href="${g.slug}/" style="--accent:${g.color}">
-        <span class="icon" aria-hidden="true">${g.name[0]}</span>
-        <span class="info">
-          <h2>${g.name}</h2>
-          <p>${g.desc}</p>
-          <span class="chips">${g.tags.map(t => `<span class="chip">${t}</span>`).join("")}</span>
-        </span>
-      </a>`;
-    list.appendChild(li);
-  }
+  const nav = document.getElementById("nav");
+  const main = document.getElementById("sections");
+  const play = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4l14 8-14 8z"/></svg>';
+
+  CATEGORIES.forEach((cat, ci) => {
+    nav.insertAdjacentHTML("beforeend",
+      `<a href="#${cat.id}" style="--c:${cat.color}"><span class="dot"></span>${cat.short}<span class="n">${cat.games.length}</span></a>`);
+
+    const cards = cat.games.map(g => `
+      <li>
+        <a class="card" href="${g.slug}/" style="--c:${cat.color}">
+          <div class="thumb">
+            <img src="thumbs/${g.slug}.jpg" alt="" width="640" height="400" loading="${ci === 0 ? "eager" : "lazy"}" decoding="async">
+            ${g.badge ? `<span class="badge">${g.badge}</span>` : ""}
+            <span class="play" aria-hidden="true">${play}</span>
+          </div>
+          <div class="info">
+            <h3>${g.name}</h3>
+            <p>${g.desc}</p>
+            <div class="chips">${g.tags.map((t, i) => `<span class="chip${cat.id !== "solo" && i === 0 ? " hi" : ""}">${t}</span>`).join("")}</div>
+          </div>
+        </a>
+      </li>`).join("");
+
+    main.insertAdjacentHTML("beforeend", `
+      <section id="${cat.id}" aria-labelledby="h-${cat.id}">
+        <div class="sec-head" style="--c:${cat.color}">
+          <div class="sec-icon">${ICONS[cat.id]}</div>
+          <div>
+            <h2 id="h-${cat.id}">${cat.label}${cat.live ? '<span class="live">LIVE</span>' : ""}</h2>
+            <p>${cat.blurb}</p>
+          </div>
+        </div>
+        <ul class="grid${cat.games.length === 2 ? " pair" : cat.games.length === 3 ? " wide" : ""}">${cards}</ul>
+      </section>`);
+  });
 </script>
 </body>
 </html>
