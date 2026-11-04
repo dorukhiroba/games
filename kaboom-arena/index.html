@@ -216,6 +216,8 @@ input.nick{width:100%;box-sizing:border-box;font-family:var(--display);font-size
 .li .pill{font-family:var(--display);font-size:11px;padding:2px 6px 4px;border-radius:5px;background:var(--ink);color:#fff;letter-spacing:.05em}
 .li .pill.gold{background:var(--yellow-lo)}
 .li .btn{font-size:16px;padding:5px 14px 8px;border-width:3px;border-radius:8px;box-shadow:inset 0 2px 0 rgba(255,255,255,.55),0 3px 0 var(--ink)}
+.joincode{display:flex;gap:8px}
+.joincode input.nick{flex:1;min-width:0;text-transform:uppercase;letter-spacing:.18em}
 .code{display:inline-block;font-family:var(--display);font-size:20px;letter-spacing:.18em;padding:2px 12px 4px;border-radius:7px;background:var(--ink);color:var(--yellow);transform:skewX(-8deg)}
 .roster{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .champ{position:relative;display:grid;place-items:center;height:200px;overflow:hidden;margin:0 -18px;border-bottom:4px solid var(--ink);background:radial-gradient(circle at 50% 60%,#5aa8ff,#1d4fc0 70%)}
@@ -338,9 +340,11 @@ input.nick{width:100%;box-sizing:border-box;font-family:var(--display);font-size
       <label class="row" for="nick"><span class="lbl ol-s">Your name</span></label>
       <input class="nick" id="nick" maxlength="14" autocomplete="off" spellcheck="false" placeholder="Pick a name">
       <div class="status" id="netStatus"><span class="dot"></span><span>Connecting…</span></div>
+      <label class="row" for="joinCode"><span class="lbl ol-s">Have a room code?</span></label>
+      <div class="joincode"><input class="nick" id="joinCode" maxlength="8" autocomplete="off" spellcheck="false" placeholder="e.g. H7RR" enterkeyhint="go"><button class="btn blue small" id="btnJoinCode"><span>Join</span></button></div>
       <div class="row"><span class="lbl ol-s">Open rooms</span><button class="btn green small" id="btnCreate"><span>Create room</span></button></div>
       <div class="list" id="roomList"><div class="empty">No rooms yet. Create one and your friends will see it here.</div></div>
-      <p class="note">Friends join from this same page. Send them this page’s link, then they pick your room from this list. Move with WASD or the arrow keys, drop bombs with Space or Enter, and send emotes with keys 1 to 4.</p>
+      <p class="note">Friends join from this same page. Send them this page’s link and your room code. They can type the code above or pick your room from this list. Move with WASD or the arrow keys, drop bombs with Space or Enter, and send emotes with keys 1 to 4.</p>
     </div>
   </div>
   <div class="view" id="vRoom" hidden>
@@ -1343,8 +1347,8 @@ async function openOnline(){
   setNetStatus('','Connecting…');
   $('#roomList').dataset.sig='';
   const api=await getRoom();
-  if(!api){setNetStatus('bad','Couldn’t start online play. Check your connection and reload the page.'); $('#btnCreate').disabled=true; return}
-  $('#btnCreate').disabled=false;
+  if(!api){setNetStatus('bad','Couldn’t start online play. Check your connection and reload the page.'); $('#btnCreate').disabled=true; $('#btnJoinCode').disabled=true; return}
+  $('#btnCreate').disabled=false; $('#btnJoinCode').disabled=false;
   setNetStatus(api.connected()?'ok':'',api.connected()?'Connected to the lobby':'Connecting…');
   NET.lobbySig=''; lobbyPresence();
   renderRoomList();
@@ -1497,7 +1501,7 @@ function renderRoomView(force){
   $('#stepBotsN').querySelector('[data-d="1"]').disabled=pl.length>=10;
   $('#stepBotsN').querySelector('[data-d="-1"]').disabled=NET.cfg.bots<=0;
   $('#btnStartNet').disabled=pl.length<2;
-  $('#roomNote').textContent=host?'You are the host. Your tab runs the match, so keep it open and in front. Friends see this room in their Open rooms list.':'If the host leaves, the next player in line takes over and the room goes back to this lobby.';
+  $('#roomNote').textContent=host?'You are the host. Your tab runs the match, so keep it open and in front. Friends can type the room code or pick it from their Open rooms list.':'If the host leaves, the next player in line takes over and the room goes back to this lobby.';
 }
 
 /* =====================================================================
@@ -2297,6 +2301,13 @@ document.querySelectorAll('[data-back]').forEach(b=>b.addEventListener('click',(
 $('#goLocal').addEventListener('click',()=>{audioInit(); showView('vLocal'); syncLocal()});
 $('#goOnline').addEventListener('click',()=>{audioInit(); openOnline()});
 $('#btnCreate').addEventListener('click',createRoom);
+function joinByCode(){
+  const code=$('#joinCode').value.toLowerCase().replace(/[^a-z0-9]/g,'');
+  if(!/^[a-z0-9]{3,8}$/.test(code)){toast('Room codes are 3 to 8 letters or numbers'); $('#joinCode').focus(); return}
+  joinRoom(code);
+}
+$('#btnJoinCode').addEventListener('click',joinByCode);
+$('#joinCode').addEventListener('keydown',e=>{if(e.key==='Enter') joinByCode()});
 $('#nick').addEventListener('change',()=>{saveName(); NET.lobbySig=''; lobbyPresence(); if(NET.named) NET.named.presence({n:myName()}).catch(()=>{})});
 $('#btnLeaveRoom').addEventListener('click',leaveRoom);
 $('#btnStartNet').addEventListener('click',()=>{audioInit(); hostStartMatch()});
