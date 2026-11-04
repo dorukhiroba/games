@@ -956,7 +956,7 @@ function savePrefs(){try{localStorage.setItem('saltpit',JSON.stringify({n:myName
 const P={pos:new V3(0,0,30),vel:new V3(),vy:0,yaw:0,pitch:0,onGround:true,hp:100,dead:false,respawnAt:0,protect:0,kills:0,deaths:0,ds:0,kb:null,
   w:0,ammoBy:WEAPONS.map(W=>W.mag),swapT:-1e9,lastFireT:-1e9,scoped:false,scopeK:0,recoil:0,shake:0,land:0,streak:0,lastHitW:null,lastHitHead:false,kw:null,kh:false,
   reloading:false,reloadEnd:0,nextFire:0,bloom:0,shotSeq:0,hitSeq:0,hits:[],lastShot:null,walk:0,kick:0,nextBeat:0,
-  crouch:false,crouchK:0,owned:[],wallhack:false,heli:null,ac:null,acHeavy:false,fx:[],fxSeq:0};
+  crouch:false,crouchK:0,owned:[],wallhack:false,heli:null,ac:null,acHeavy:false,fx:[],fxSeq:0,clickT:-1e9};
 const curW=()=>WEAPONS[P.w];
 let playing=false, paused=true, firing=false, round=1, roundOver=false, roundResetAt=0, roundWinner='';
 let practice=true;
@@ -1203,8 +1203,10 @@ function applyHit(t,dmg,head,at,w){
   hitMarker(head,killed);dmgNumber(at,dmg,head);
 }
 function fire(){
-  if(P.dead||roundOver||paused)return;
+  if(P.dead||roundOver||paused){firing=false;return}
   const W=curW();
+  // a single-shot click only counts for a moment; an old click must never go off later (e.g. after respawning)
+  if(!W.auto&&now-P.clickT>300){firing=false;return}
   if(P.reloading||now<P.nextFire||now<P.swapT+SWAP_MS)return;
   if(!W.auto)firing=false;
   if(P.ammoBy[P.w]<=0){dryFire();startReload();P.nextFire=now+250;return}
@@ -1288,6 +1290,7 @@ function die(from){
 }
 function respawn(){
   pickSpawn(P.pos,'me');P.vy=0;P.vel.set(0,0,0);P.hp=100;P.dead=false;P.protect=now+1500;P.ammoBy=WEAPONS.map(W=>W.mag);P.reloading=false;P.swapT=now;P.recoil=0;
+  firing=false;P.clickT=-1e9;
   P.yaw=Math.atan2(P.pos.x,P.pos.z);P.pitch=0;$('#death').hidden=true;vm.visible=true;
 }
 function newRound(r){
@@ -1477,7 +1480,7 @@ function callAC(){
   canvas.style.filter='grayscale(1) contrast(1.4) brightness(1.08)';$('#acHud').hidden=false;$('#cross').style.visibility='hidden';
   ksAnnounce('AC-130 above',isTouch?'Fire = 40mm · R = 105mm':'Left click 40mm · right click 105mm');
 }
-function endAC(){if(!P.ac)return;P.ac=null;canvas.style.filter='';$('#acHud').hidden=true;$('#cross').style.visibility='';camera.fov=FOV;camera.updateProjectionMatrix()}
+function endAC(){if(!P.ac)return;P.ac=null;firing=false;canvas.style.filter='';$('#acHud').hidden=true;$('#cross').style.visibility='';camera.fov=FOV;camera.updateProjectionMatrix()}
 function acMove(dx,dy){
   const s=.05*sens,right=new V3(1,0,0).applyQuaternion(camera.quaternion),fwd=new V3(0,0,-1).applyQuaternion(camera.quaternion);
   right.y=0;right.normalize();fwd.y=0;fwd.normalize();
@@ -1859,9 +1862,11 @@ canvas.addEventListener('click',()=>{if(playing&&!paused&&!locked&&!lockFailed)r
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
 let mouseDown=false;
 canvas.addEventListener('mousedown',e=>{
-  if(!playing||paused||wmOpen)return;
+  if(e.button===0)mouseDown=true;
+  // clicks while dead, between rounds or paused never arm the trigger
+  if(!playing||paused||wmOpen||P.dead||roundOver)return;
   if(e.button===2){if(P.ac)P.acHeavy=true;else P.scoped=true;return}
-  if(e.button!==0)return;mouseDown=true;if(locked||lockFailed){firing=true;initAudio()}
+  if(e.button!==0)return;if(locked||lockFailed){firing=true;P.clickT=now;initAudio()}
 });
 addEventListener('mouseup',e=>{if(e.button===0){mouseDown=false;if(curW().auto||P.ac)firing=false}if(e.button===2)P.scoped=false});
 addEventListener('mousemove',e=>{
@@ -1912,7 +1917,7 @@ tl.addEventListener('touchmove',e=>{
 function endTouch(e){for(const t of e.changedTouches){if(t.identifier===stick.id){stick.id=null;stick.x=stick.y=0;stickEl.style.opacity=0;stickEl.firstChild.style.transform=''}if(t.identifier===look.id)look.id=null}}
 tl.addEventListener('touchend',endTouch);tl.addEventListener('touchcancel',endTouch);
 const tbtn=(id,down,up)=>{const b=$(id);b.addEventListener('touchstart',e=>{e.preventDefault();e.stopPropagation();initAudio();down()},{passive:false});b.addEventListener('touchend',e=>{e.preventDefault();e.stopPropagation();up&&up()},{passive:false})};
-tbtn('#tFire',()=>{firing=true},()=>{firing=false});
+tbtn('#tFire',()=>{if(!P.dead&&!roundOver){firing=true;P.clickT=now}},()=>{firing=false});
 tbtn('#tJump',()=>{jumpQueued=true});
 tbtn('#tReload',()=>{if(P.ac)P.acHeavy=true;else startReload()});
 tbtn('#tPause',()=>pause());
