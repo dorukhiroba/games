@@ -303,7 +303,7 @@ kbd{font:700 11px var(--f-mono);background:#fff;border:1px solid rgba(23,32,42,.
   <div id="vote" hidden><div class="vbox"><div class="tape"></div><div class="vhd"><h2>Next map</h2><span id="voteT">15s</span></div><div id="voteGrid"></div><p class="note">Click a map or press 1 or 2</p></div></div>
   <div id="kspanel">
     <div class="lbl">Streak <b id="kscount">0</b> · <span id="ksnext">Care package at 3</span></div>
-    <div class="ksnav" id="ksnav" hidden><button type="button" id="ksPrev" aria-label="Previous killstreak">◀</button><span>← →</span><button type="button" id="ksNext" aria-label="Next killstreak">▶</button></div>
+    <div class="ksnav" id="ksnav" hidden><button type="button" id="ksPrev" aria-label="Select the killstreak above">▲</button><span>↑ ↓</span><button type="button" id="ksNext" aria-label="Select the killstreak below">▼</button></div>
     <div id="kslist"></div>
   </div>
   <div id="kspop"><h3 id="ksT">—</h3><p id="ksS"></p></div>
@@ -1839,7 +1839,7 @@ function addStreakKill(w){
 }
 function grantStreak(id,why){
   const k=ksById(id);P.owned.push(id);if(P.owned.length>6)P.owned.shift();P.ksSel=P.owned.length-1;
-  ksAnnounce(k.icon+' '+k.name+' ready',why+' · '+(isTouch?'tap ★ to use it':'Q to use · ← → to choose'));streakChime();
+  ksAnnounce(k.icon+' '+k.name+' ready',why+' · '+(isTouch?'tap ★ to use it':'Q to use · ↑ ↓ to choose'));streakChime();
 }
 function cycleStreak(d){if(P.owned.length<2)return;P.ksSel=(clamp(P.ksSel,0,P.owned.length-1)+d+P.owned.length)%P.owned.length;tick(700,.05,.03)}
 // ground point under the crosshair, at most maxD away, kept inside the arena
@@ -2225,8 +2225,8 @@ function updatePlayer(dt){
   P.crouchK+=((P.crouch?1:0)-P.crouchK)*Math.min(1,dt*12);
   let mx=0,mz=0;
   if(!paused){
-    if(keys.has('KeyW')||keys.has('ArrowUp'))mz-=1;if(keys.has('KeyS')||keys.has('ArrowDown'))mz+=1;
-    if(keys.has('KeyA'))mx-=1;if(keys.has('KeyD'))mx+=1;
+    if(keys.has('KeyW'))mz-=1;if(keys.has('KeyS'))mz+=1;
+    if(keys.has('KeyA')||keys.has('ArrowLeft'))mx-=1;if(keys.has('KeyD')||keys.has('ArrowRight'))mx+=1;
     mx+=stick.x;mz+=stick.y;
   }
   const ml=Math.hypot(mx,mz);if(ml>1){mx/=ml;mz/=ml}
@@ -2554,7 +2554,7 @@ addEventListener('keydown',e=>{
   if(e.code==='KeyB'){openWM();return}
   if(ksVote&&(e.code==='KeyY'||e.code==='KeyN')){castKsVote(e.code==='KeyY');return}
   if(e.code==='KeyQ'){if(!e.repeat)useStreak();return}
-  if(e.code==='ArrowLeft'||e.code==='ArrowRight'){cycleStreak(e.code==='ArrowLeft'?-1:1);return}
+  if(e.code==='ArrowUp'||e.code==='ArrowDown'){cycleStreak(e.code==='ArrowUp'?1:-1);return}
   if(e.code==='KeyC')P.crouch=true;
   keys.add(e.code);
   if(e.code==='KeyR')startReload();
@@ -2594,8 +2594,8 @@ tbtn('#tWeap',()=>openWM());
 $('#shopBtn').addEventListener('click',e=>{e.stopPropagation();openWM()});
 tbtn('#tScope',()=>{P.scoped=!P.scoped});
 tbtn('#tStreak',()=>useStreak());
-$('#ksPrev').addEventListener('click',e=>{e.stopPropagation();cycleStreak(-1)});
-$('#ksNext').addEventListener('click',e=>{e.stopPropagation();cycleStreak(1)});
+$('#ksPrev').addEventListener('click',e=>{e.stopPropagation();cycleStreak(1)});
+$('#ksNext').addEventListener('click',e=>{e.stopPropagation();cycleStreak(-1)});
 let touchUse=false;
 tbtn('#tUse',()=>{touchUse=true},()=>{touchUse=false});
 tbtn('#tCrouch',()=>{P.crouch=!P.crouch;$('#tCrouch').classList.toggle('on',P.crouch)});
