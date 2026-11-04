@@ -317,7 +317,7 @@ kbd{font-family:var(--display);font-size:12px;color:var(--ink);background:#f2f3f
       <button class="btn gold" id="onlineBtn" disabled>Connecting…</button>
       <button class="btn blue" id="practiceBtn">Practice vs bots</button>
       <p id="tStatus"></p>
-      <p class="note"><b>Playing with friends:</b> share this page with them from the Share menu, then everyone opens it and joins the same arena code. The first player in hosts the match and the bots; if they leave, someone else takes over. Up to 10 players, and bots fill the empty spots.</p>
+      <p class="note"><b>Playing with friends:</b> send them this page’s link, then everyone opens it and joins the same arena code. The first player in hosts the match and the bots; if they leave, someone else takes over. Up to 10 players, and bots fill the empty spots.</p>
     </div>
   </div>
 </div>
@@ -329,6 +329,7 @@ kbd{font-family:var(--display);font-size:12px;color:var(--ink);background:#f2f3f
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="../net.js"></script>
 <script>
 (()=>{
 'use strict';
@@ -1205,7 +1206,7 @@ $('#muteBtn').onclick=()=>{SFX.init();SFX.toggle();setMuteIcon();};
 /* ================= NET LAYER ================= */
 const NET={mode:'none',gr:null,myPeer:null,myPres:{},joinT:0,code:'',unsubs:[]};
 function waitClaude(ms){return new Promise(res=>{const t0=Date.now();const iv=setInterval(()=>{if(window.claude&&typeof window.claude.use==='function'){clearInterval(iv);res(window.claude);}else if(Date.now()-t0>ms){clearInterval(iv);res(null);}},100);});}
-const claudeP=waitClaude(4000);
+const claudeP=waitClaude(window.KNet?1500:4000).then(cl=>cl||window.KNet||null);
 const roomP=claudeP.then(cl=>cl?Promise.race([cl.use('room'),new Promise(r=>setTimeout(()=>r(null),11000))]).catch(()=>null):null);
 const userP=claudeP.then(cl=>cl?Promise.race([cl.use('user'),new Promise(r=>setTimeout(()=>r(null),11000))]).catch(()=>null):null);
 function setPres(patch){
@@ -2520,7 +2521,7 @@ async function boot(){
   roomP.then(room=>{
     const b=$('#onlineBtn');
     if(room){b.disabled=false;b.textContent='Play online';}
-    else{b.disabled=true;b.textContent='Online unavailable';$('#tStatus').textContent='Online play needs this page opened on claude.ai while signed in. Practice works anywhere.';}
+    else{b.disabled=true;b.textContent='Online unavailable';$('#tStatus').textContent='Couldn’t start online play. Check your connection and reload. Practice works anywhere.';}
   });
   userP.then(async u=>{if(!u||$('#nameIn').value)return;try{const me=await u.me();const n=cleanName((me.name||'').split(' ')[0]);if(n&&!$('#nameIn').value)$('#nameIn').value=n;}catch(e){}});
 }

@@ -5,6 +5,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@700;800;900&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="../net.js"></script>
 <style>
 /* Layout: one-screen 3D arena on a blue burst. Slanted timer plate on top, slanted fighter plates in side columns,
    a framed WebGL view in the middle with a 2D overlay for tags, emotes and countdowns. Narrow screens stack chips above. */
@@ -339,7 +340,7 @@ input.nick{width:100%;box-sizing:border-box;font-family:var(--display);font-size
       <div class="status" id="netStatus"><span class="dot"></span><span>Connecting…</span></div>
       <div class="row"><span class="lbl ol-s">Open rooms</span><button class="btn green small" id="btnCreate"><span>Create room</span></button></div>
       <div class="list" id="roomList"><div class="empty">No rooms yet. Create one and your friends will see it here.</div></div>
-      <p class="note">Friends join from this same page. Invite them from the Share menu, then they pick your room from this list. Move with WASD or the arrow keys, drop bombs with Space or Enter, and send emotes with keys 1 to 4.</p>
+      <p class="note">Friends join from this same page. Send them this page’s link, then they pick your room from this list. Move with WASD or the arrow keys, drop bombs with Space or Enter, and send emotes with keys 1 to 4.</p>
     </div>
   </div>
   <div class="view" id="vRoom" hidden>
@@ -1297,7 +1298,7 @@ const NET={api:null,tried:false,named:null,code:null,isHost:false,myPeer:null,ho
 async function getRoom(){
   if(NET.tried) return NET.api;
   NET.tried=true;
-  try{NET.api=(window.claude&&window.claude.use)?await window.claude.use('room'):null}catch(e){NET.api=null}
+  try{NET.api=(window.claude&&window.claude.use)?await window.claude.use('room'):window.KNet?await window.KNet.use('room'):null}catch(e){NET.api=null}
   if(NET.api){
     try{NET.api.onPeers(()=>renderRoomList(),()=>{setNetStatus('bad','Lost the connection to the online lobby. Reload the page to try again.')})}catch(e){}
     try{NET.api.onConnection(c=>{ if(!$('#vOnline').hidden) setNetStatus(c?'ok':'',c?'Connected to the lobby':'Connecting…') },()=>{})}catch(e){}
@@ -1342,7 +1343,7 @@ async function openOnline(){
   setNetStatus('','Connecting…');
   $('#roomList').dataset.sig='';
   const api=await getRoom();
-  if(!api){setNetStatus('bad','Online play needs this page open on claude.ai while signed in. Friends need to be invited from the Share menu and signed in too.'); $('#btnCreate').disabled=true; return}
+  if(!api){setNetStatus('bad','Couldn’t start online play. Check your connection and reload the page.'); $('#btnCreate').disabled=true; return}
   $('#btnCreate').disabled=false;
   setNetStatus(api.connected()?'ok':'',api.connected()?'Connected to the lobby':'Connecting…');
   NET.lobbySig=''; lobbyPresence();

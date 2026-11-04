@@ -182,6 +182,7 @@ kbd{font:700 11px var(--f-mono);background:#fff;border:1px solid rgba(23,32,42,.
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="../net.js"></script>
 <script>
 (function(){
 'use strict';
@@ -557,7 +558,7 @@ function goOffline(){netMode='offline';net=null;netUp=false;updateNetUI()}
 function onRoomErr(e){if(e&&TERMINAL.includes(e.code))goOffline();else if(net&&net!==lobby){net=null;netUp=false;updateNetUI();setTimeout(joinArena,2000)}}
 async function connect(){
   let api=null;
-  try{api=(window.claude&&typeof window.claude.use==='function')?await window.claude.use('room'):null}catch(e){api=null}
+  try{api=(window.claude&&typeof window.claude.use==='function')?await window.claude.use('room'):window.KNet?await window.KNet.use('room'):null}catch(e){api=null}
   if(!api){goOffline();return}
   lobby=api;
   lobby.onConnection(c=>{if(net===lobby)netUp=c;updateNetUI()},e=>{if(e&&TERMINAL.includes(e.code))goOffline()});
@@ -822,7 +823,7 @@ function updateNetUI(){
   let msg,cls='',pill;
   const others=remotes.size;
   if(netMode==='connecting'){msg='Finding an arena…';pill='Connecting'}
-  else if(netMode==='offline'){msg='Other players can’t reach this view, so you’ll practise against bots. Open the page signed in to claude.ai to play together.';cls='off';pill='Offline · bots'}
+  else if(netMode==='offline'){msg='Couldn’t connect to other players, so you’ll practise against bots. Check your connection and reload to try again.';cls='off';pill='Offline · bots'}
   else if(!netUp){msg='Reconnecting to arena '+arenaNo+'…';pill='Reconnecting'}
   else{cls='live';
     msg=others===0?'Arena '+arenaNo+' is empty. Bots keep you busy until someone drops in — share this page to invite people.':'Arena '+arenaNo+' · '+others+' player'+(others>1?'s':'')+' fighting now.';
