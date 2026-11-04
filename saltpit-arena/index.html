@@ -162,12 +162,13 @@ kbd{font:700 11px var(--f-mono);background:#fff;border:1px solid rgba(23,32,42,.
 #objPrompt i{display:block;width:200px;height:6px;background:rgba(241,235,224,.2);border-radius:2px;overflow:hidden}
 #objPrompt i b{display:block;height:100%;width:0;background:var(--hazard)}
 #board tr.teamrow td{font:800 14px var(--f-display);letter-spacing:.1em;text-transform:uppercase;padding-top:10px}
-#vote{position:absolute;inset:0;display:grid;place-items:center;padding:16px;background:rgba(23,32,42,.35);pointer-events:auto}
+#vote{position:absolute;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(560px,calc(100vw - 32px));pointer-events:auto}
+#banner{top:16%}
 #vote .vbox{width:min(640px,100%);background:var(--salt);color:var(--ink);border-radius:3px;overflow:hidden;box-shadow:0 28px 60px -24px rgba(23,32,42,.8)}
 #vote .vhd{display:flex;justify-content:space-between;align-items:baseline;padding:12px 16px 4px}
 #vote h2{margin:0;font:900 30px/.9 var(--f-display);letter-spacing:.04em;text-transform:uppercase}
 #voteT{font:700 18px var(--f-mono);color:var(--hazard)}
-#voteGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:10px 16px 6px}
+#voteGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:10px 16px 6px}
 .vcard{font:inherit;color:var(--salt);text-align:left;cursor:pointer;border:3px solid transparent;border-radius:3px;padding:44px 10px 10px;position:relative;
   background:linear-gradient(180deg,var(--a) 0%,var(--b) 55%,var(--g) 56%,var(--g) 100%);min-height:120px;display:grid;align-content:end;gap:2px}
 .vcard h3{margin:0;font:900 22px/.95 var(--f-display);letter-spacing:.04em;text-transform:uppercase;text-shadow:0 2px 0 rgba(23,32,42,.6)}
@@ -177,7 +178,7 @@ kbd{font:700 11px var(--f-mono);background:#fff;border:1px solid rgba(23,32,42,.
 .vcard.on{border-color:var(--hazard);box-shadow:0 0 0 2px var(--hazard)}
 #vote .note{padding:0 16px 12px}
 #tUse{width:64px;height:64px;left:50%;margin-left:-32px;bottom:calc(150px + env(safe-area-inset-bottom,0px));background:rgba(255,98,36,.55)}
-@media (max-width:560px){#voteGrid{grid-template-columns:1fr}.vcard{min-height:76px;padding-top:30px}}
+@media (max-width:560px){.vcard{min-height:76px;padding-top:30px}}
 /* ---------- armory ---------- */
 #armory{position:fixed;inset:0;z-index:40;display:grid;place-items:center;overflow:auto;padding:16px;background:rgba(23,32,42,.55)}
 .arm{width:min(760px,100%);background:var(--salt);color:var(--ink);border-radius:3px;overflow:hidden;box-shadow:0 28px 60px -24px rgba(23,32,42,.8)}
@@ -227,6 +228,16 @@ kbd{font:700 11px var(--f-mono);background:#fff;border:1px solid rgba(23,32,42,.
 #kspanel>.lbl{background:var(--plate);padding:5px 9px;border-radius:3px}
 #kspanel>.lbl b{color:var(--hazard)}
 #kslist{display:grid;gap:5px;justify-items:end}
+#ksvote{position:absolute;left:calc(14px + env(safe-area-inset-left,0px));top:40%;display:grid;gap:5px;background:var(--plate);padding:9px 12px;border-radius:3px;max-width:260px;box-shadow:inset 3px 0 0 var(--hazard)}
+#ksvote b{font:800 17px var(--f-display);letter-spacing:.06em;text-transform:uppercase}
+.ksvrow{display:flex;gap:6px;align-items:center}
+.ksvrow button{pointer-events:auto;cursor:pointer;border:0;border-radius:2px;padding:5px 9px;font:800 14px var(--f-display);letter-spacing:.06em;text-transform:uppercase;background:rgba(241,235,224,.15);color:var(--salt);display:flex;gap:6px;align-items:center}
+.ksvrow button.on{background:var(--hazard);color:var(--ink)}
+#ksvTime{font:700 12px var(--f-mono);color:var(--hazard);margin-left:auto}
+#ksvTally{font:700 10.5px var(--f-mono);letter-spacing:.06em;color:rgba(241,235,224,.75)}
+.touchui #ksvote{top:auto;bottom:calc(200px + env(safe-area-inset-bottom,0px))}
+.ksnav{display:flex;gap:6px;align-items:center;background:var(--plate);padding:3px 5px;border-radius:3px;font:700 10px var(--f-mono);color:rgba(241,235,224,.7)}
+.ksnav button{pointer-events:auto;cursor:pointer;border:0;background:var(--hazard);color:var(--ink);font:800 12px var(--f-body);width:26px;height:22px;border-radius:2px}
 .ks{pointer-events:auto;cursor:pointer;border:0;display:flex;align-items:center;gap:8px;background:var(--plate);color:var(--salt);border-radius:3px;padding:6px 8px 6px 10px;font:800 15px var(--f-display);letter-spacing:.08em;text-transform:uppercase;box-shadow:inset 3px 0 0 var(--slate)}
 .ks.top{box-shadow:inset 3px 0 0 var(--hazard),0 0 0 1px rgba(255,98,36,.6);animation:kspulse 1.4s ease-in-out infinite}
 .ks kbd{background:var(--hazard);color:var(--ink);border-color:var(--ink)}
@@ -289,12 +300,16 @@ kbd{font:700 11px var(--f-mono);background:#fff;border:1px solid rgba(23,32,42,.
   <div class="hud-tc plate"><div class="goal"><span id="goalTxt">First to 30</span> · <span id="mapname">Salt Quarry</span></div><div id="leader">No eliminations yet</div>
     <div id="objHud" hidden><div class="tsrow"><b id="tsA" style="color:#2f7fd8">0</b><span id="tsTail"></span><b id="tsB" style="color:#e2483d">0</b></div><div id="objLine"></div><div class="lbl">You are <span id="tsMine">Blue</span></div></div></div>
   <div id="objPrompt" hidden><span id="objPromptT"></span><i><b id="objBar"></b></i></div>
-  <div id="vote" hidden><div class="vbox"><div class="tape"></div><div class="vhd"><h2>Vote for the next map</h2><span id="voteT">10s</span></div><div id="voteGrid"></div><p class="note">Click a map or press 1–3</p></div></div>
+  <div id="vote" hidden><div class="vbox"><div class="tape"></div><div class="vhd"><h2>Next map</h2><span id="voteT">15s</span></div><div id="voteGrid"></div><p class="note">Click a map or press 1 or 2</p></div></div>
   <div id="kspanel">
     <div class="lbl">Streak <b id="kscount">0</b> · <span id="ksnext">Care package at 3</span></div>
+    <div class="ksnav" id="ksnav" hidden><button type="button" id="ksPrev" aria-label="Previous killstreak">◀</button><span>← →</span><button type="button" id="ksNext" aria-label="Next killstreak">▶</button></div>
     <div id="kslist"></div>
   </div>
   <div id="kspop"><h3 id="ksT">—</h3><p id="ksS"></p></div>
+  <div id="ksvote" hidden><span class="lbl">Vote · turn killstreaks off</span><b id="ksvBy">—</b>
+    <div class="ksvrow"><button type="button" id="ksvYes"><kbd>Y</kbd> Yes</button><button type="button" id="ksvNo"><kbd>N</kbd> No</button><span id="ksvTime">20s</span></div>
+    <span id="ksvTally"></span></div>
   <div id="acHud" hidden><div class="acframe"></div><div class="acret"><i></i><i></i><i></i><i></i></div>
     <div class="acinfo plate"><b>AC-130</b> · <span id="acTime">25s</span> · <span id="acHeavy">105mm ready</span></div></div>
   <div id="nukeHud" hidden>
@@ -374,6 +389,7 @@ kbd{font:700 11px var(--f-mono);background:#fff;border:1px solid rgba(23,32,42,.
       <div class="field"><span class="lbl" id="colLbl">Suit colour</span><div id="swatches" role="group" aria-labelledby="colLbl"></div></div>
       <div class="field"><label class="lbl" for="sens">Look sensitivity <b id="sensVal">1.0×</b></label><input id="sens" type="range" min="0.2" max="3" step="0.1"></div>
       <button class="secondary" id="armBtn" type="button">Armory · weapon camos</button>
+      <button class="secondary" id="ksVoteBtn" type="button" hidden>Vote to turn killstreaks off</button>
       <button class="primary" id="play" type="button"><span id="playTxt">Drop in</span><i>▶</i></button>
       <div class="status"><span class="dot" id="mdot"></span><span id="mstatus">Finding an arena…</span></div>
       <div class="keys" id="keys">
@@ -405,12 +421,12 @@ const BOT_NAMES=['Gravel','Shale','Flint','Basalt','Quartz'];
 const SPH=[{y:.5,r:.36,head:false,dy:.18},{y:1.12,r:.42,head:false,dy:.4},{y:1.64,r:.27,head:true,dy:.52}];
 // killstreaks, earned at n kills in a row (kills made by killstreaks don't count toward the next one)
 const KS=[
-  {id:'pkg',n:3,name:'Care package',hint:'A crate with a random killstreak lands where you aim'},
-  {id:'air',n:5,name:'Airstrike',hint:'A bombing run along your aim'},
-  {id:'heli',n:7,name:'Attack helicopter',hint:'Hunts enemies for 40 seconds'},
-  {id:'wall',n:9,name:'Wallhack',hint:'See enemies through walls until you die'},
-  {id:'ac',n:11,name:'AC-130',hint:'Gunship view for 25 seconds'},
-  {id:'nuke',n:15,name:'Tactical nuke',hint:'10 seconds, then everyone else dies and you win the round'},
+  {id:'pkg',n:3,name:'Care package',icon:'📦',hint:'A crate with a random killstreak lands where you aim; anyone can take it'},
+  {id:'air',n:5,name:'Airstrike',icon:'✈️',hint:'A bombing run along your aim'},
+  {id:'heli',n:7,name:'Attack helicopter',icon:'🚁',hint:'Arrives in 10 seconds, then hunts enemies for 40'},
+  {id:'wall',n:9,name:'Wallhack',icon:'👁️',hint:'See enemies through walls until you die'},
+  {id:'ac',n:11,name:'AC-130',icon:'🎯',hint:'Gunship view for 25 seconds'},
+  {id:'nuke',n:15,name:'Tactical nuke',icon:'☢️',hint:'10 seconds, then everyone dies and you win the round'},
 ];
 const ksById=id=>KS.find(k=>k.id===id);
 // kill-feed codes for killstreak kills (weapons use 0–5)
@@ -1087,7 +1103,7 @@ function savePrefs(){try{localStorage.setItem('saltpit',JSON.stringify({n:myName
 const P={pos:new V3(0,0,30),vel:new V3(),vy:0,yaw:0,pitch:0,onGround:true,hp:100,dead:false,respawnAt:0,protect:0,kills:0,deaths:0,ds:0,kb:null,
   w:0,ammoBy:WEAPONS.map(W=>W.mag),swapT:-1e9,lastFireT:-1e9,scoped:false,scopeK:0,recoil:0,shake:0,land:0,streak:0,lastHitW:null,lastHitHead:false,kw:null,kh:false,
   reloading:false,reloadEnd:0,nextFire:0,bloom:0,shotSeq:0,hitSeq:0,hits:[],lastShot:null,walk:0,kick:0,nextBeat:0,
-  crouch:false,crouchK:0,owned:[],wallhack:false,heli:null,ac:null,acHeavy:false,fx:[],fxSeq:0,clickT:-1e9};
+  crouch:false,crouchK:0,owned:[],wallhack:false,heli:null,ac:null,acHeavy:false,fx:[],fxSeq:0,clickT:-1e9,ksSel:0,life:0,pkgHold:0};
 const curW=()=>WEAPONS[P.w];
 let playing=false, paused=true, firing=false, round=1, roundOver=false, roundResetAt=0, roundWinner='';
 let practice=true;
@@ -1187,6 +1203,7 @@ async function joinArena(){
   const g=++joinGen, code=roomCode, switching=!!net;
   if(net&&net!==lobby){const old=net;old.leave().catch(()=>{})}
   net=null;netUp=false;myPeer=null;clearRemotes();netMode='connecting';updateNetUI();
+  ksDisabled=false;if(ksVote){ksVote=null;$('#ksvote').hidden=true}
   if(switching){round=1;if(playing)newRound(1)}
   let pick=0;
   if(!code){
@@ -1219,7 +1236,7 @@ function sendPresence(){
   if(!myPeer)return;
   net.presence({n:myName,c:myColor,p:[r2(P.pos.x),r2(P.pos.y),r2(P.pos.z)],r:[r3(P.yaw),r3(P.pitch)],hp:Math.max(0,Math.round(P.hp)),
     dd:P.dead?1:0,ds:P.ds,kb:P.kb||null,kw:P.kw,kh:P.kh?1:0,w:P.w,k:P.kills,d:P.deaths,rd:round,sp:now<P.protect?1:0,sh:P.lastShot,h:P.hits,
-    cr:P.crouchK>.5?1:0,fx:P.fx,tm:myTeam,md:mode,mp:curMap,mv:roundOver?P_mv:-1,ia:P.ia?1:0,ob:isTeam()&&isHost()?OB:null,
+    cr:P.crouchK>.5?1:0,fx:P.fx,tm:myTeam,md:mode,mp:curMap,mv:roundOver?P_mv:-1,ia:P.ia?1:0,ob:isTeam()&&isHost()?OB:null,ko:ksDisabled?1:0,kv:ksVote&&ksVote.mine>=0?[ksVote.id,ksVote.mine]:null,
     cm:camoData.sel[P.w],
     hl:P.heli?[r2(P.heli.pos.x),r2(P.heli.pos.y),r2(P.heli.pos.z),r3(P.heli.yaw)]:null,
     ac:P.ac?[r2(P.ac.plane.x),r2(P.ac.plane.y),r2(P.ac.plane.z)]:null}).catch(()=>{});
@@ -1243,6 +1260,7 @@ function syncPeers(dt){
     let s=remotes.get(p.peer);
     if(!s){s={pos:new V3(...pr.p),tp:new V3(),yaw:0,pitch:0,av:makeAvatar(ci,name),name,ci,first:true};remotes.set(p.peer,s);if(playing)toast(name+' dropped in')}
     if(s.ci!==ci||s.name!==name){disposeAvatar(s.av);s.av=makeAvatar(ci,name);s.ci=ci;s.name=name}
+    s.ko=!!pr.ko;s.kv=Array.isArray(pr.kv)&&typeof pr.kv[0]==='string'?[pr.kv[0],pr.kv[1]?1:0]:null;
     s.tm=rtm;s.md=pr.md;s.mp=Number.isInteger(pr.mp)&&MAPS[pr.mp]?pr.mp:null;s.mv=Number.isInteger(pr.mv)?pr.mv:-1;s.ia=!!pr.ia;
     const ob=pr.ob;s.ob=ob&&typeof ob==='object'&&ob.md===mode&&Array.isArray(ob.ts)&&Array.isArray(ob.dom)&&ob.dom.length===3&&Array.isArray(ob.fl)&&ob.fl.length===2&&ob.sd&&typeof ob.sd==='object'&&Array.isArray(ob.ev)?ob:null;
     s.av.enemy=isEnemyTeam(rtm);s.av.hideTag=isTeam()&&s.av.enemy;
@@ -1442,7 +1460,7 @@ function die(from){
 }
 function respawn(){
   pickSpawn(P.pos,'me');P.vy=0;P.vel.set(0,0,0);P.hp=100;P.dead=false;P.protect=now+1500;P.ammoBy=WEAPONS.map(W=>W.mag);P.reloading=false;P.swapT=now;P.recoil=0;
-  firing=false;P.clickT=-1e9;
+  firing=false;P.clickT=-1e9;P.life++;
   P.yaw=Math.atan2(P.pos.x,P.pos.z);P.pitch=0;$('#death').hidden=true;vm.visible=true;
 }
 function newRound(r,m){
@@ -1625,12 +1643,14 @@ function followObjectives(){
       lastBoom=V.sd.boom|0;
     }
   }
-  if(V.end>=0&&!roundOver){const w=V.end;endRound(w===myTeam?'Your team wins':TEAMS[w].name+' team wins',MODES[mode].name)}
+  if(V.end>=0&&!roundOver){const w=V.end,nk=now-lastNukeT<30000,txt=w===myTeam?'Your team wins':TEAMS[w].name+' team wins';
+    endRound(nk?'TACTICAL NUKE!':txt,nk?txt:MODES[mode].name)}
 }
 
 // ---- round end, then results, then a map vote, then the next round
 let roundEndT=0, voteOpts=[], P_mv=-1, voteOpen=false;
-const RESULTS_MS=4500, VOTE_MS=10000;
+const BREAK_MS=15000, VOTE_FROM=1500;
+let lastNukeT=-1e9, ovT=0;
 function endRound(title,sub){
   if(roundOver)return;roundOver=true;roundEndT=now;firing=false;P_mv=-1;
   $('#bannerT').textContent=title;$('#bannerS').textContent=sub||'';$('#banner').hidden=false;tick(660,.12,.15);tick(990,.12,.2,.15);
@@ -1638,7 +1658,7 @@ function endRound(title,sub){
 }
 function voteOptions(r){
   const rng=mulberry32(r*7919+MODE_IDS.indexOf(mode)*31+17),c=MAPS.map((_,i)=>i).filter(i=>i!==curMap);
-  for(let i=c.length-1;i>0;i--){const j=(rng()*(i+1))|0;[c[i],c[j]]=[c[j],c[i]]}return c.slice(0,3);
+  for(let i=c.length-1;i>0;i--){const j=(rng()*(i+1))|0;[c[i],c[j]]=[c[j],c[i]]}return c.slice(0,2);
 }
 function voteCounts(){
   const n=voteOpts.map(()=>0);if(P_mv>=0&&P_mv<n.length)n[P_mv]++;
@@ -1666,13 +1686,10 @@ function roundLogic(){
   if(!playing)return;
   if(roundOver){
     const t=now-roundEndT;
-    if(t<RESULTS_MS){$('#bannerS').dataset.k='';setText('voteT','');if(!$('#bannerS').textContent)$('#bannerS').textContent='Map vote in '+Math.ceil((RESULTS_MS-t)/1000)}
-    else{
-      if(!voteOpen){$('#banner').hidden=true;openVote()}
-      const left=Math.max(0,Math.ceil((RESULTS_MS+VOTE_MS-t)/1000));setText('voteT',left+'s');renderVote();
-      // the host decides; everyone else follows the host's next round (or decides alone if the host is gone)
-      if(t>=RESULTS_MS+VOTE_MS&&(isHost()||t>=RESULTS_MS+VOTE_MS+3000))newRound(round+1,voteWinner());
-    }
+    if(t>=VOTE_FROM&&!voteOpen)openVote();
+    if(voteOpen){setText('voteT',Math.max(0,Math.ceil((BREAK_MS-t)/1000))+'s');renderVote()}
+    // the host decides; everyone else follows the host's next round (or decides alone if the host is gone)
+    if(t>=BREAK_MS&&(isHost()||t>=BREAK_MS+3000))newRound(round+1,voteWinner());
     return;
   }
   if(!isTeam()){
@@ -1760,7 +1777,7 @@ function teamScoreText(V){
   return [V.ts[0],V.ts[1],'first to '+L];
 }
 function updateObjHud(){
-  const box=$('#objHud');if(!isTeam()){if(!box.hidden)box.hidden=true;return}
+  const box=$('#objHud');if(!isTeam()){if(!box.hidden)box.hidden=true;updatePrompt();return}
   box.hidden=false;const V=VIEW(),[a,b,tail]=teamScoreText(V);
   setText('tsA',String(a));setText('tsB',String(b));setText('tsTail',tail);
   $('#tsMine').textContent=TEAMS[myTeam].name;$('#tsMine').style.color=TEAMS[myTeam].color;
@@ -1770,11 +1787,14 @@ function updateObjHud(){
   if(mode==='snd'){const S=V.sd,role=myTeam===S.atk?'Attack':'Defend';
     line=role+' · '+(S.ph===0?'plant in '+Math.max(0,Math.ceil(S.tl))+'s':S.ph===1?'bomb at '+'AB'[S.site]+' · '+Math.max(0,Math.ceil(S.bl))+'s':'next round')+(playing&&P.dead&&S.ph<2?' · you are out':'')}
   setText('objLine',line);
-  // plant / defuse prompt
-  const pr=$('#objPrompt');let show=false;
-  if(mode==='snd'&&playing&&!P.dead&&OBJ){const S=V.sd;
+  updatePrompt();
+}
+function updatePrompt(){
+  const V=VIEW(),pr=$('#objPrompt');let show=false;
+  if(isTeam()&&mode==='snd'&&playing&&!P.dead&&OBJ){const S=V.sd;
     if(myTeam===S.atk&&S.ph===0&&OBJ.site.some(z=>Math.hypot(P.pos.x-z.x,P.pos.z-z.z)<3)){show=true;setText('objPromptT',(isTouch?'Hold USE':'Hold E')+' to plant');$('#objBar').style.width=Math.min(100,S.pp/PLANT_TIME*100)+'%'}
     else if(myTeam!==S.atk&&S.ph===1&&v3(S.bp)&&P.pos.distanceTo(v3(S.bp))<2.4){show=true;setText('objPromptT',(isTouch?'Hold USE':'Hold E')+' to defuse');$('#objBar').style.width=Math.min(100,S.dp/DEFUSE_TIME*100)+'%'}}
+  if(!show&&pkgPrompt){show=true;setText('objPromptT',pkgPrompt.t);$('#objBar').style.width=Math.min(100,pkgPrompt.p*100)+'%'}
   pr.hidden=!show;$('#tUse').hidden=!(isTouch&&show);
 }
 
@@ -1788,14 +1808,18 @@ function updateTimers(){for(let i=timers.length-1;i>=0;i--)if(now>=timers[i].at)
 function pushFx(e){P.fxSeq++;e.s=P.fxSeq;P.fx.push(e);if(P.fx.length>16)P.fx.shift();return e.s}
 function ksAnnounce(title,sub){$('#ksT').textContent=title;$('#ksS').textContent=sub||'';ksPopT=now}
 function streakChime(){[660,880,1320].forEach((f,i)=>tick(f,.09,.18,i*.09))}
+// life in which each killstreak type was last called: its kills only feed your streak during that life
+const ksLife={};
 function addStreakKill(w){
-  if(Number.isInteger(w)&&w>=10)return;
+  if(ksDisabled)return;
+  if(Number.isInteger(w)&&w>=10&&ksLife[w]!==P.life)return;
   P.streak++;const k=KS.find(x=>x.n===P.streak);if(k)grantStreak(k.id,k.n+' kills in a row');
 }
 function grantStreak(id,why){
-  const k=ksById(id);P.owned.push(id);if(P.owned.length>6)P.owned.shift();
-  ksAnnounce(k.name+' ready',why+' · '+(isTouch?'tap ★ to use it':'press Q to use it'));streakChime();
+  const k=ksById(id);P.owned.push(id);if(P.owned.length>6)P.owned.shift();P.ksSel=P.owned.length-1;
+  ksAnnounce(k.icon+' '+k.name+' ready',why+' · '+(isTouch?'tap ★ to use it':'Q to use · ← → to choose'));streakChime();
 }
+function cycleStreak(d){if(P.owned.length<2)return;P.ksSel=(clamp(P.ksSel,0,P.owned.length-1)+d+P.owned.length)%P.owned.length;tick(700,.05,.03)}
 // ground point under the crosshair, at most maxD away, kept inside the arena
 function aimPoint(maxD){
   const o=camera.getWorldPosition(new V3()),d=new V3(0,0,-1).applyQuaternion(camera.quaternion);
@@ -1803,12 +1827,50 @@ function aimPoint(maxD){
   p.x=clamp(p.x,-ARENA+3,ARENA-3);p.z=clamp(p.z,-ARENA+3,ARENA-3);p.y=floorAt({x:p.x,y:60,z:p.z},.3);return p;
 }
 function useStreak(i){
-  if(!playing||P.dead||roundOver||paused||P.ac||wmOpen)return;
-  if(i==null)i=P.owned.length-1;const id=P.owned[i];if(!id)return;
+  if(!playing||P.dead||roundOver||paused||P.ac||wmOpen||ksDisabled)return;
+  if(i==null)i=clamp(P.ksSel,0,P.owned.length-1);const id=P.owned[i];if(!id)return;
   if(id==='heli'&&P.heli){toast('Your helicopter is still flying');return}
   if(id==='nuke'&&nuke)return;
-  P.owned.splice(i,1);
+  P.owned.splice(i,1);P.ksSel=P.owned.length-1;if(KSW[id])ksLife[KSW[id]]=P.life;
   ({pkg:callPackage,air:callAirstrike,heli:callHeli,wall:callWallhack,ac:callAC,nuke:callNuke})[id]();
+}
+
+// --- vote to switch killstreaks off for the rest of the game (players only; bots don't vote)
+let ksDisabled=false, ksVote=null, ksVoteCooldown=0;
+const KSV_MS=20000;
+function startKsVote(){
+  if(!playing)return;
+  if(ksDisabled){toast('Killstreaks are already off');return}
+  if(ksVote){toast('A vote is already running');return}
+  if(now<ksVoteCooldown){toast('Wait '+Math.ceil((ksVoteCooldown-now)/1000)+'s before starting another vote');return}
+  const id=meId()+':'+(P.fxSeq+1);pushFx({k:'ksvote',v:id});openKsVote(id,myName);castKsVote(true);
+}
+function openKsVote(id,by){ksVote={id,by,until:now+KSV_MS,mine:-1};$('#ksvote').hidden=false;setText('ksvBy','Started by '+by);renderKsVote()}
+function castKsVote(yes){if(!ksVote)return;ksVote.mine=yes?1:0;tick(yes?880:440,.07,.05);renderKsVote()}
+function ksVoteTally(){
+  let yes=ksVote.mine===1?1:0,no=ksVote.mine===0?1:0;
+  for(const [,r] of remotes)if(r.kv&&r.kv[0]===ksVote.id){if(r.kv[1])yes++;else no++}
+  return {yes,no,total:(playing?1:0)+remotes.size};
+}
+function renderKsVote(){
+  if(!ksVote)return;const t=ksVoteTally();
+  setText('ksvTally',t.yes+' yes · '+t.no+' no · '+t.total+' player'+(t.total===1?'':'s'));
+  setText('ksvTime',Math.max(0,Math.ceil((ksVote.until-now)/1000))+'s');
+  $('#ksvYes').classList.toggle('on',ksVote.mine===1);$('#ksvNo').classList.toggle('on',ksVote.mine===0);
+}
+function endKsVote(msg){ksVote=null;$('#ksvote').hidden=true;ksVoteCooldown=now+60000;toast(msg)}
+function disableKillstreaks(){
+  if(ksDisabled)return;ksDisabled=true;P.owned=[];P.ksSel=0;endHeli();endAC();
+  if(nuke){nuke=null;$('#nukeHud').hidden=true}
+  ksAnnounce('Killstreaks off','For the rest of this game');
+}
+function updateKsVote(){
+  // sticky: once anyone in the room has them off, everyone does
+  if(!ksDisabled)for(const [,r] of remotes)if(r.ko){disableKillstreaks();if(ksVote){ksVote=null;$('#ksvote').hidden=true}break}
+  if(!ksVote)return;
+  const t=ksVoteTally();renderKsVote();
+  if(t.yes*2>t.total){disableKillstreaks();endKsVote('Vote passed · killstreaks are off')}
+  else if(t.no*2>=t.total||now>ksVote.until)endKsVote('Vote failed · killstreaks stay on');
 }
 
 // --- sounds
@@ -1827,32 +1889,47 @@ function whoosh(){if(!actx)return;const t=actx.currentTime;noiseHit(t,.8,2400,90
 
 // --- care package
 const crateGeo=new T.BoxGeometry(1.1,1.1,1.1), chuteGeo=new T.SphereGeometry(1.6,10,6,0,Math.PI*2,0,Math.PI/2);
-function spawnCrate(key,x,fy,z,mine,id){
+// floating label with the killstreak inside the crate
+function ksSprite(id){
+  const k=ksById(id)||KS[1],c=document.createElement('canvas');c.width=320;c.height=96;const g=c.getContext('2d');
+  g.fillStyle='rgba(23,32,42,.85)';g.fillRect(8,8,304,80);g.fillStyle='#ff6224';g.fillRect(8,8,8,80);
+  g.font='52px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif';g.textBaseline='middle';g.fillText(k.icon,26,50);
+  g.fillStyle='#f1ebe0';g.font='800 34px "Big Shoulders Display","Arial Narrow",sans-serif';g.fillText(k.name.toUpperCase(),96,52,206);
+  const sp=new T.Sprite(new T.SpriteMaterial({map:new T.CanvasTexture(c),transparent:true,depthTest:false}));sp.scale.set(3,.9,1);sp.renderOrder=997;return sp;
+}
+function spawnCrate(key,x,fy,z,mine,id,reward,owner){
   const g=new T.Group(),b=new T.Mesh(crateGeo,mat('#4a5a3a'));b.castShadow=true;g.add(b);
   g.add(new T.Mesh(new T.BoxGeometry(1.14,.18,1.14),mat('#ff6224')));
   const chute=new T.Mesh(chuteGeo,mat('#f1ebe0'));chute.position.y=3;g.add(chute);
+  const tag=ksSprite(reward);tag.position.y=1.7;g.add(tag);
   g.position.set(x,fy+45,z);scene.add(g);
-  crates.push({key,id,g,chute,x,z,fy,landed:false,mine,t0:now,flare:0});
+  crates.push({key,id,g,chute,tag,x,z,fy,landed:false,mine,owner,reward,t0:now,flare:0});
 }
 function removeCrate(key){for(let i=crates.length-1;i>=0;i--)if(crates[i].key===key){scene.remove(crates[i].g);crates.splice(i,1)}}
 function removeCrates(prefix){for(let i=crates.length-1;i>=0;i--)if(crates[i].key.startsWith(prefix)){scene.remove(crates[i].g);crates.splice(i,1)}}
 function callPackage(){
-  const p=aimPoint(30),id=pushFx({k:'pkg',p:[r2(p.x),r2(p.y),r2(p.z)]});
-  spawnCrate('me:'+id,p.x,p.y,p.z,true,id);jetSound();
-  ksAnnounce('Care package inbound','Walk into the crate to open it');
+  const r=rollLoot(),p=aimPoint(30),id=pushFx({k:'pkg',p:[r2(p.x),r2(p.y),r2(p.z)],r});
+  spawnCrate('me:'+id,p.x,p.y,p.z,true,id,r,meId());jetSound();
+  ksAnnounce('📦 Care package inbound','Hold E at the crate for 2 seconds · anyone can take it');
 }
 const PKG_LOOT=[['air',35],['heli',27],['wall',23],['ac',15]];
+function rollLoot(){let r=Math.random()*100;for(const [k,w] of PKG_LOOT){if(r<w)return k;r-=w}return 'air'}
+let pkgPrompt=null;
 function updateCrates(dt){
+  // the closest landed crate you're standing at; hold E (or USE) for 2 seconds to take it
+  let near=null;
+  if(playing&&!P.dead&&!P.ac&&!roundOver)for(const c of crates)if(c.landed&&Math.hypot(P.pos.x-c.x,P.pos.z-c.z)<2&&Math.abs(P.pos.y-c.fy)<1.8){near=c;break}
+  if(near&&P.ia){P.pkgHold+=dt;if(P.pkgHold>=2){P.pkgHold=0;removeCrate(near.key);pushFx({k:'pkgx',o:near.owner,id:near.id});grantStreak(near.reward,'Care package');near=null}}
+  else P.pkgHold=0;
+  pkgPrompt=near?{t:(isTouch?'Hold USE':'Hold E')+' · '+ksById(near.reward).icon+' '+ksById(near.reward).name,p:P.pkgHold/2}:null;
   for(const c of [...crates]){
     if(!c.landed){
       c.g.position.y=Math.max(c.fy+.55,c.g.position.y-dt*11);c.g.rotation.y+=dt*.6;
       c.flare-=dt;if(c.flare<=0){c.flare=.07;puff(new V3(c.x,c.fy+.2,c.z),'#ff6224',.7,.9,2.2)}
       if(c.g.position.y<=c.fy+.55){c.landed=true;c.chute.visible=false;puff(new V3(c.x,c.fy+.3,c.z),'#f6f1e8',2,.6,.5)}
     }
-    if(c.mine&&c.landed&&playing&&!P.dead&&!P.ac&&Math.hypot(P.pos.x-c.x,P.pos.z-c.z)<1.7&&Math.abs(P.pos.y-c.fy)<1.8){
-      let r=Math.random()*100,id='air';for(const [k,w] of PKG_LOOT){if(r<w){id=k;break}r-=w}
-      removeCrate(c.key);pushFx({k:'pkgx',id:c.id});grantStreak(id,'Care package');
-    }else if(now-c.t0>90000){removeCrate(c.key);if(c.mine)pushFx({k:'pkgx',id:c.id})}
+    c.tag.position.y=1.7+Math.sin(now*.003)*.12;
+    if(now-c.t0>(c.mine?90000:100000)){removeCrate(c.key);if(c.mine)pushFx({k:'pkgx',o:c.owner,id:c.id})}
   }
 }
 
@@ -1899,14 +1976,22 @@ function makeHeli(color){
 }
 function callHeli(){
   const h=makeHeli(COLORS[myColor]);scene.add(h.g);
-  P.heli=Object.assign(h,{pos:new V3(clamp(P.pos.x,-30,30),30,clamp(P.pos.z,-30,30)),yaw:P.yaw,ang:Math.atan2(P.pos.z,P.pos.x),until:now+40000,next:0,burst:0,tgt:null,retarget:0});
-  ksAnnounce('Attack helicopter inbound','It hunts on its own for 40 seconds');
+  const a=Math.random()*Math.PI*2;
+  P.heli=Object.assign(h,{pos:new V3(Math.cos(a)*150,36,Math.sin(a)*150),from:null,yaw:0,ang:a,arriveAt:now+10000,until:now+50000,next:0,burst:0,tgt:null,retarget:0,arrived:false});
+  ksAnnounce('🚁 Attack helicopter inbound','Arriving in 10 seconds · then it hunts for 40');
 }
 function endHeli(){if(P.heli){scene.remove(P.heli.g);P.heli=null}}
 const _Y=new V3(0,1,0);
 function updateHeli(dt){
   const Hh=P.heli;if(!Hh)return;
   if(now>Hh.until){endHeli();toast('Your helicopter is leaving');return}
+  if(now<Hh.arriveAt){
+    // inbound: a smooth run from far outside the map to its patrol circle
+    const entry=new V3(Math.cos(Hh.ang)*17,15,Math.sin(Hh.ang)*17),k=1-(Hh.arriveAt-now)/10000,e=k*k*(3-2*k);
+    if(!Hh.from)Hh.from=Hh.pos.clone();Hh.pos.lerpVectors(Hh.from,entry,e);
+    Hh.yaw=Math.atan2(-(entry.x-Hh.from.x),-(entry.z-Hh.from.z));Hh.g.position.copy(Hh.pos);Hh.g.rotation.set(-.25,Hh.yaw,0);return;
+  }
+  if(!Hh.arrived){Hh.arrived=true;toast('Helicopter on station · opening fire in 3 seconds')}
   Hh.ang+=dt*.2;
   const want=new V3(Math.cos(Hh.ang)*17,15+Math.sin(now*.0012)*1.2,Math.sin(Hh.ang)*17);
   const prev=Hh.pos.clone();Hh.pos.lerp(want,1-Math.exp(-dt*.8));
@@ -1920,7 +2005,7 @@ function updateHeli(dt){
   const mv=Hh.pos.clone().sub(prev);
   const ty=Hh.tgt?Math.atan2(-(Hh.tgt.pos.x-Hh.pos.x),-(Hh.tgt.pos.z-Hh.pos.z)):Math.atan2(-mv.x,-mv.z);
   Hh.yaw=lerpAngle(Hh.yaw,ty,Math.min(1,dt*3));Hh.g.position.copy(Hh.pos);Hh.g.rotation.set(-.12,Hh.yaw,0);
-  if(Hh.tgt&&now>Hh.next&&!roundOver){
+  if(Hh.tgt&&now>Hh.next&&now>Hh.arriveAt+3000&&!roundOver){
     if(Hh.burst>=10){Hh.burst=0;Hh.next=now+1000;return}
     Hh.burst++;Hh.next=now+110;
     const tg=Hh.tgt,c=new V3(tg.pos.x,tg.pos.y+1.1-.4*tg.ck,tg.pos.z),d=from.distanceTo(c);
@@ -1983,16 +2068,18 @@ function startNuke(ownerId,ownerName,mine,tm){
   $('#nukeHud').hidden=false;$('#nukeHud').classList.remove('final');
   $('#nukeBy').textContent=mine?'You called it. Everyone else is about to die.':'Called by '+ownerName+'. Nowhere to hide.';
 }
-function updateNuke(){
-  updateNukeFx();
+function updateNuke(dt){
+  updateNukeFx(dt);
   if(!nuke)return;const left=Math.max(0,Math.ceil((nuke.at-now)/1000));
   if(left!==nuke.lastSec){nuke.lastSec=left;$('#nukeT').textContent=left;klaxon(left);$('#nukeHud').classList.toggle('final',left<=3)}
   if(left<=3)P.shake=Math.max(P.shake,(3-(nuke.at-now)/1000)*.12);
   if(now>=nuke.at)detonateNuke();
 }
+let timeScale=1;
 function detonateNuke(){
-  const n=nuke;nuke=null;$('#nukeHud').hidden=true;flashT=now;
-  endAC();nukeRumble();P.shake=1.2;startNukeFx(n);
+  const n=nuke;nuke=null;$('#nukeHud').hidden=true;flashT=now;lastNukeT=now;
+  endAC();nukeRumble();after(900,nukeRumble);P.shake=1.6;startNukeFx(n);
+  $('#bannerT').textContent='TACTICAL NUKE!';$('#bannerS').textContent=(n.mine?'You':n.ownerName)+' called it';$('#banner').hidden=false;
 }
 let nukeFx=null;
 const NK_WHITE=new T.Color('#ffffff'),NUKE_SKY=new T.Color('#ff8a3d'),NK_HOT=new T.Color('#fff6d0'),NK_FIRE=new T.Color('#ff6a24'),NK_GLOW=new T.Color('#ff7a30'),NK_ASH=new T.Color('#6f625c');
@@ -2002,58 +2089,66 @@ function startNukeFx(n){
   // the cloud is lit and faceted so it reads as a solid billowing mass; its glow fades as it cools
   const cloud=(geo)=>{const m=new T.Mesh(jitterGeo(geo,.12,Math.random),new T.MeshStandardMaterial({color:'#ff7a30',emissive:'#ff5a1a',emissiveIntensity:1,flatShading:true,roughness:1,transparent:true,fog:false}));g.add(m);return m};
   const fire=mk(new T.SphereGeometry(1,20,14),'#fff6d0');fire.position.set(0,6,0);
+  const wave2=mk(new T.RingGeometry(.94,1,72),'#ffb070');wave2.rotation.x=-Math.PI/2;wave2.position.y=.5;
+  const collar=mk(new T.TorusGeometry(1,.12,8,40),'#fff1d6');collar.rotation.x=Math.PI/2;
   const stem=cloud(new T.CylinderGeometry(1,1.5,1,14,4,true));
   const cap=cloud(new T.SphereGeometry(1,16,10));
   const rim=cloud(new T.TorusGeometry(1,.42,8,22));rim.rotation.x=Math.PI/2;
   const wave=mk(new T.RingGeometry(.9,1,72),'#fff1d6');wave.rotation.x=-Math.PI/2;wave.position.y=.4;
   const dust=mk(new T.CylinderGeometry(1,1,1,48,1,true),'#e7d3b8');
-  nukeFx={g,fire,stem,cap,rim,wave,dust,t0:now,n,bg0:scene.background.clone(),hemi0:hemi.intensity,whoosh:false,roundSet:false};
+  nukeFx={g,fire,stem,cap,rim,wave,wave2,collar,dust,t0:now,t:0,rt:0,ember:0,n,bg0:scene.background.clone(),hemi0:hemi.intensity,whoosh:false,roundSet:false};
   xLight.distance=220;
 }
 function endNukeFx(){
   if(!nukeFx)return;scene.remove(nukeFx.g);nukeFx.g.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose()});
-  const M=MAPS[mapIdx];scene.background.set(M.fog[0]);scene.fog.color.set(M.fog[0]);hemi.intensity=M.hemi[2];sky.material.color.set('#ffffff');xLight.distance=22;nukeFx=null;
+  const M=MAPS[mapIdx];scene.background.set(M.fog[0]);scene.fog.color.set(M.fog[0]);hemi.intensity=M.hemi[2];sky.material.color.set('#ffffff');xLight.distance=22;nukeFx=null;timeScale=1;
 }
-function updateNukeFx(){
-  const F=nukeFx;if(!F)return;const t=(now-F.t0)/1000;
+function updateNukeFx(dt){
+  const F=nukeFx;if(!F)return;
+  // slow motion: a quarter speed for the first four seconds, then easing back to normal
+  F.rt+=dt;timeScale=F.rt<4?.25:F.rt<7?.25+.75*(F.rt-4)/3:1;F.t+=dt*timeScale;const t=F.t;
   const e=(a,b)=>clamp((t-a)/(b-a),0,1),ease=x=>1-(1-x)*(1-x)*(1-x);
   // fireball swells and climbs, white-hot to orange
-  F.fire.scale.setScalar(2+ease(e(0,1.2))*15);F.fire.position.y=6+e(.5,4.5)*26;
+  F.fire.scale.setScalar(2+ease(e(0,1.2))*20);F.fire.position.y=6+e(.5,4.5)*36;
   F.fire.material.color.lerpColors(NK_HOT,NK_FIRE,e(.2,2));F.fire.material.opacity=1-e(2.5,5);
   // stem and mushroom cap, cooling from glow to ash
-  const h=Math.max(.01,ease(e(.6,4.5))*44),w=3.5+e(1,5)*3,cr=Math.max(.01,ease(e(1,5.2))*21);
+  const h=Math.max(.01,ease(e(.6,4.5))*62),w=4.5+e(1,5)*4,cr=Math.max(.01,ease(e(1,5.2))*30);
+  F.collar.scale.setScalar(Math.max(.01,cr*1.25*e(.8,2)));F.collar.position.y=h*.55;F.collar.material.opacity=1-e(2,5);
   F.stem.scale.set(w,h,w);F.stem.position.y=h/2;
   F.cap.scale.set(cr,cr*.55,cr);F.cap.position.y=h+cr*.12;F.cap.rotation.y+=.01;
   F.rim.scale.setScalar(cr*.8);F.rim.position.y=h-cr*.08;
   const ash=e(2,7);for(const m of [F.stem,F.cap,F.rim]){m.material.color.lerpColors(NK_GLOW,NK_ASH,ash);m.material.emissiveIntensity=1.1*(1-ash)}
-  F.stem.material.opacity=F.cap.material.opacity=F.rim.material.opacity=1-e(7.5,9.5);
+  F.stem.material.opacity=F.cap.material.opacity=F.rim.material.opacity=1-e(9,13)*.45;
+  // embers boil off the cap while it grows
+  F.ember-=dt;if(F.ember<=0&&t<6){F.ember=.05;const a=Math.random()*6.28;puff(new V3(Math.cos(a)*cr*.8,h+Math.random()*cr*.4,Math.sin(a)*cr*.8),Math.random()<.5?'#ff7a30':'#ffd27a',2.5,1.6,3)}
   // shockwave ring and dust wall racing outward across the map
-  const wr=Math.max(.01,t*58),dh=4+e(0,2)*6;F.wave.scale.setScalar(wr);F.wave.material.opacity=Math.max(0,1-wr/150);
+  const wr=Math.max(.01,t*58),dh=4+e(0,2)*9;F.wave.scale.setScalar(wr);F.wave.material.opacity=Math.max(0,1-wr/150);
+  const wr2=Math.max(.01,(t-.6)*44);F.wave2.scale.setScalar(wr2);F.wave2.material.opacity=t>.6?Math.max(0,.9-wr2/140):0;
   F.dust.scale.set(wr,dh,wr);F.dust.position.y=dh/2;F.dust.material.opacity=Math.max(0,.55-wr/170);
   // the sky burns orange, then settles
-  const tint=e(0,.25)*(1-e(1.5,8));scene.background.lerpColors(F.bg0,NUKE_SKY,tint*.85);scene.fog.color.copy(scene.background);hemi.intensity=F.hemi0+tint*1.3;
+  const tint=e(0,.25)*(1-e(2,12)*.6);scene.background.lerpColors(F.bg0,NUKE_SKY,tint*.85);scene.fog.color.copy(scene.background);hemi.intensity=F.hemi0+tint*1.3;
   sky.material.color.lerpColors(NK_WHITE,NUKE_SKY,tint*.9);
   xLight.position.set(0,24,0);xLight.intensity=Math.max(xLight.intensity,(1-e(0,3))*9);
   // whatever the wave passes dies
   const meD=Math.hypot(P.pos.x,P.pos.z);
-  if(!F.whoosh&&wr>=meD-10){F.whoosh=true;whoosh();P.shake=1.2}
-  if(F.n.mine){for(const b of activeBots())if(!b.dead&&isEnemyTeam(b.tm)&&Math.hypot(b.pos.x,b.pos.z)<=wr)damageBot(b,999,false,KSW.nuke)}
-  else if(playing&&!P.dead&&meD<=wr&&(!isTeam()||F.n.tm!==myTeam)){P.lastHitW=KSW.nuke;P.lastHitHead=false;die(F.n.ownerId)}
+  if(!F.whoosh&&wr>=meD-10){F.whoosh=true;whoosh();P.shake=1.6;flashT=now-900}
+  for(const b of activeBots())if(!b.dead&&Math.hypot(b.pos.x,b.pos.z)<=wr){if(F.n.mine&&isEnemyTeam(b.tm))damageBot(b,999,false,KSW.nuke);else killBot(b,null)}
+  if(playing&&!P.dead&&meD<=wr){P.lastHitW=KSW.nuke;P.lastHitHead=false;die(F.n.mine?meId():F.n.ownerId)}
   if(!F.roundSet&&wr>80){F.roundSet=true;
     if(isTeam()){if(isHost()&&OB.end<0)OB.end=F.n.tm}
-    else if(playing)endRound(F.n.mine?'You win · Tactical nuke':F.n.ownerName+' wins · Tactical nuke','Tactical nuke')}
-  if(t>10)endNukeFx();
+    else if(playing)endRound('TACTICAL NUKE!',F.n.mine?'You win the round':F.n.ownerName+' wins the round')}
 }
 
 // --- other players' killstreaks
 function remoteFx(e,s,peer){
   const v3=a=>Array.isArray(a)&&a.length===3&&a.every(Number.isFinite)?new V3(clamp(a[0],-60,60),clamp(a[1],-5,120),clamp(a[2],-60,60)):null;
-  if(e.k==='pkg'){const p=v3(e.p);if(p){spawnCrate(peer+':'+e.s,p.x,p.y,p.z,false,e.s);if(playing)toast(s.name+' called in a care package')}}
-  else if(e.k==='pkgx')removeCrate(peer+':'+e.id);
+  if(e.k==='pkg'){const p=v3(e.p);if(p){spawnCrate(peer+':'+e.s,p.x,p.y,p.z,false,e.s,ksById(e.r)?e.r:'air',peer);if(playing)toast(s.name+' called in a care package')}}
+  else if(e.k==='pkgx'){const o=typeof e.o==='string'?e.o:peer;removeCrate((o===myPeer||o==='me'?'me':o)+':'+e.id)}
   else if(e.k==='air'){if(Array.isArray(e.p)&&e.p.length===2&&e.p.every(Number.isFinite)&&Number.isFinite(e.d)){runAirstrike(clamp(e.p[0],-ARENA,ARENA),clamp(e.p[1],-ARENA,ARENA),e.d,false);if(playing)toast(s.name+' called an airstrike')}}
   else if(e.k==='tr'){const f=v3(e.f),t=v3(e.e);if(f&&t){tracer(f,t,{w:.05,life:.09,color:'#ffd27a'});impact(t);heliGun(f)}}
   else if(e.k==='boom'){const p=v3(e.p);if(p)explosion(p,false,clamp(+e.r||1,.5,3))}
-  else if(e.k==='nuke')startNuke(peer,s.name,false,e.tm|0);
+  else if(e.k==='nuke'){if(!ksDisabled)startNuke(peer,s.name,false,e.tm|0)}
+  else if(e.k==='ksvote'){if(!ksVote&&!ksDisabled&&typeof e.v==='string'){openKsVote(e.v.slice(0,60),s.name);if(playing)toast(s.name+' wants to turn killstreaks off · Y / N')}}
 }
 // helicopter / gunship of another player, from their presence
 function syncVehicle(s,kind,arr,k){
@@ -2080,7 +2175,17 @@ function updateVehicles(dt){
 
 /* ================= player ================= */
 const stick={id:null,ox:0,oy:0,x:0,y:0}, look={id:null,lx:0,ly:0};
+// wide shot of the arena for everyone: the whole break between rounds, and the nuke from detonation on
+function overviewCam(dt){
+  const nk=!!nukeFx;ovT+=dt*(nk?.035:.07);const r=nk?110:64,h=nk?28:40;
+  camera.position.set(Math.sin(ovT)*r,h,Math.cos(ovT)*r);camera.lookAt(0,nk?26:0,0);
+  if(camera.fov!==60){camera.fov=60;camera.updateProjectionMatrix()}
+  P.shake=Math.max(0,P.shake-dt*.6);const sh=reduceMotion?0:P.shake*P.shake;
+  if(sh){camera.rotation.x+=(Math.random()-.5)*sh*.025;camera.rotation.z+=(Math.random()-.5)*sh*.03}
+  vm.visible=false;$('#death').hidden=true;P.scopeK=0;
+}
 function updatePlayer(dt){
+  if(roundOver||nukeFx){overviewCam(dt);return}
   if(P.dead){
     $('#respawn').textContent=P.respawnAt===Infinity?'Out until the next round':'Back in '+Math.max(0,Math.ceil((P.respawnAt-now)/1000));
     if(now>P.respawnAt&&!roundOver)respawn();
@@ -2099,7 +2204,7 @@ function updatePlayer(dt){
   let mx=0,mz=0;
   if(!paused){
     if(keys.has('KeyW')||keys.has('ArrowUp'))mz-=1;if(keys.has('KeyS')||keys.has('ArrowDown'))mz+=1;
-    if(keys.has('KeyA')||keys.has('ArrowLeft'))mx-=1;if(keys.has('KeyD')||keys.has('ArrowRight'))mx+=1;
+    if(keys.has('KeyA'))mx-=1;if(keys.has('KeyD'))mx+=1;
     mx+=stick.x;mz+=stick.y;
   }
   const ml=Math.hypot(mx,mz);if(ml>1){mx/=ml;mz/=ml}
@@ -2198,14 +2303,14 @@ function renderBoard(){
 function renderKs(){
   const list=$('#kslist');list.textContent='';
   P.owned.forEach((id,i)=>{
-    const k=ksById(id),top=i===P.owned.length-1,b=document.createElement('button');
+    const k=ksById(id),top=i===clamp(P.ksSel,0,P.owned.length-1),b=document.createElement('button');
     b.type='button';b.className='ks'+(top?' top':'');b.title=k.hint;
-    const nm=document.createElement('span');nm.textContent=k.name;b.append(nm);
+    const nm=document.createElement('span');nm.textContent=k.icon+' '+k.name;b.append(nm);
     if(top&&!isTouch){const kb=document.createElement('kbd');kb.textContent='Q';b.append(kb)}
     b.addEventListener('click',e=>{e.stopPropagation();useStreak(i)});
     list.prepend(b);
   });
-  $('#tStreak').hidden=!P.owned.length;
+  $('#tStreak').hidden=!P.owned.length;$('#ksnav').hidden=P.owned.length<2;
 }
 function updateHUD(){
   if(!playing)return;
@@ -2227,8 +2332,9 @@ function updateHUD(){
   const dk=Math.max(0,1-(now-dmgT)/500);$('#vignette').style.opacity=Math.max(dk*.9,P.hp<=30&&!P.dead?.35:0);$('#dmgdir').style.opacity=dk;
   if(now-toastT>2600)$('#toast').style.opacity=0;
   setText('kscount',String(P.streak));
-  const nx=KS.find(k=>k.n>P.streak);setText('ksnext',nx?'next: '+nx.name+' at '+nx.n:'every killstreak earned');
-  const sig=P.owned.join(',');if(cache.ks!==sig){cache.ks=sig;renderKs()}
+  const nx=KS.find(k=>k.n>P.streak);setText('ksnext',ksDisabled?'killstreaks off':nx?'next: '+nx.name+' at '+nx.n:'every killstreak earned');
+  if(paused)updateKsVoteBtn();
+  const sig=P.owned.join(',')+'|'+P.ksSel;if(cache.ks!==sig){cache.ks=sig;renderKs()}
   const kq=(now-ksPopT)/2800;$('#kspop').style.opacity=kq<1?(kq>.75?(1-kq)*4:1):0;
   $('#flash').style.opacity=Math.max(0,1-(now-flashT)/2500);
   $('#tCrouch').classList.toggle('on',P.crouch);
@@ -2294,7 +2400,7 @@ function startPlay(){
   if(!playing){playing=true;respawn();if(practice)resetBots();setTimeout(()=>{if(playing&&!wmOpen)toast(isTouch?'Tap the shop button to pick your weapon':'Press B for the weapon shop')},1200)}
   paused=false;vm.visible=!P.dead;canvas.focus();requestLock();
 }
-function pause(){if(!playing)return;closeWM(false);paused=true;firing=false;P.scoped=false;keys.clear();$('#playTxt').textContent='Resume';$('#menu').hidden=false;$('#touch').hidden=true}
+function pause(){if(!playing)return;setTimeout(updateKsVoteBtn,0);closeWM(false);paused=true;firing=false;P.scoped=false;keys.clear();$('#playTxt').textContent='Resume';$('#menu').hidden=false;$('#touch').hidden=true}
 $('#play').addEventListener('click',startPlay);
 if(window.KQuit)$('#play').after(KQuit.button('secondary'));
 
@@ -2349,6 +2455,13 @@ function renderArmory(){
 }
 function openArmory(){armW=P.w;renderArmory();$('#armory').hidden=false;$('#armClose').focus()}
 $('#armBtn').addEventListener('click',openArmory);
+$('#ksVoteBtn').addEventListener('click',()=>{startKsVote();updateKsVoteBtn()});
+$('#ksvYes').addEventListener('click',e=>{e.stopPropagation();castKsVote(true)});
+$('#ksvNo').addEventListener('click',e=>{e.stopPropagation();castKsVote(false)});
+function updateKsVoteBtn(){
+  const b=$('#ksVoteBtn');b.hidden=!playing;
+  b.disabled=ksDisabled||!!ksVote;b.textContent=ksDisabled?'Killstreaks are off for this game':ksVote?'Vote running…':'Vote to turn killstreaks off';
+}
 $('#armClose').addEventListener('click',()=>{$('#armory').hidden=true;$('#armBtn').focus()});
 $('#armory').addEventListener('click',e=>{if(e.target.id==='armory')$('#armory').hidden=true});
 
@@ -2417,7 +2530,9 @@ addEventListener('keydown',e=>{
   if(d&&voteOpen){castVote(+d[1]-1);return}
   if(d&&wmOpen){switchWeapon(+d[1]-1);closeWM(true);return}
   if(e.code==='KeyB'){openWM();return}
+  if(ksVote&&(e.code==='KeyY'||e.code==='KeyN')){castKsVote(e.code==='KeyY');return}
   if(e.code==='KeyQ'){if(!e.repeat)useStreak();return}
+  if(e.code==='ArrowLeft'||e.code==='ArrowRight'){cycleStreak(e.code==='ArrowLeft'?-1:1);return}
   if(e.code==='KeyC')P.crouch=true;
   keys.add(e.code);
   if(e.code==='KeyR')startReload();
@@ -2457,6 +2572,8 @@ tbtn('#tWeap',()=>openWM());
 $('#shopBtn').addEventListener('click',e=>{e.stopPropagation();openWM()});
 tbtn('#tScope',()=>{P.scoped=!P.scoped});
 tbtn('#tStreak',()=>useStreak());
+$('#ksPrev').addEventListener('click',e=>{e.stopPropagation();cycleStreak(-1)});
+$('#ksNext').addEventListener('click',e=>{e.stopPropagation();cycleStreak(1)});
 let touchUse=false;
 tbtn('#tUse',()=>{touchUse=true},()=>{touchUse=false});
 tbtn('#tCrouch',()=>{P.crouch=!P.crouch;$('#tCrouch').classList.toggle('on',P.crouch)});
@@ -2473,12 +2590,12 @@ function frame(t){
   syncPeers(dt);updateMode();updateTimers();
   // follow the host's map (late joiners, host changes)
   if(!isHost()&&!roundOver){const h=remotes.get(hostId());if(h&&h.rd===round&&h.mp!==null&&h.mp!==curMap)curMap=h.mp}
-  if(isHost())hostTick(dt);followObjectives();updateObjectives();
+  if(isHost())hostTick(dt);followObjectives();updateObjectives();updateKsVote();
   if(playing)updatePlayer(dt);else orbit(dt);
   for(const b of bots){updateBot(b,dt);b.av.g.position.copy(b.pos);b.av.g.rotation.y=b.yaw;b.av.upper.rotation.x=b.pitch*.6;avatarFx(b.av,b.pos.y)}
   for(const [,s] of remotes)avatarFx(s.av,s.pos.y);
-  updateCrates(dt);updateHeli(dt);updateVehicles(dt);updateNuke();updateSnow(dt);
-  updateEffects(dt);roundLogic();sendPresence();updateHUD();
+  updateCrates(dt);updateHeli(dt);updateVehicles(dt);updateNuke(dt);updateSnow(dt);
+  updateEffects(dt*timeScale);roundLogic();sendPresence();updateHUD();
   if(t-lastNetUI>500){lastNetUI=t;updateNetUI()}
   window.__sky.position.copy(camera.position);
   renderer.render(scene,camera);
