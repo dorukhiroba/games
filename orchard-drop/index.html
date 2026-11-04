@@ -1,0 +1,547 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Orchard Drop</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Nunito:wght@600;800;900&display=swap">
+<style>
+/* Layout: one screen — market awning band, scoreboard, a wooden crate-jar centered in the remaining height, the fruit ladder underneath */
+:root{
+  --bg:#d4e5bd;
+  --ink:#26331f;
+  --tomato:#e4513b;
+  --paper:#fbf6e8;
+  --wood:#b37b46;
+  --glass:#eaf3df;
+  --muted:#56684a;
+  --display:"Bagel Fat One","Arial Rounded MT Bold",ui-rounded,system-ui,sans-serif;
+  --body:"Nunito",ui-rounded,system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+html{height:100%;box-sizing:border-box}
+*,*::before,*::after{box-sizing:inherit}
+body{
+  height:100%;margin:0;overflow:hidden;
+  background-color:var(--bg);
+  background-image:radial-gradient(rgba(38,51,31,.08) 1.2px,transparent 1.5px);
+  background-size:18px 18px;
+  color:var(--ink);font-family:var(--body);
+  display:flex;flex-direction:column;
+  -webkit-tap-highlight-color:transparent;
+}
+.awning{
+  flex:none;height:24px;
+  background:
+    radial-gradient(circle at 14px 0,var(--tomato) 13px,transparent 13.6px) 0 10px/56px 14px repeat-x,
+    radial-gradient(circle at 42px 0,var(--paper) 13px,transparent 13.6px) 0 10px/56px 14px repeat-x,
+    repeating-linear-gradient(90deg,var(--tomato) 0 28px,var(--paper) 28px 56px) 0 0/100% 11px no-repeat;
+  filter:drop-shadow(0 2px 0 rgba(38,51,31,.15));
+}
+.app{
+  flex:1;min-height:0;width:100%;max-width:560px;margin:0 auto;
+  display:flex;flex-direction:column;gap:10px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:8px 12px;
+}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px 16px;flex-wrap:wrap}
+.brand{font-family:var(--display);font-weight:400;font-size:clamp(24px,6vw,32px);line-height:1;margin:0;letter-spacing:.01em;color:var(--ink)}
+.brand span{color:var(--tomato)}
+.stats{display:flex;align-items:center;gap:14px}
+.stat{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0}
+.lbl{font-size:10.5px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+.num{font-family:var(--display);font-size:24px;line-height:1;font-variant-numeric:tabular-nums;color:var(--ink)}
+#best{color:var(--muted)}
+.next{align-items:center}
+#nextCv{width:40px;height:40px;display:block;background:var(--paper);border:2px solid var(--ink);border-radius:50%}
+.btns{display:flex;gap:6px}
+.icon-btn{
+  width:36px;height:36px;border-radius:50%;border:2px solid var(--ink);background:var(--paper);color:var(--ink);
+  display:grid;place-items:center;cursor:pointer;padding:0;box-shadow:0 2px 0 var(--ink);
+}
+.icon-btn:active{transform:translateY(2px);box-shadow:none}
+.icon-btn svg{width:18px;height:18px}
+.icon-btn[aria-pressed="false"] .on{display:none}
+.icon-btn[aria-pressed="true"] .off{display:none}
+button:focus-visible,canvas:focus-visible{outline:3px solid var(--tomato);outline-offset:3px}
+
+.stage{flex:1;min-height:0;display:flex;align-items:flex-start;justify-content:center}
+.jar{
+  position:relative;flex:none;
+  background:linear-gradient(100deg,rgba(255,255,255,.55) 0 8%,rgba(255,255,255,0) 22%),var(--glass);
+  border:6px solid var(--wood);border-top:0;border-bottom-width:12px;border-radius:0 0 18px 18px;
+  box-shadow:0 6px 0 -1px rgba(38,51,31,.18);
+}
+.jar::before,.jar::after{
+  content:"";position:absolute;top:-6px;width:14px;height:10px;background:var(--wood);border-radius:4px;
+}
+.jar::before{left:-10px}
+.jar::after{right:-10px}
+#cv{display:block;touch-action:none;cursor:crosshair;width:100%;height:100%}
+.over{
+  position:absolute;inset:0;display:grid;place-items:center;padding:16px;
+  background:rgba(234,243,223,.72);backdrop-filter:blur(2px);
+}
+.card{
+  background:var(--paper);border:3px solid var(--ink);border-radius:18px;box-shadow:0 6px 0 var(--ink);
+  padding:22px 26px;text-align:center;display:flex;flex-direction:column;gap:10px;max-width:280px;
+}
+.card h2{font-family:var(--display);font-weight:400;font-size:30px;margin:0;line-height:1.05;text-wrap:balance;color:var(--tomato)}
+.card p{margin:0;font-weight:600;color:var(--muted)}
+.card .big{font-family:var(--display);font-size:46px;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
+.play{
+  margin-top:6px;font-family:var(--display);font-size:20px;border:3px solid var(--ink);border-radius:999px;
+  background:var(--tomato);color:var(--paper);padding:10px 22px;cursor:pointer;box-shadow:0 4px 0 var(--ink);
+}
+.play:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+
+.ladder{flex:none;display:flex;flex-direction:column;align-items:center;gap:6px}
+.ladder .lbl{letter-spacing:.1em}
+.chain{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;gap:2px 3px;max-width:100%}
+.chain canvas{display:block;opacity:.35;transition:opacity .3s,transform .3s}
+.chain canvas.got{opacity:1}
+.chain canvas.top{transform:translateY(-3px)}
+@media (max-height:620px){.ladder{display:none}}
+@media (prefers-reduced-motion:reduce){.chain canvas{transition:none}}
+</style>
+
+<div class="awning" aria-hidden="true"></div>
+<div class="app">
+  <header class="top">
+    <h1 class="brand">Orchard <span>Drop</span></h1>
+    <div class="stats">
+      <div class="stat"><span class="lbl">Score</span><span id="score" class="num">0</span></div>
+      <div class="stat"><span class="lbl">Best</span><span id="best" class="num">0</span></div>
+      <div class="stat next"><span class="lbl">Next</span><canvas id="nextCv" width="80" height="80" aria-label="Next fruit"></canvas></div>
+      <div class="btns">
+        <button id="soundBtn" class="icon-btn" type="button" aria-pressed="true" aria-label="Sound">
+          <svg class="on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/></svg>
+          <svg class="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M17 9l5 6M22 9l-5 6"/></svg>
+        </button>
+        <button id="newBtn" class="icon-btn" type="button" aria-label="New game">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="stage" id="stage">
+    <div class="jar" id="jar">
+      <canvas id="cv" tabindex="0" aria-label="Game area. Move to aim, click or tap to drop. Arrow keys and Space also work."></canvas>
+      <div class="over" id="over" hidden>
+        <div class="card" role="dialog" aria-labelledby="overTitle">
+          <h2 id="overTitle">The crate is full</h2>
+          <p>Final score</p>
+          <div class="big" id="finalScore">0</div>
+          <p id="finalNote"></p>
+          <button class="play" id="againBtn" type="button">Play again</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="ladder">
+    <span class="lbl">Two of a kind make the next one</span>
+    <div class="chain" id="chain"></div>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+<script>
+(() => {
+const { Engine, Bodies, Body, Composite, Events } = Matter;
+
+const W = 400, H = 620, HOLD_Y = 48, DANGER_Y = 104, STEP = 1000 / 60;
+const INK = '#26331f';
+const FRUITS = [
+  { name: 'Cherry',     r: 14,  c: '#d7263d' },
+  { name: 'Strawberry', r: 19,  c: '#ef3e4a' },
+  { name: 'Grape',      r: 25,  c: '#7b3fa0' },
+  { name: 'Tangerine',  r: 31,  c: '#f7931e' },
+  { name: 'Persimmon',  r: 38,  c: '#f26a1b' },
+  { name: 'Apple',      r: 46,  c: '#e0332f' },
+  { name: 'Pear',       r: 54,  c: '#c9d43b' },
+  { name: 'Peach',      r: 63,  c: '#ff9c86' },
+  { name: 'Pineapple',  r: 73,  c: '#f4c430' },
+  { name: 'Melon',      r: 86,  c: '#a9d27c' },
+  { name: 'Watermelon', r: 102, c: '#3c9a3f' },
+];
+const SPAWN_W = [30, 26, 20, 14, 10];
+const PAD = 1.45;
+
+/* ---------- fruit painting ---------- */
+function rng(seed){ return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const TAU = Math.PI * 2;
+function ball(g, r, a, b, c){
+  const gr = g.createRadialGradient(-r*.35, -r*.4, r*.08, 0, 0, r);
+  gr.addColorStop(0, a); gr.addColorStop(.55, b); gr.addColorStop(1, c);
+  g.beginPath(); g.arc(0, 0, r, 0, TAU); g.fillStyle = gr; g.fill();
+}
+function outline(g, r){ g.beginPath(); g.arc(0, 0, r, 0, TAU); g.lineWidth = Math.max(1.6, r*.055); g.strokeStyle = INK; g.stroke(); }
+function shine(g, r){
+  g.save(); g.fillStyle = 'rgba(255,255,255,.62)';
+  g.beginPath(); g.ellipse(-r*.4, -r*.4, r*.22, r*.11, -.75, 0, TAU); g.fill();
+  g.beginPath(); g.arc(-r*.12, -r*.64, r*.05, 0, TAU); g.fill(); g.restore();
+}
+function clip(g, r, fn){ g.save(); g.beginPath(); g.arc(0, 0, r, 0, TAU); g.clip(); fn(); g.restore(); }
+function leaf(g, x, y, len, ang, col = '#4f9a3a'){
+  g.save(); g.translate(x, y); g.rotate(ang);
+  g.beginPath(); g.moveTo(0, 0); g.quadraticCurveTo(len*.5, -len*.4, len, 0); g.quadraticCurveTo(len*.5, len*.4, 0, 0);
+  g.fillStyle = col; g.fill(); g.lineJoin = 'round'; g.lineWidth = Math.max(1.2, len*.08); g.strokeStyle = INK; g.stroke();
+  g.beginPath(); g.moveTo(len*.12, 0); g.lineTo(len*.78, 0); g.strokeStyle = 'rgba(0,0,0,.22)'; g.lineWidth = Math.max(.8, len*.045); g.stroke();
+  g.restore();
+}
+function stem(g, x1, y1, x2, y2, w, col = '#6b4a2b'){
+  g.beginPath(); g.moveTo(x1, y1); g.quadraticCurveTo((x1+x2)/2 + w, (y1+y2)/2, x2, y2);
+  g.lineCap = 'round'; g.lineWidth = w; g.strokeStyle = INK; g.stroke(); g.lineWidth = w*.5; g.strokeStyle = col; g.stroke();
+}
+function drawFruit(g, t, r){
+  const R = rng(t*977 + 13);
+  g.lineCap = 'round';
+  switch(t){
+    case 0: // cherry
+      ball(g, r, '#ff8a8a', '#d7263d', '#86102a'); shine(g, r); outline(g, r);
+      stem(g, 0, -r*.75, r*.38, -r*1.3, r*.2, '#6f9a3a'); leaf(g, r*.34, -r*1.24, r*.65, -.25); break;
+    case 1: // strawberry
+      ball(g, r, '#ff9a92', '#ef3e4a', '#a0172b');
+      clip(g, r, () => { for (let y = -r*.35; y < r; y += r*.32) for (let x = -r; x < r; x += r*.34) {
+        const ox = x + ((Math.round(y/(r*.32)) % 2) ? r*.17 : 0);
+        g.beginPath(); g.ellipse(ox, y, r*.05, r*.08, 0, 0, TAU); g.fillStyle = '#ffe48a'; g.fill(); }});
+      shine(g, r); outline(g, r);
+      for (const a of [.3, .95, 2.2, 2.85]) leaf(g, 0, -r*.82, r*.58, a, '#3f8f3a');
+      stem(g, 0, -r*.8, r*.05, -r*1.15, r*.16, '#5d8d33'); break;
+    case 2: // grape
+      ball(g, r, '#c8a2e6', '#7b3fa0', '#3a1656');
+      clip(g, r, () => { const pts = [[-.45,-.3],[.15,-.45],[.55,-.05],[-.15,.15],[.3,.45],[-.5,.4],[-.05,.68]];
+        for (const [x,y] of pts){ g.beginPath(); g.arc(x*r, y*r, r*.3, 0, TAU); g.fillStyle = 'rgba(255,255,255,.1)'; g.fill(); g.lineWidth = r*.04; g.strokeStyle = 'rgba(30,5,50,.25)'; g.stroke(); }});
+      shine(g, r); outline(g, r);
+      stem(g, 0, -r*.85, r*.1, -r*1.22, r*.14); leaf(g, r*.06, -r*1.1, r*.62, -.45, '#6aa84f'); break;
+    case 3: // tangerine
+      ball(g, r, '#ffc77a', '#f7931e', '#c05a06');
+      clip(g, r, () => { g.fillStyle = 'rgba(150,60,0,.22)'; for (let i = 0; i < 60; i++){ const a = R()*TAU, d = Math.sqrt(R())*r; g.beginPath(); g.arc(Math.cos(a)*d, Math.sin(a)*d, r*.025, 0, TAU); g.fill(); }});
+      shine(g, r); outline(g, r);
+      stem(g, 0, -r*.9, 0, -r*1.05, r*.12); leaf(g, 0, -r*.98, r*.62, -.55); break;
+    case 4: // persimmon
+      ball(g, r, '#ffab74', '#f26a1b', '#ad3a08');
+      clip(g, r, () => { g.strokeStyle = 'rgba(140,40,0,.18)'; g.lineWidth = r*.03; for (const s of [-1,1]){ g.beginPath(); g.moveTo(0,-r); g.quadraticCurveTo(s*r*.55, 0, 0, r); g.stroke(); }});
+      shine(g, r); outline(g, r);
+      for (const a of [.3, 2.84, -.45, -2.69]) leaf(g, 0, -r*.74, r*.45, a, '#4b7a2e');
+      g.fillStyle = '#5a3a1e'; g.strokeStyle = INK; g.lineWidth = r*.04; g.beginPath(); g.roundRect ? g.roundRect(-r*.08, -r*.9, r*.16, r*.16, r*.03) : g.rect(-r*.08, -r*.9, r*.16, r*.16); g.fill(); g.stroke(); break;
+    case 5: // apple
+      ball(g, r, '#ff8f7d', '#e0332f', '#8d1818');
+      clip(g, r, () => { const gr = g.createRadialGradient(r*.45, r*.35, 0, r*.45, r*.35, r*.7); gr.addColorStop(0, 'rgba(255,210,90,.45)'); gr.addColorStop(1, 'rgba(255,210,90,0)'); g.fillStyle = gr; g.fillRect(-r, -r, 2*r, 2*r); });
+      shine(g, r); outline(g, r);
+      stem(g, 0, -r*.8, r*.12, -r*1.2, r*.13); leaf(g, r*.08, -r*1.02, r*.6, -.4); break;
+    case 6: // pear
+      ball(g, r, '#f6f8b0', '#c9d43b', '#7c8c1c');
+      clip(g, r, () => { g.fillStyle = 'rgba(110,80,20,.3)'; for (let i = 0; i < 45; i++){ const a = R()*TAU, d = Math.sqrt(R())*r; g.beginPath(); g.arc(Math.cos(a)*d, Math.sin(a)*d, r*.018, 0, TAU); g.fill(); }});
+      shine(g, r); outline(g, r);
+      stem(g, 0, -r*.84, -r*.1, -r*1.22, r*.11); leaf(g, -r*.06, -r*1.08, r*.5, -2.55); break;
+    case 7: // peach
+      ball(g, r, '#ffe7cc', '#ffa38a', '#dd5368');
+      clip(g, r, () => { const gr = g.createRadialGradient(r*.3, r*.1, 0, r*.3, r*.1, r*.9); gr.addColorStop(0, 'rgba(230,60,90,.35)'); gr.addColorStop(1, 'rgba(230,60,90,0)'); g.fillStyle = gr; g.fillRect(-r,-r,2*r,2*r);
+        g.beginPath(); g.moveTo(-r*.05, -r*.95); g.quadraticCurveTo(r*.3, -r*.3, r*.05, r*.45); g.lineWidth = r*.045; g.strokeStyle = 'rgba(180,50,70,.4)'; g.stroke(); });
+      shine(g, r); outline(g, r);
+      leaf(g, 0, -r*.9, r*.5, -.5); leaf(g, 0, -r*.9, r*.42, -2.55); break;
+    case 8: // pineapple
+      ball(g, r, '#ffe58a', '#f4c430', '#b07a0c');
+      clip(g, r, () => { g.strokeStyle = 'rgba(130,80,8,.5)'; g.lineWidth = r*.025; const s = r*.3;
+        for (let k = -6; k <= 6; k++){ g.beginPath(); g.moveTo(k*s - r, -r); g.lineTo(k*s + r, r); g.stroke(); g.beginPath(); g.moveTo(k*s + r, -r); g.lineTo(k*s - r, r); g.stroke(); }
+        g.fillStyle = 'rgba(120,70,5,.55)';
+        for (let i = -6; i <= 6; i++) for (let j = -6; j <= 6; j++){ const x = (i + j) * s / 2, y = (j - i) * s / 2; if (x*x + y*y < r*r) { g.beginPath(); g.arc(x, y + s*.5, r*.03, 0, TAU); g.fill(); } } });
+      shine(g, r); outline(g, r);
+      for (const a of [-2.35, -1.95, -1.57, -1.19, -.79]) leaf(g, 0, -r*.84, r*.58, a, '#3f8f3a'); break;
+    case 9: // melon
+      ball(g, r, '#eaf7cf', '#a9d27c', '#5f8f37');
+      clip(g, r, () => { g.strokeStyle = 'rgba(255,255,236,.7)'; g.lineWidth = r*.022; const n = 7;
+        for (let i = -n; i <= n; i++){ for (const dir of [0, 1]){ g.beginPath(); for (let k = -10; k <= 10; k++){ const u = k / 10 * r, v = i / n * r + (R()-.5) * r*.09; const x = dir ? v : u, y = dir ? u : v; k === -10 ? g.moveTo(x, y) : g.lineTo(x, y); } g.stroke(); } } });
+      shine(g, r); outline(g, r);
+      stem(g, 0, -r*.92, 0, -r*1.12, r*.08, '#7d6a2a'); stem(g, -r*.1, -r*1.1, r*.1, -r*1.1, r*.07, '#7d6a2a'); break;
+    case 10: // watermelon
+      ball(g, r, '#86d873', '#3c9a3f', '#1b5420');
+      clip(g, r, () => { g.fillStyle = '#1d5b22'; const sp = r*.34;
+        for (let i = -3; i <= 3; i++){ g.beginPath(); const L = [], Rr = [];
+          for (let k = -20; k <= 20; k++){ const y = k / 20 * r, sq = Math.sqrt(Math.max(0, 1 - (y/r)**2)), w = Math.sin(k*1.3 + i) * r*.035; L.push([(i*sp - r*.06 + w) * sq, y]); Rr.push([(i*sp + r*.06 + w) * sq, y]); }
+          g.moveTo(...L[0]); for (const p of L) g.lineTo(...p); for (const p of Rr.reverse()) g.lineTo(...p); g.closePath(); g.fill(); } });
+      shine(g, r); outline(g, r);
+      stem(g, 0, -r*.92, r*.12, -r*1.1, r*.07, '#6f8a32'); break;
+  }
+}
+
+/* ---------- DOM ---------- */
+const $ = id => document.getElementById(id);
+const cv = $('cv'), ctx = cv.getContext('2d'), stage = $('stage'), jar = $('jar');
+const scoreEl = $('score'), bestEl = $('best'), nextCv = $('nextCv'), over = $('over');
+const chainEl = $('chain');
+let dpr = 1, pxScale = 1, sprites = [];
+
+function buildSprites(){
+  sprites = FRUITS.map((f, t) => {
+    const half = f.r * PAD, size = Math.ceil(half * 2 * pxScale);
+    const c = document.createElement('canvas'); c.width = c.height = size;
+    const g = c.getContext('2d'); g.translate(size/2, size/2); g.scale(pxScale, pxScale); drawFruit(g, t, f.r);
+    return { c, half };
+  });
+}
+function drawFit(canvas, t, cssSize){
+  const d = window.devicePixelRatio || 1, g = canvas.getContext('2d');
+  canvas.width = canvas.height = Math.round(cssSize * d);
+  const r = FRUITS[t].r, k = cssSize / (2 * r * 1.5);
+  g.setTransform(d * k, 0, 0, d * k, canvas.width / 2, canvas.height / 2 + r * .12 * d * k);
+  drawFruit(g, t, r);
+}
+const chainCvs = FRUITS.map((f, t) => {
+  const c = document.createElement('canvas'), s = 20 + t * 2.4;
+  c.style.width = c.style.height = s + 'px'; c.title = f.name; c.setAttribute('aria-label', f.name);
+  drawFit(c, t, s); chainEl.appendChild(c); return c;
+});
+
+function resize(){
+  const bw = 12, bh = 12;
+  const aw = stage.clientWidth - bw, ah = stage.clientHeight - bh;
+  const s = Math.max(.3, Math.min(aw / W, ah / H));
+  const cw = Math.floor(W * s), ch = Math.floor(H * s);
+  jar.style.width = cw + 'px'; jar.style.height = ch + 'px';
+  jar.style.boxSizing = 'content-box';
+  dpr = window.devicePixelRatio || 1;
+  cv.width = Math.round(cw * dpr); cv.height = Math.round(ch * dpr);
+  const nps = cv.width / W;
+  if (Math.abs(nps - pxScale) > .01 || !sprites.length){ pxScale = nps; buildSprites(); }
+  pxScale = nps;
+}
+new ResizeObserver(resize).observe(stage);
+
+/* ---------- state ---------- */
+let engine, fruits = [], mergeQ = [], particles = [], popups = [];
+let score = 0, best = 0, cur = 0, next = 0, aimX = W / 2, canDropAt = 0, overT = 0, state = 'play', maxTier = 0;
+try { best = +localStorage.getItem('orchard-drop-best') || 0; } catch(e) {}
+
+function pickNext(){ let s = SPAWN_W.reduce((a, b) => a + b), x = Math.random() * s; for (let i = 0; i < SPAWN_W.length; i++){ x -= SPAWN_W[i]; if (x < 0) return i; } return 0; }
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+function setScore(v){ score = v; scoreEl.textContent = score; if (score > best){ best = score; bestEl.textContent = best; try { localStorage.setItem('orchard-drop-best', best); } catch(e) {} } }
+function drawNext(){ drawFit(nextCv, next, 40); }
+function updateChain(){ chainCvs.forEach((c, i) => { c.classList.toggle('got', i <= maxTier); c.classList.toggle('top', i === maxTier); }); }
+
+function initEngine(){
+  engine = Engine.create();
+  engine.gravity.y = 1.15;
+  engine.positionIterations = 10; engine.velocityIterations = 8;
+  const o = { isStatic: true, friction: .4, restitution: 0 };
+  Composite.add(engine.world, [
+    Bodies.rectangle(W/2, H + 50, W + 200, 100, o),
+    Bodies.rectangle(-50, H/2 - 400, 100, H + 1200, o),
+    Bodies.rectangle(W + 50, H/2 - 400, 100, H + 1200, o),
+  ]);
+  const onPairs = e => { for (const p of e.pairs){ const a = p.bodyA, b = p.bodyB;
+    if (a.tier == null || b.tier == null || a.tier !== b.tier || a.gone || b.gone) continue;
+    a.gone = b.gone = true; mergeQ.push([a, b]); } };
+  Events.on(engine, 'collisionStart', onPairs);
+  Events.on(engine, 'collisionActive', onPairs);
+}
+
+function addFruit(t, x, y, now){
+  const b = Bodies.circle(x, y, FRUITS[t].r, { restitution: .12, friction: .3, frictionStatic: .45, frictionAir: .008, density: .001, slop: .03 });
+  b.tier = t; b.dropAt = now; b.popAt = 0;
+  Composite.add(engine.world, b); fruits.push(b);
+  if (t > maxTier){ maxTier = t; updateChain(); }
+  return b;
+}
+
+function drop(){
+  if (state !== 'play') return;
+  const now = performance.now(); if (now < canDropAt) return;
+  const r = FRUITS[cur].r, x = clamp(aimX, r + 1, W - r - 1);
+  addFruit(cur, x, HOLD_Y, now); sfx('drop');
+  cur = next; next = pickNext(); drawNext(); canDropAt = now + 480;
+}
+
+function processMerges(now){
+  if (!mergeQ.length) return;
+  for (const [a, b] of mergeQ){
+    Composite.remove(engine.world, a); Composite.remove(engine.world, b);
+    const t = a.tier, x = (a.position.x + b.position.x) / 2, y = (a.position.y + b.position.y) / 2;
+    const pts = (t + 1) * (t + 2) / 2;
+    setScore(score + pts);
+    burst(x, y, FRUITS[t].c, FRUITS[t].r, t === 10 ? 40 : 10 + t);
+    popups.push({ x, y: y - FRUITS[Math.min(10, t + 1)].r * .4, text: '+' + pts, life: 900, max: 900, size: 16 + t * 1.6 });
+    if (t < 10){
+      const nb = addFruit(t + 1, x, y, now - 300);
+      nb.popAt = now;
+      Body.setVelocity(nb, { x: (a.velocity.x + b.velocity.x) / 2, y: Math.min(0, (a.velocity.y + b.velocity.y) / 2) });
+    }
+    sfx('pop', t);
+  }
+  fruits = fruits.filter(f => !f.gone);
+  mergeQ.length = 0;
+}
+
+function burst(x, y, col, r, n){
+  for (let i = 0; i < n; i++){
+    const a = Math.random() * TAU, sp = .08 + Math.random() * .22 * (1 + r / 60);
+    particles.push({ x: x + Math.cos(a) * r * .6, y: y + Math.sin(a) * r * .6, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - .12, r: 2 + Math.random() * (2 + r * .05), life: 500 + Math.random() * 300, col });
+  }
+  particles.push({ ring: true, x, y, r: r * .7, max: r * 1.5, life: 260, col });
+}
+
+function checkOver(now, dt){
+  let danger = false;
+  for (const f of fruits){ if (now - f.dropAt > 1100 && f.position.y - f.circleRadius < DANGER_Y){ danger = true; break; } }
+  overT = danger ? overT + dt : Math.max(0, overT - dt * 2);
+  if (overT > 2000) gameOver();
+}
+function gameOver(){
+  state = 'over';
+  $('finalScore').textContent = score;
+  $('finalNote').textContent = score >= best && score > 0 ? 'New best score' : 'Best: ' + best + '  ·  Biggest fruit: ' + FRUITS[maxTier].name;
+  over.hidden = false; $('againBtn').focus();
+}
+function restart(){
+  for (const f of fruits) Composite.remove(engine.world, f);
+  fruits = []; mergeQ.length = 0; particles = []; popups = [];
+  score = 0; scoreEl.textContent = 0; overT = 0; maxTier = 0; updateChain();
+  cur = Math.floor(Math.random() * 3); next = pickNext(); drawNext();
+  canDropAt = 0; state = 'play'; over.hidden = true; cv.focus({ preventScroll: true });
+}
+
+/* ---------- sound ---------- */
+let actx = null, soundOn = true;
+try { soundOn = localStorage.getItem('orchard-drop-sound') !== '0'; } catch(e) {}
+$('soundBtn').setAttribute('aria-pressed', soundOn);
+function ensureAudio(){
+  if (!soundOn) return;
+  if (!actx){ try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) { return; } }
+  if (actx.state === 'suspended') actx.resume().catch(() => {});
+}
+function sfx(kind, t = 0){
+  if (!soundOn || !actx) return;
+  const o = actx.createOscillator(), g = actx.createGain(), n = actx.currentTime;
+  if (kind === 'drop'){ o.type = 'sine'; o.frequency.setValueAtTime(340, n); o.frequency.exponentialRampToValueAtTime(170, n + .09); g.gain.setValueAtTime(.07, n); g.gain.exponentialRampToValueAtTime(.001, n + .11); }
+  else { const f = 900 - t * 58; o.type = 'triangle'; o.frequency.setValueAtTime(f * .55, n); o.frequency.exponentialRampToValueAtTime(f, n + .06); g.gain.setValueAtTime(.13, n); g.gain.exponentialRampToValueAtTime(.001, n + .2); }
+  o.connect(g).connect(actx.destination); o.start(n); o.stop(n + .25);
+}
+$('soundBtn').addEventListener('click', () => {
+  soundOn = !soundOn; $('soundBtn').setAttribute('aria-pressed', soundOn);
+  try { localStorage.setItem('orchard-drop-sound', soundOn ? '1' : '0'); } catch(e) {}
+  if (soundOn) ensureAudio();
+});
+$('newBtn').addEventListener('click', restart);
+$('againBtn').addEventListener('click', restart);
+
+/* ---------- input ---------- */
+const toX = e => { const b = cv.getBoundingClientRect(); return (e.clientX - b.left) / b.width * W; };
+cv.addEventListener('pointermove', e => { aimX = toX(e); });
+cv.addEventListener('pointerdown', e => { ensureAudio(); aimX = toX(e); try { cv.setPointerCapture(e.pointerId); } catch(_) {} });
+cv.addEventListener('pointerup', e => { aimX = toX(e); drop(); });
+const keys = {};
+window.addEventListener('keydown', e => {
+  if (e.target.tagName === 'BUTTON') return;
+  if (['ArrowLeft','ArrowRight','a','d','A','D'].includes(e.key)){ keys[e.key.toLowerCase()] = true; e.preventDefault(); }
+  if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowDown'){ ensureAudio(); e.preventDefault(); if (state === 'play') drop(); else restart(); }
+});
+window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+
+/* ---------- render ---------- */
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function drawSprite(t, x, y, ang, s, alpha = 1){
+  const sp = sprites[t]; if (!sp) return;
+  ctx.save(); ctx.globalAlpha = alpha; ctx.translate(x, y); if (ang) ctx.rotate(ang); if (s !== 1) ctx.scale(s, s);
+  ctx.drawImage(sp.c, -sp.half, -sp.half, sp.half * 2, sp.half * 2); ctx.restore();
+}
+function easeOutBack(k){ const c = 1.9; return 1 + (c + 1) * Math.pow(k - 1, 3) + c * Math.pow(k - 1, 2); }
+
+function render(now){
+  ctx.setTransform(pxScale, 0, 0, pxScale, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+
+  // danger line
+  const d = overT / 2000;
+  ctx.save(); ctx.setLineDash([10, 8]); ctx.lineWidth = 2.5; ctx.lineCap = 'round';
+  ctx.strokeStyle = d > 0 ? `rgba(228,81,59,${.45 + .55 * Math.abs(Math.sin(now / (140 - d * 70)))})` : 'rgba(38,51,31,.2)';
+  ctx.beginPath(); ctx.moveTo(8, DANGER_Y); ctx.lineTo(W - 8, DANGER_Y); ctx.stroke(); ctx.restore();
+
+  // aim + held fruit
+  if (state === 'play'){
+    const r = FRUITS[cur].r, x = clamp(aimX, r + 1, W - r - 1);
+    ctx.save(); ctx.setLineDash([2, 9]); ctx.lineCap = 'round'; ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(38,51,31,.22)';
+    ctx.beginPath(); ctx.moveTo(x, HOLD_Y + r + 6); ctx.lineTo(x, H - 4); ctx.stroke(); ctx.restore();
+    // clothes-peg rail
+    ctx.fillStyle = 'rgba(38,51,31,.14)'; ctx.fillRect(10, 8, W - 20, 4);
+    ctx.fillStyle = '#b37b46'; ctx.strokeStyle = INK; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x - 6, 2, 12, 18, 4) : ctx.rect(x - 6, 2, 12, 18); ctx.fill(); ctx.stroke();
+    const wait = Math.max(0, canDropAt - now) / 480;
+    const k = 1 - wait;
+    drawSprite(cur, x, HOLD_Y + (1 - k) * -10, 0, wait > 0 ? .6 + .4 * k : 1, wait > 0 ? k : 1);
+  }
+
+  // fruits
+  for (const f of fruits){
+    let s = 1;
+    if (f.popAt && !reduceMotion){ const k = Math.min(1, (now - f.popAt) / 180); s = .55 + .45 * easeOutBack(k); }
+    drawSprite(f.tier, f.position.x, f.position.y, f.angle, s);
+  }
+
+  // particles
+  for (const p of particles){
+    if (p.ring){ const k = 1 - p.life / 260; ctx.beginPath(); ctx.arc(p.x, p.y, p.r + (p.max - p.r) * k, 0, TAU); ctx.lineWidth = 4 * (1 - k); ctx.strokeStyle = p.col; ctx.globalAlpha = 1 - k; ctx.stroke(); ctx.globalAlpha = 1; continue; }
+    ctx.globalAlpha = Math.min(1, p.life / 300); ctx.fillStyle = p.col;
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, TAU); ctx.fill(); ctx.globalAlpha = 1;
+  }
+  for (const p of popups){
+    const k = 1 - p.life / p.max;
+    ctx.save(); ctx.globalAlpha = Math.min(1, p.life / 300);
+    ctx.font = `${p.size}px "Bagel Fat One", "Arial Rounded MT Bold", sans-serif`; ctx.textAlign = 'center';
+    ctx.lineWidth = 4; ctx.strokeStyle = '#fbf6e8'; ctx.lineJoin = 'round';
+    ctx.strokeText(p.text, p.x, p.y - k * 30); ctx.fillStyle = INK; ctx.fillText(p.text, p.x, p.y - k * 30); ctx.restore();
+  }
+
+  if (!fruits.length && state === 'play'){
+    ctx.save(); ctx.textAlign = 'center'; ctx.fillStyle = 'rgba(38,51,31,.5)';
+    ctx.font = '22px "Bagel Fat One", "Arial Rounded MT Bold", sans-serif'; ctx.fillText('Tap or click to drop', W/2, H*.5);
+    ctx.font = '800 14px Nunito, system-ui, sans-serif'; ctx.fillText('Match two of a kind. Keep fruit below the line.', W/2, H*.5 + 26); ctx.restore();
+  }
+}
+
+function updateFx(dt){
+  for (const p of particles){ p.life -= dt; if (!p.ring){ p.x += p.vx * dt; p.y += p.vy * dt; p.vy += .0009 * dt; } }
+  particles = particles.filter(p => p.life > 0);
+  for (const p of popups) p.life -= dt;
+  popups = popups.filter(p => p.life > 0);
+}
+
+let last = performance.now(), acc = 0;
+function frame(now){
+  const dt = Math.min(100, now - last); last = now;
+  const dir = (keys['arrowright'] || keys['d'] ? 1 : 0) - (keys['arrowleft'] || keys['a'] ? 1 : 0);
+  if (dir) aimX = clamp(aimX + dir * .38 * dt, 0, W);
+  if (state === 'play'){
+    acc += dt;
+    while (acc >= STEP){ Engine.update(engine, STEP); processMerges(now); acc -= STEP; }
+    checkOver(now, dt);
+  }
+  updateFx(dt);
+  render(now);
+  requestAnimationFrame(frame);
+}
+
+/* ---------- boot (keeps an in-progress game across page updates) ---------- */
+function snapshot(){ return { score, best, cur, next, maxTier, state, fruits: fruits.map(f => ({ t: f.tier, x: f.position.x, y: f.position.y })) }; }
+function start(data){
+  initEngine(); resize();
+  bestEl.textContent = best;
+  cur = Math.floor(Math.random() * 3); next = pickNext();
+  if (data && Array.isArray(data.fruits) && data.state === 'play'){
+    const now = performance.now();
+    for (const f of data.fruits) addFruit(f.t, f.x, f.y, now);
+    cur = data.cur ?? cur; next = data.next ?? next; score = data.score || 0; scoreEl.textContent = score;
+    if (data.best > best) { best = data.best; bestEl.textContent = best; }
+  }
+  updateChain(); drawNext();
+  requestAnimationFrame(t => { last = t; frame(t); });
+}
+window.claude?.hot?.snapshot?.(snapshot);
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+})();
+</script>
+
+</body></html>

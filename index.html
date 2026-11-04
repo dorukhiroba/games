@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kral Oyun Arcade</title>
+<meta name="description" content="A collection of browser games — pick one and play.">
+<meta name="theme-color" content="#14121f">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Figtree:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #14121f;
+    --card: #1f1c30;
+    --card-hover: #29253f;
+    --text: #f4f1ff;
+    --muted: #a9a3c7;
+    --chip: #322d4d;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: Figtree, system-ui, sans-serif;
+    min-height: 100vh;
+    padding: max(24px, env(safe-area-inset-top)) 16px 48px;
+  }
+  header { text-align: center; max-width: 960px; margin: 0 auto 28px; }
+  h1 {
+    font-family: "Lilita One", system-ui, sans-serif;
+    font-weight: 400;
+    font-size: clamp(2.2rem, 8vw, 3.6rem);
+    margin: 8px 0 4px;
+    letter-spacing: .02em;
+  }
+  header p { color: var(--muted); margin: 0; font-size: 1.05rem; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0;
+    list-style: none;
+  }
+  .card {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    padding: 16px;
+    border-radius: 16px;
+    background: var(--card);
+    color: inherit;
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: background .15s, transform .15s, border-color .15s;
+    height: 100%;
+  }
+  .card:hover, .card:focus-visible {
+    background: var(--card-hover);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    outline: none;
+  }
+  .icon {
+    flex: none;
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    display: grid; place-items: center;
+    font-family: "Lilita One", system-ui, sans-serif;
+    font-size: 1.5rem;
+    color: #fff;
+    background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 55%, #000));
+  }
+  .info { min-width: 0; }
+  .info h2 { margin: 0 0 3px; font-size: 1.12rem; font-weight: 700; }
+  .info p { margin: 0 0 8px; color: var(--muted); font-size: .92rem; line-height: 1.35; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    font-size: .72rem; font-weight: 600;
+    padding: 3px 8px; border-radius: 999px;
+    background: var(--chip); color: var(--muted);
+  }
+  footer { text-align: center; color: var(--muted); font-size: .85rem; margin-top: 36px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Kral Oyun Arcade</h1>
+  <p>Pick a game and play — right in your browser.</p>
+</header>
+
+<ul class="grid" id="games"></ul>
+
+<footer>13 games · works on phone and desktop</footer>
+
+<script>
+  const GAMES = [
+    { slug: "aradaki-7-fark",   name: "Aradaki 7 Fark",   desc: "İki resim arasındaki 7 farkı bul.",          tags: ["Puzzle", "Türkçe"],   color: "#e9774f" },
+    { slug: "city-block-smash", name: "City Block Smash", desc: "Smash your way through the city.",           tags: ["3D", "Action"],      color: "#4f8de9" },
+    { slug: "epoch-clash",      name: "Epoch Clash",      desc: "Head-to-head battle across the ages.",       tags: ["2 players"],         color: "#c94fe9" },
+    { slug: "gem-mosaic",       name: "Gem Mosaic",       desc: "Sort the jewels. Restore the picture.",      tags: ["Puzzle"],            color: "#2fb7a3" },
+    { slug: "kaboom-arena",     name: "Kaboom Arena",     desc: "Last one standing takes the crown.",         tags: ["3D", "Arena"],       color: "#f2563b" },
+    { slug: "kafa-kafaya",      name: "Kafa Kafaya",      desc: "İki oyunculu kafa kafaya mücadele.",         tags: ["2 players", "Türkçe"], color: "#e9b84f" },
+    { slug: "loop-blaster",     name: "Loop Blaster",     desc: "Fast-paced blasting action.",                tags: ["Arcade"],            color: "#e94f8d" },
+    { slug: "mochi-tower",      name: "Mochi Tower",      desc: "Stack the sweets. Keep the mochi on top.",   tags: ["3D", "Stacking"],    color: "#f28bb5" },
+    { slug: "orchard-drop",     name: "Orchard Drop",     desc: "Drop fruit with real physics.",              tags: ["Physics"],           color: "#6cbf3f" },
+    { slug: "saltpit-arena",    name: "Saltpit Arena",    desc: "Low-poly free-for-all in a salt quarry.",    tags: ["3D", "Arena"],       color: "#c9a77a" },
+    { slug: "tank-tussle",      name: "Tank Tussle",      desc: "Pick your tank and roll into battle.",       tags: ["3D", "Action"],      color: "#7a9a4f" },
+    { slug: "word-calm",        name: "Word Calm",        desc: "Swipe letters. Fill the valley.",            tags: ["Word"],              color: "#4fb0e9" },
+    { slug: "wordfield",        name: "Wordfield",        desc: "A field of words to discover.",              tags: ["Word"],              color: "#8d6cf2" },
+  ];
+
+  const list = document.getElementById("games");
+  for (const g of GAMES) {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <a class="card" href="${g.slug}/" style="--accent:${g.color}">
+        <span class="icon" aria-hidden="true">${g.name[0]}</span>
+        <span class="info">
+          <h2>${g.name}</h2>
+          <p>${g.desc}</p>
+          <span class="chips">${g.tags.map(t => `<span class="chip">${t}</span>`).join("")}</span>
+        </span>
+      </a>`;
+    list.appendChild(li);
+  }
+</script>
+</body>
+</html>
