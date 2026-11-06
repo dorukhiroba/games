@@ -268,6 +268,14 @@ kbd{font:700 11px var(--f-mono);background:#fff;border:1px solid rgba(23,32,42,.
 #nukeHud.final .nk-box{animation:nkshake .12s linear infinite}
 @keyframes nkshake{50%{transform:translateX(calc(-50% + 3px))}}
 #flash{position:absolute;inset:0;background:#fff;opacity:0}
+#killcam{position:absolute;inset:0}
+#killcam .kcbar{position:absolute;left:0;right:0;height:9vh;background:#0b0f14}
+#killcam .kcbar.top{top:0}#killcam .kcbar.bot{bottom:0}
+#killcam .kcinfo{position:absolute;left:50%;top:calc(9vh + 12px);transform:translateX(-50%);display:grid;justify-items:center;gap:2px;text-align:center;white-space:nowrap}
+#kcT{font:900 clamp(26px,5vw,40px)/.9 var(--f-display);letter-spacing:.12em;text-transform:uppercase;color:var(--hazard);text-shadow:0 2px 0 rgba(23,32,42,.7)}
+#kcS{font:700 15px var(--f-body);text-shadow:0 1px 3px rgba(0,0,0,.8)}
+#kcSlow{position:absolute;left:calc(14px + env(safe-area-inset-left,0px));bottom:calc(9vh + 12px);font:700 12px var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--hazard);background:var(--plate);padding:4px 8px;border-radius:2px}
+#kcSkip{position:absolute;right:calc(14px + env(safe-area-inset-right,0px));bottom:calc(9vh + 12px);font:700 12px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:rgba(241,235,224,.8)}
 .ksinfo{padding-top:10px;border-top:1px dashed rgba(23,32,42,.25)}
 .ksinfo ol{list-style:none;margin:6px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 14px;font-size:13px}
 .ksinfo li{display:flex;gap:8px;align-items:baseline}
@@ -319,6 +327,9 @@ kbd{font:700 11px var(--f-mono);background:#fff;border:1px solid rgba(23,32,42,.
     <div class="tape"></div></div>
   </div>
   <div id="flash"></div>
+  <div id="killcam" hidden><i class="kcbar top"></i><i class="kcbar bot"></i>
+    <div class="kcinfo"><b id="kcT">Killcam</b><span id="kcS">—</span></div>
+    <div id="kcSlow" hidden>Slow motion</div><div id="kcSkip">Space or click to skip</div></div>
   <div class="hud-tr" id="feed"></div>
   <div id="vignette"></div>
   <div id="dmgdir"><b></b></div>
@@ -878,7 +889,9 @@ for(let i=0;i<70;i++){const m=new T.Mesh(puffGeo,basic('#f6f1e8'));m.visible=fal
 const chipGeo=new T.TetrahedronGeometry(.06,0), caseGeo=new T.BoxGeometry(.025,.025,.07);
 for(let i=0;i<60;i++){const m=new T.Mesh(chipGeo,new T.MeshStandardMaterial({color:'#e7dccb',flatShading:true,roughness:.9}));m.visible=false;scene.add(m);parts.push({m,v:new V3(),t:0,life:.6,spin:new V3()})}
 let ti=0,pi=0,ci2=0;
-function tracer(a,b,o){
+function tracer(a,b,o,rep){
+  // everything live is logged for killcams; while one plays, live tracers stay hidden
+  if(!rep){shotLog.push({t:now,a:a.clone(),b:b.clone(),o,snd:o&&o.snd!=null?o.snd:null});if(replay)return}
   const tr=tracers[ti++%tracers.length], len=a.distanceTo(b);if(len<.05)return;
   tr.m.position.copy(a);tr.m.lookAt(b);tr.w=(o&&o.w)||.02;tr.m.scale.set(tr.w,tr.w,len);
   tr.m.material.color.set((o&&o.color)||'#fff4cf');tr.life=(o&&o.life)||.07;tr.t=0;tr.m.visible=true;
@@ -894,7 +907,8 @@ function deathBurst(p,color){for(let i=0;i<7;i++){puff(new V3(p.x+(Math.random()
 // muzzle light on the camera and one shared explosion light
 const mLight=new T.PointLight('#ffcf7a',0,8,2);mLight.position.set(.25,-.1,-1);camera.add(mLight);
 const xLight=new T.PointLight('#ffae5c',0,22,2);scene.add(xLight);
-function explosion(p,mine,size=1){
+function explosion(p,mine,size=1,rep){
+  if(!rep){boomLog.push({t:now,p:p.clone(),size});if(replay)return}
   for(let i=0;i<12;i++){const d=new V3(Math.random()-.5,Math.random()*.8,Math.random()-.5).normalize().multiplyScalar(Math.random()*1.6*size);
     puff(p.clone().add(d),i<4?'#ffb35c':i<8?'#f6f1e8':'#9a9187',(2+Math.random()*1.4)*size,.55+Math.random()*.4,1.2*size)}
   chips(p,'#e7dccb',10,8*Math.min(2,size));
@@ -1207,7 +1221,7 @@ function updateBot(b,dt){
       const chance=clamp(.5-b.dist/70,.12,.45)*(1-.25*P.crouchK), hit=Math.random()<chance, head=hit&&Math.random()<.15;
       const to=new V3(P.pos.x,P.pos.y+1.25-.45*P.crouchK,P.pos.z);
       if(!hit){to.x+=(Math.random()-.5)*2.4;to.y+=(Math.random()-.3)*1.4;to.z+=(Math.random()-.5)*2.4}
-      tracer(from,to,WEAPONS[b.w].tr);shotSound(vol,b.w);
+      tracer(from,to,Object.assign({snd:b.w},WEAPONS[b.w].tr));shotSound(vol,b.w);
       if(hit)takeDamage(head?BW[4]:BW[3],b.id,b.pos,{w:b.w,hd:head});else impact(to);
     }
   }
@@ -1330,7 +1344,7 @@ function syncPeers(dt){
         const m=muzzleOf(s.av);
         for(const e of ends){if(!Array.isArray(e)||e.length!==3||!e.every(Number.isFinite))continue;const ev=new V3(...e);
           if(sw===LAUNCHER){tracer(m,ev,{w:.09,life:.25,color:'#d8d0c4'});explosion(ev,false);remoteBlast(ev)}
-          else{tracer(m,ev,WEAPONS[sw].tr);impact(ev)}}
+          else{tracer(m,ev,e===ends[0]?Object.assign({snd:sw},WEAPONS[sw].tr):WEAPONS[sw].tr);impact(ev)}}
         if(playing&&sw!==LAUNCHER)shotSound(clamp(1-s.pos.distanceTo(P.pos)/60,0,1)*.7,sw);
       }
       s.lastShot=sh.s;
@@ -1347,7 +1361,7 @@ function syncPeers(dt){
     else if(ds!==s.lastDs){
       s.lastDs=ds;deathBurst(s.pos,COLORS[s.ci]);
       const kb=typeof pr.kb==='string'?pr.kb:null, kw=Number.isInteger(pr.kw)&&wName(pr.kw)?pr.kw:null, kh=!!pr.kh;
-      feed(kb?nameOf(kb):'the quarry',s.name,kb===myPeer,kw,kh);
+      logKill(kb,p.peer,kw,kh);feed(kb?nameOf(kb):'the quarry',s.name,kb===myPeer,kw,kh);
       if(kb===myPeer&&playing&&!roundOver&&s.rd===round){P.kills++;addStreakKill(kw);killPop(kh,s.name);if(kh||kw===KNIFE)camoKill(kw)}
     }
     s.first=false;
@@ -1433,7 +1447,7 @@ function fire(){
     for(let i=0;i<W.pellets;i++){
       const d=fwd.clone();d.x+=(Math.random()-.5)*spread*2;d.y+=(Math.random()-.5)*spread*2;d.z+=(Math.random()-.5)*spread*2;d.normalize();
       const r=traceShot(o,d,W.range);ends.push(r.end);
-      tracer(muzzle,r.end,W.tr);
+      tracer(muzzle,r.end,i===0?Object.assign({snd:P.w},W.tr):W.tr);
       if(r.hit){const a=per.get(r.hit.id)||{t:r.hit,d:0,head:false,at:r.end};a.d+=(r.head?W.head:W.dmg)*falloff(W,r.t);a.head=a.head||r.head;per.set(r.hit.id,a)}
       else impact(r.end);
     }
@@ -1479,7 +1493,7 @@ function selfBlast(at,k){
 function remoteBlast(at){selfBlast(at,.6)}
 function damageBot(b,d,head,w){
   if(b.dead||roundOver)return false;b.hp-=d;
-  if(b.hp<=0){b.dead=true;b.d++;b.ia=false;b.respawnAt=mode==='snd'?Infinity:now+3000;startDying(b.av);deathBurst(b.pos,COLORS[b.ci]);P.kills++;addStreakKill(w);if(head||w===KNIFE)camoKill(w);feed(myName,b.name,true,w,head);killPop(head,b.name);return true}
+  if(b.hp<=0){b.dead=true;b.d++;b.ia=false;b.respawnAt=mode==='snd'?Infinity:now+3000;startDying(b.av);deathBurst(b.pos,COLORS[b.ci]);P.kills++;addStreakKill(w);if(head||w===KNIFE)camoKill(w);logKill(meId(),b.id,w,head);feed(myName,b.name,true,w,head);killPop(head,b.name);return true}
   return false;
 }
 function takeDamage(d,fromId,fromPos,info){
@@ -1495,13 +1509,20 @@ function die(from){
   feed(nameOf(from),myName,false,P.kw,P.kh);
   $('#killer').textContent=nameOf(from)+(wName(P.kw)?' · '+wName(P.kw):'');$('#death').hidden=false;vm.visible=false;
   deathBurst(P.pos,COLORS[myColor]);
+  logKill(from,meId(),P.kw,P.kh);
+  if(from&&from!==meId()&&P.kw!==KSW.nuke&&!roundOver){
+    const k=killLog[killLog.length-1];pendingKC={at:now+900,k};
+    if(P.respawnAt!==Infinity)P.respawnAt=now+900+replayLength(KC.own)+300;
+  }
 }
 function respawn(){
   pickSpawn(P.pos,'me');P.vy=0;P.vel.set(0,0,0);P.hp=100;P.dead=false;P.protect=now+1500;P.ammoBy=WEAPONS.map(W=>W.mag);P.reloading=false;P.swapT=now;P.recoil=0;
   firing=false;P.clickT=-1e9;P.life++;
   P.yaw=Math.atan2(P.pos.x,P.pos.z);P.pitch=0;$('#death').hidden=true;vm.visible=true;
+  pendingKC=null;if(replay&&!replay.final)endReplay();
 }
 function newRound(r,m){
+  pendingKC=null;if(replay)endReplay();
   round=r;if(Number.isInteger(m)&&MAPS[m])curMap=m;ensureMap();roundOver=false;closeVote();P_mv=-1;
   OB=freshOB();domAcc=0;lastSdR=1;lastBoom=0;
   P.kills=0;P.deaths=0;P.streak=0;$('#banner').hidden=true;
@@ -1693,6 +1714,9 @@ function endRound(title,sub){
   if(roundOver)return;roundOver=true;roundEndT=now;firing=false;P_mv=-1;
   $('#bannerT').textContent=title;$('#bannerS').textContent=sub||'';$('#banner').hidden=false;tick(660,.12,.15);tick(990,.12,.2,.15);
   voteOpts=voteOptions(round);
+  pendingKC=null;if(replay)endReplay();
+  const last=killLog[killLog.length-1];
+  if(last&&now-last.t<12000&&last.w!==KSW.nuke&&now-lastNukeT>30000&&startReplay(last,true))$('#banner').hidden=true;
 }
 function voteOptions(r){
   const rng=mulberry32(r*7919+MODE_IDS.indexOf(mode)*31+17),c=MAPS.map((_,i)=>i).filter(i=>i!==curMap);
@@ -1723,6 +1747,7 @@ function renderVote(build){
 function roundLogic(){
   if(!playing)return;
   if(roundOver){
+    if(replay&&replay.final)return;
     const t=now-roundEndT;
     if(t>=VOTE_FROM&&!voteOpen)openVote();
     if(voteOpen){setText('voteT',Math.max(0,Math.ceil((BREAK_MS-t)/1000))+'s');renderVote()}
@@ -1751,7 +1776,7 @@ function setupBots(){
 function botRespawn(b){b.dead=false;b.hp=100;b.ia=false;pickSpawn(b.pos,b.id);armBot(b);reviveAvatar(b.av)}
 function killBot(b,from,w,head){
   if(b.dead)return;b.hp=0;b.dead=true;b.d++;b.ia=false;b.respawnAt=mode==='snd'?Infinity:now+3000;startDying(b.av);deathBurst(b.pos,COLORS[b.ci]);
-  if(from){from.k++;feed(from.name,b.name,false,Number.isInteger(w)?w:from.w,!!head)}else feed('the quarry',b.name,false,null,false);
+  if(from){from.k++;logKill(from.id,b.id,Number.isInteger(w)?w:from.w,!!head);feed(from.name,b.name,false,Number.isInteger(w)?w:from.w,!!head)}else feed('the quarry',b.name,false,null,false);
 }
 function botGoal(b){
   const V=VIEW();
@@ -1800,7 +1825,7 @@ function updateTeamBot(b,dt){
     const chance=b.w===2?.7:t.me?clamp(.5-b.dist/70,.12,.45)*(1-.25*P.crouchK):clamp(.62-b.dist/60,.22,.55),hit=Math.random()<chance,head=hit&&b.w!==2&&Math.random()<.15;
     const dmg=b.w===2?Math.round(36*falloff(WEAPONS[2],b.dist)):head?BW[4]:BW[3];
     if(!hit){to.x+=(Math.random()-.5)*2.4;to.y+=(Math.random()-.3)*1.4;to.z+=(Math.random()-.5)*2.4}
-    tracer(from,to,WEAPONS[b.w].tr);shotSound(vol,b.w);
+    tracer(from,to,Object.assign({snd:b.w},WEAPONS[b.w].tr));shotSound(vol,b.w);
     if(!hit)impact(to);
     else if(t.me){if(now>P.protect)takeDamage(dmg,b.id,b.pos,{w:b.w,hd:head})}
     else{t.b.hp-=dmg;t.b.av.hitT=now;if(t.b.hp<=0)killBot(t.b,b,b.w,head)}
@@ -1835,6 +1860,100 @@ function updatePrompt(){
   if(!show&&pkgPrompt){show=true;setText('objPromptT',pkgPrompt.t);$('#objBar').style.width=Math.min(100,pkgPrompt.p*100)+'%'}
   pr.hidden=!show;$('#tUse').hidden=!(isTouch&&show);
 }
+
+/* ================= killcam ================= */
+// Every client keeps ~8 s of what it saw (everyone's position, aim, weapon; shots; explosions; kills) and can
+// replay a recent kill from the killer's eyes, slowing down around the moment of the kill. Nothing extra is
+// sent over the network: each player replays their own recording.
+const HIST_MS=8000, hist=[], shotLog=[], boomLog=[], killLog=[];
+let lastSnap=0, replay=null, pendingKC=null, myGhost=null, myGhostKey='';
+function recordHistory(){
+  if(now-lastSnap<50)return;lastSnap=now;
+  const e=[];
+  if(playing)e.push({id:meId(),x:P.pos.x,y:P.pos.y,z:P.pos.z,yaw:P.yaw,pitch:P.pitch,w:P.w,cm:camoData.sel[P.w],dead:P.dead});
+  for(const [id,r] of remotes)e.push({id,x:r.pos.x,y:r.pos.y,z:r.pos.z,yaw:r.yaw,pitch:r.pitch,w:r.av.w,cm:r.av.camo|0,dead:!!r.dead});
+  for(const b of activeBots())e.push({id:b.id,x:b.pos.x,y:b.pos.y,z:b.pos.z,yaw:b.yaw,pitch:b.pitch,w:b.w|0,cm:0,dead:b.dead});
+  hist.push({t:now,e});
+  const cut=now-HIST_MS;
+  while(hist.length&&hist[0].t<cut)hist.shift();while(shotLog.length&&shotLog[0].t<cut)shotLog.shift();
+  while(boomLog.length&&boomLog[0].t<cut)boomLog.shift();while(killLog.length&&killLog[0].t<now-20000)killLog.shift();
+}
+function logKill(killer,victim,w,head){if(killer&&victim&&killer!==victim)killLog.push({t:now,killer,victim,w:Number.isInteger(w)?w:null,head:!!head})}
+function avatarOf(id){
+  if(id===meId()){
+    const ci=isTeam()?TEAMS[myTeam].ci:myColor,key=ci+'|'+myName;
+    if(!myGhost||myGhostKey!==key){if(myGhost)disposeAvatar(myGhost);myGhost=makeAvatar(ci,myName);myGhostKey=key;myGhost.g.visible=false}
+    return myGhost;
+  }
+  const r=remotes.get(id);if(r)return r.av;const b=bots.find(x=>x.id===id);return b?b.av:null;
+}
+function allAvatars(){const out=[];for(const [,r] of remotes)out.push(r.av);for(const b of bots)out.push(b.av);if(myGhost)out.push(myGhost);return out}
+// slow motion window around the kill: [from, to] ms relative to the kill, and the speed inside it
+const KC={own:{pre:2500,post:900,slow:[-500,300],rate:.3},final:{pre:3000,post:1500,slow:[-700,450],rate:.25}};
+function replayLength(c){const w=c.slow[1]-c.slow[0];return c.pre+c.post-w+w/c.rate}
+function startReplay(k,final){
+  const c=final?KC.final:KC.own;
+  if(!hist.length||hist[hist.length-1].t<k.t-200)return false;
+  const t0=Math.max(hist[0].t,k.t-c.pre);
+  const kName=k.killer===meId()?myName:nameOf(k.killer),vName=k.victim===meId()?myName:nameOf(k.victim);
+  replay={k,final,c,t0,t1:k.t+c.post,rt:t0,prev:t0,burst:false,skip:false};
+  $('#kcT').textContent=final?'Final killcam':'Killcam';
+  $('#kcS').textContent=kName+(wName(k.w)?' · '+wName(k.w):'')+(k.head?' · headshot':'')+' → '+vName;
+  $('#kcSkip').hidden=final;$('#killcam').hidden=false;$('#death').hidden=true;$('#cross').style.visibility='hidden';
+  return true;
+}
+function endReplay(){
+  const r=replay;if(!r)return;replay=null;
+  $('#killcam').hidden=true;$('#cross').style.visibility='';
+  // hand the avatars back to the live game
+  for(const [,x] of remotes){x.av.g.visible=!x.dead||x.av.dieT!==null;if(x.av.dieT===null)x.av.g.rotation.set(0,x.av.g.rotation.y,0)}
+  for(const b of bots){b.av.g.visible=activeBots().includes(b)&&(!b.dead||b.av.dieT!==null);if(b.av.dieT===null)b.av.g.rotation.set(0,b.av.g.rotation.y,0)}
+  if(myGhost)myGhost.g.visible=false;
+  if(camera.fov!==FOV){camera.fov=FOV;camera.updateProjectionMatrix()}
+  if(r.final){roundEndT=now;$('#banner').hidden=false}
+  else if(playing&&P.dead&&P.respawnAt!==Infinity){P.respawnAt=Math.min(P.respawnAt,now+350);$('#death').hidden=false}
+}
+function lerpEnt(a,b,k){return {x:a.x+(b.x-a.x)*k,y:a.y+(b.y-a.y)*k,z:a.z+(b.z-a.z)*k,yaw:lerpAngle(a.yaw,b.yaw,k),pitch:a.pitch+(b.pitch-a.pitch)*k,w:b.w,cm:b.cm,dead:k<.5?a.dead:b.dead}}
+function sampleAt(t){
+  let i=0;while(i<hist.length-1&&hist[i+1].t<=t)i++;
+  const A=hist[i],B=hist[Math.min(i+1,hist.length-1)],k=B.t>A.t?clamp((t-A.t)/(B.t-A.t),0,1):0,m=new Map();
+  for(const e of A.e){const o=B.e.find(x=>x.id===e.id);m.set(e.id,o?lerpEnt(e,o,k):e)}
+  return m;
+}
+function updateReplay(dt){
+  if(pendingKC&&now>=pendingKC.at){const k=pendingKC.k;pendingKC=null;
+    if(playing&&P.dead&&!roundOver&&!replay&&!startReplay(k,false)&&P.respawnAt!==Infinity)P.respawnAt=Math.min(P.respawnAt,now+1500)}
+  const r=replay;if(!r)return;
+  const d=r.rt-r.k.t,slow=d>r.c.slow[0]&&d<r.c.slow[1];
+  $('#kcSlow').hidden=!slow;
+  r.prev=r.rt;r.rt+=dt*1000*(slow?r.c.rate:1);
+  // replay the shots and blasts that happened in this slice of time
+  for(const x of shotLog)if(x.t>r.prev&&x.t<=r.rt){tracer(x.a,x.b,x.o,true);if(x.snd!=null)shotSound(clamp(1-x.a.distanceTo(camera.position)/60,0,1)*.7,x.snd)}
+  for(const x of boomLog)if(x.t>r.prev&&x.t<=r.rt)explosion(x.p,false,x.size,true);
+  if(r.rt>=r.t1||r.skip){endReplay();return}
+  const snap=sampleAt(r.rt),k=r.k;
+  for(const av of allAvatars())av.g.visible=false;
+  for(const [id,e] of snap){
+    const av=avatarOf(id);if(!av)continue;
+    av.g.position.set(e.x,e.y,e.z);av.g.rotation.set(0,e.yaw,0);av.upper.rotation.x=e.pitch*.6;setAvatarGun(av,e.w,e.cm|0);
+    av.g.visible=!e.dead;av.tag.visible=false;
+    // the victim topples over at the moment of the kill
+    if(id===k.victim&&r.rt>=k.t){const f=Math.min(1,(r.rt-k.t)/450),q=1-(1-f)*(1-f);av.g.visible=true;av.g.rotation.x=q*1.45}
+  }
+  if(!r.burst&&r.rt>=k.t){r.burst=true;const v=snap.get(k.victim);if(v)deathBurst(new V3(v.x,v.y,v.z),'#e2483d');hitSound(k.head,true)}
+  // camera: the killer's eyes for gunfire; a chase camera on the victim for killstreak kills
+  const ke=snap.get(k.killer),ve=snap.get(k.victim);
+  if(ke&&!(k.w>=10)){
+    camera.position.set(ke.x,ke.y+EYE,ke.z);camera.rotation.set(ke.pitch,ke.yaw,0);
+    const kav=avatarOf(k.killer);if(kav)kav.g.visible=false;
+    const mine=k.killer===meId();vm.visible=mine;if(mine)VMS.forEach((m,i)=>{m.g.visible=i===ke.w});
+  }else if(ve){
+    vm.visible=false;const a=r.rt*.0004;
+    camera.position.set(ve.x+Math.sin(a)*7,ve.y+4,ve.z+Math.cos(a)*7);camera.lookAt(ve.x,ve.y+1.2,ve.z);
+  }
+  if(camera.fov!==FOV){camera.fov=FOV;camera.updateProjectionMatrix()}
+}
+function skipKillcam(){if(replay&&!replay.final)replay.skip=true}
 
 /* ================= killstreaks ================= */
 // Whoever calls a killstreak simulates it and deals its damage (through the same hit list as gunfire);
@@ -2543,6 +2662,7 @@ canvas.addEventListener('contextmenu',e=>e.preventDefault());
 let mouseDown=false;
 canvas.addEventListener('mousedown',e=>{
   if(e.button===0)mouseDown=true;
+  if(replay&&!replay.final&&e.button===0){skipKillcam();return}
   // clicks while dead, between rounds or paused never arm the trigger
   if(!playing||paused||wmOpen||P.dead||roundOver)return;
   if(e.button===2){if(P.ac)P.acHeavy=true;else P.scoped=true;return}
@@ -2562,6 +2682,7 @@ addEventListener('keydown',e=>{
   if(wmOpen&&(e.code==='Escape'||e.code==='KeyB')){e.preventDefault();closeWM(true);return}
   if(e.code==='Escape'||e.code==='KeyP'){if(!paused)pause();return}
   if(paused)return;
+  if(replay&&!replay.final&&e.code==='Space'){skipKillcam();return}
   const d=/^Digit([1-7])$/.exec(e.code);
   if(d&&voteOpen){castVote(+d[1]-1);return}
   if(d&&wmOpen){switchWeapon(+d[1]-1);closeWM(true);return}
@@ -2579,6 +2700,7 @@ addEventListener('blur',()=>{keys.clear();firing=false;if(!isTouch)P.crouch=fals
 // touch
 const tl=$('#touch'),stickEl=$('#stick');
 tl.addEventListener('touchstart',e=>{
+  if(replay&&!replay.final){skipKillcam();e.preventDefault();return}
   for(const t of e.changedTouches){
     if(t.target.closest&&t.target.closest('button'))continue;
     if(t.clientX<innerWidth*.45&&stick.id===null){stick.id=t.identifier;stick.ox=t.clientX;stick.oy=t.clientY;stick.x=stick.y=0;stickEl.style.left=t.clientX+'px';stickEl.style.top=t.clientY+'px';stickEl.style.opacity=1}
@@ -2632,6 +2754,7 @@ function frame(t){
   for(const [,s] of remotes)avatarFx(s.av,s.pos.y);
   updateCrates(dt);updateHeli(dt);updateVehicles(dt);updateNuke(dt);updateSnow(dt);
   updateEffects(dt*timeScale);roundLogic();sendPresence();updateHUD();
+  recordHistory();updateReplay(dt);
   if(t-lastNetUI>500){lastNetUI=t;updateNetUI()}
   window.__sky.position.copy(camera.position);
   renderer.render(scene,camera);
