@@ -1,7 +1,7 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html lang="tr"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Altı Dilim</title>
 <script src="../net.js"></script>
-<script src="../quit.js"></script>
+<script src="../quit.js" data-lang="tr"></script>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -132,7 +132,7 @@ h1,h2,h3{text-wrap:balance;margin:0}
 .pc.turn{border-color:var(--paper)}
 .pc.away{opacity:.4}
 .pc.done::after{content:"✓";position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:var(--good);color:var(--ink);font-size:12px;font-weight:800;display:grid;place-items:center}
-.pc.me .nm::after{content:" (you)";color:var(--muted);font-weight:500}
+.pc.me .nm::after{content:" (sen)";color:var(--muted);font-weight:500}
 
 /* wheel */
 .wheel{display:block;width:min(100%,380px);margin:0 auto;overflow:visible}
@@ -141,7 +141,7 @@ h1,h2,h3{text-wrap:balance;margin:0}
 .wheel.live .slice:hover{filter:brightness(1.15)}
 .wheel .lab{font-family:var(--f-display);font-weight:800;font-size:8.6px;letter-spacing:.06em;fill:var(--ink);pointer-events:none}
 .wheel .rot{transform-origin:100px 100px;transform-box:view-box;transition:transform 1.7s cubic-bezier(.17,.84,.24,1)}
-.wheel .need{font-size:6px;fill:var(--ink);opacity:.7}
+.wheel .need{font-size:9px;fill:var(--ink);opacity:.7}
 .center{text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
 .pick-h{font-size:clamp(24px,5.5vw,36px)}
 
@@ -165,6 +165,34 @@ h1,h2,h3{text-wrap:balance;margin:0}
 .xbtn{background:none;border:1px solid var(--line);border-radius:10px;width:40px;height:44px;color:var(--muted);flex:none;font-size:18px}
 .pass{font-size:15px;color:var(--muted)}
 
+/* teams + category picker */
+.teams{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.tcard{display:flex;align-items:center;gap:10px;background:var(--ink-2);border:2px solid color-mix(in srgb,var(--tc) 40%,transparent);border-radius:16px;padding:10px 12px;min-width:0}
+.tcard.turn{border-color:var(--tc);box-shadow:0 0 0 3px color-mix(in srgb,var(--tc) 22%,transparent)}
+.tcard .mid{display:flex;flex-direction:column;min-width:0;flex:1}
+.tcard .tn{font-family:var(--f-display);font-weight:800;font-size:15px;color:var(--tc);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tcard .sc{font-family:var(--f-display);font-weight:700;font-size:13px;font-variant-numeric:tabular-nums}
+.tcard .d{font-family:var(--f-display);font-weight:700;font-variant-numeric:tabular-nums;font-size:14px}
+.tcard .d.pos{color:var(--good)} .tcard .d.neg{color:var(--bad)}
+.mem{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tdot{width:10px;height:10px;border-radius:50%;flex:none;display:inline-block;margin-left:6px;vertical-align:middle}
+.tpill{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-display);font-weight:700;font-size:12px;letter-spacing:.06em;padding:6px 12px;border-radius:999px;border:1.5px solid var(--tc);color:var(--tc)}
+.tcols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tcol{display:flex;flex-direction:column;gap:8px;border:1.5px solid color-mix(in srgb,var(--tc) 50%,transparent);border-radius:16px;padding:10px;background:color-mix(in srgb,var(--tc) 7%,var(--ink));min-width:0}
+.tcol h3{font-family:var(--f-display);font-size:14px;font-weight:800;color:var(--tc);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tcol .pslot{background:var(--ink-2)}
+@media (max-width:560px){.tcol .pslot .tag{display:none}.tcol .pslot.me{border-color:var(--paper)}}
+button.pslot{width:100%;text-align:left}
+button.pslot:hover{border-color:var(--tc)}
+.catgrid{display:flex;flex-wrap:wrap;gap:6px}
+.cchip{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);background:var(--ink);border-radius:999px;padding:7px 12px;font-size:14px;font-weight:600;color:var(--muted)}
+.cchip[aria-pressed="true"]{color:var(--paper);border-color:var(--paper);background:var(--ink-3)}
+.cchip .slot{width:10px;height:10px;border-radius:3px;flex:none}
+.cchip:disabled[aria-pressed="false"]{opacity:.5}
+.presets{display:flex;gap:6px;flex-wrap:wrap}
+.presets button{background:none;border:1px dashed var(--line);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;color:var(--muted)}
+.presets button:hover{color:var(--paper);border-color:var(--paper)}
+
 @media (max-width:560px){
   .opts{grid-template-columns:1fr}
   .plist{grid-template-columns:1fr}
@@ -184,348 +212,500 @@ h1,h2,h3{text-wrap:balance;margin:0}
 
 <div class="app">
   <header class="top">
-    <button class="brand" id="brand" type="button" aria-label="Altı Dilim home"><span id="logo"></span><span>Altı Dilim</span></button>
+    <button class="brand" id="brand" type="button" aria-label="Altı Dilim ana sayfa"><span id="logo"></span><span>Altı Dilim</span></button>
     <div class="top-r" id="topR"></div>
   </header>
   <main id="main" class="stage"></main>
 </div>
 
 <script>
-// [category, region, question, correct, wrong1, wrong2, wrong3]
-// category: 0 Geography, 1 Screen & Song, 2 History, 3 Arts & Letters, 4 Science & Nature, 5 Sport & Table
-// region: "t" = Türkiye, "g" = global
+// [kategori, bölge, soru, doğru, yanlış1, yanlış2, yanlış3]
+// kategori: CATS dizisindeki sıra (0 Coğrafya … 12 Troll Sorular)
+// bölge: "t" = Türkiye, "g" = global
 const QS = [
-// ── 0 GEOGRAPHY ─────────────────────────────
-[0,"t","Which is the largest lake in Türkiye?","Lake Van","Tuz Gölü","Lake Beyşehir","Lake Eğirdir"],
-[0,"t","What is Türkiye's highest mountain?","Mount Ararat (Ağrı Dağı)","Mount Erciyes","Mount Süphan","Uludağ"],
-[0,"t","Which strait connects the Sea of Marmara with the Aegean Sea?","The Dardanelles (Çanakkale)","The Bosphorus","The Strait of Kerch","The Strait of Otranto"],
-[0,"t","Göreme and its fairy chimneys are in which province?","Nevşehir","Konya","Kayseri","Aksaray"],
-[0,"t","Which is Türkiye's largest province by area?","Konya","Sivas","Erzurum","Ankara"],
-[0,"t","The Kızılırmak, the longest river entirely within Türkiye, flows into which sea?","Black Sea","Mediterranean Sea","Aegean Sea","Sea of Marmara"],
-[0,"t","Pamukkale's white travertine terraces are in which province?","Denizli","Muğla","Aydın","Antalya"],
-[0,"t","How many countries share a land border with Türkiye?","8","6","7","9"],
-[0,"t","Which of these cities is in the European part of Türkiye?","Edirne","Bursa","Bilecik","Balıkesir"],
-[0,"t","Mount Nemrut, with its giant stone heads, is in which province?","Adıyaman","Malatya","Şanlıurfa","Diyarbakır"],
-[0,"t","Which is Türkiye's most populous geographical region?","Marmara","Central Anatolia","Aegean","Black Sea"],
-[0,"t","Tuz Gölü (Salt Lake) is Türkiye's ___ largest lake.","Second","Largest","Third","Fifth"],
-[0,"t","Which river forms much of the border between Türkiye and Greece?","Meriç (Evros)","Tunca","Ergene","Struma"],
-[0,"t","The mountain lake Uzungöl is in which province?","Trabzon","Rize","Artvin","Giresun"],
-[0,"t","Türkiye's easternmost point lies in which province?","Iğdır","Van","Hakkari","Kars"],
-[0,"t","Which city is the heart of Türkiye's tea growing?","Rize","Trabzon","Artvin","Ordu"],
-[0,"t","The Ölüdeniz lagoon is next to which town?","Fethiye","Kaş","Marmaris","Bodrum"],
-[0,"t","What is Türkiye's largest island?","Gökçeada","Bozcaada","Marmara Island","Büyükada"],
-[0,"t","Which two seas does the Bosphorus connect?","Black Sea and Sea of Marmara","Aegean and Marmara","Black Sea and Aegean","Mediterranean and Aegean"],
-[0,"t","Mount Erciyes, a ski resort and extinct volcano, towers over which city?","Kayseri","Sivas","Niğde","Nevşehir"],
-[0,"t","The Sümela Monastery clings to a cliff in which province?","Trabzon","Gümüşhane","Rize","Bayburt"],
-// global
-[0,"g","What is the capital of Australia?","Canberra","Sydney","Melbourne","Perth"],
-[0,"g","What is the longest river in Africa?","Nile","Congo","Niger","Zambezi"],
-[0,"g","Counting overseas territories, which country spans the most time zones?","France","Russia","United Kingdom","China"],
-[0,"g","What is the largest hot desert in the world?","Sahara","Arabian Desert","Gobi","Kalahari"],
-[0,"g","Mount Kilimanjaro is in which country?","Tanzania","Kenya","Uganda","Ethiopia"],
-[0,"g","Which country has the most natural lakes?","Canada","Finland","Russia","Sweden"],
-[0,"g","What is the capital of Kazakhstan?","Astana","Almaty","Bishkek","Tashkent"],
-[0,"g","Which of these capitals sits on the Danube?","Budapest","Prague","Warsaw","Bucharest"],
-[0,"g","What is the smallest country in the world by area?","Vatican City","Monaco","San Marino","Liechtenstein"],
-[0,"g","Angkor Wat is in which country?","Cambodia","Thailand","Laos","Vietnam"],
-[0,"g","Lake Titicaca lies on the border of Peru and which country?","Bolivia","Chile","Ecuador","Argentina"],
-[0,"g","What is the capital of New Zealand?","Wellington","Auckland","Christchurch","Queenstown"],
-[0,"g","Which is Africa's most populous country?","Nigeria","Ethiopia","Egypt","DR Congo"],
-[0,"g","The Atacama Desert lies mostly in which country?","Chile","Peru","Argentina","Bolivia"],
-[0,"g","Which sea has no coastline at all?","Sargasso Sea","Caspian Sea","Dead Sea","Coral Sea"],
-[0,"g","Which of these capitals is the furthest north?","Reykjavík","Helsinki","Oslo","Tallinn"],
-[0,"g","What is the largest island in the world?","Greenland","New Guinea","Borneo","Madagascar"],
-[0,"g","Which river flows through Baghdad?","Tigris","Euphrates","Jordan","Karun"],
-[0,"g","Mount Fuji is on which Japanese island?","Honshu","Hokkaido","Kyushu","Shikoku"],
-[0,"g","Which country has the longest coastline?","Canada","Norway","Indonesia","Russia"],
-[0,"g","What is the capital of Morocco?","Rabat","Casablanca","Marrakesh","Fez"],
-[0,"g","Which of these South American countries is landlocked?","Paraguay","Uruguay","Ecuador","Colombia"],
-[0,"g","The Danube empties into which sea?","Black Sea","Adriatic Sea","Baltic Sea","Aegean Sea"],
-[0,"g","Angel Falls, the world's highest uninterrupted waterfall, is in which country?","Venezuela","Brazil","Colombia","Guyana"],
-[0,"g","Which country is said to have the most islands?","Sweden","Norway","Indonesia","Philippines"],
-[0,"g","What is the capital of Vietnam?","Hanoi","Ho Chi Minh City","Da Nang","Huế"],
-[0,"g","The Strait of Gibraltar separates Spain from which country?","Morocco","Algeria","Tunisia","Portugal"],
-[0,"g","Lake Baikal, the world's deepest lake, is in which country?","Russia","Mongolia","Kazakhstan","China"],
-[0,"g","Which country's coast touches both the Atlantic and the Indian Ocean?","South Africa","Namibia","Mozambique","Angola"],
-[0,"g","The Mekong River reaches the sea in which country?","Vietnam","Cambodia","Thailand","Myanmar"],
-[0,"g","Which Scandinavian country is famous for its fjord-lined west coast?","Norway","Denmark","Sweden","Finland"],
-
-// ── 1 SCREEN & SONG ─────────────────────────
-[1,"t","Which Turkish director won the Palme d'Or in 2014 for ‘Winter Sleep’ (Kış Uykusu)?","Nuri Bilge Ceylan","Fatih Akın","Semih Kaplanoğlu","Zeki Demirkubuz"],
-[1,"t","Yılmaz Güney shared the 1982 Palme d'Or for which film?","Yol","Sürü","Umut","Duvar"],
-[1,"t","Which singer is known as Türkiye's ‘Megastar’?","Tarkan","Mustafa Sandal","Kenan Doğulu","Teoman"],
-[1,"t","Which nickname belongs to Sezen Aksu?","Minik Serçe","Diva","Süperstar","Megastar"],
-[1,"t","Who won the Eurovision Song Contest for Türkiye in 2003?","Sertab Erener","Hadise","maNga","Kenan Doğulu"],
-[1,"t","Which Turkish series about Sultan Süleyman became a hit across 40+ countries?","Muhteşem Yüzyıl","Diriliş: Ertuğrul","Kurtlar Vadisi","Payitaht"],
-[1,"t","In ‘Hababam Sınıfı’, Kemal Sunal played which character?","İnek Şaban","Damat Ferit","Güdük Necmi","Tulum Hayri"],
-[1,"t","Which Cem Yılmaz film is set on an alien planet of the same name?","G.O.R.A.","A.R.O.G","Vizontele","Yahşi Batı"],
-[1,"t","What was Barış Manço's famous TV show for children called?","7'den 77'ye","Çarkıfelek","Susam Sokağı","Bir Kahkaha"],
-[1,"t","maNga came second at Eurovision 2010 with which song?","We Could Be the Same","Cevapsız Sorular","Dursun Zaman","Bir Kadın Çizeceksin"],
-[1,"t","Who wrote and sang ‘Gülpembe’?","Barış Manço","Cem Karaca","Erkin Koray","Fikret Kızılok"],
-[1,"t","In the shadow-puppet play, Karagöz's partner is…","Hacivat","Nasreddin","Keloğlan","Pişekar"],
-[1,"t","The police series ‘Behzat Ç.’ is set in which city?","Ankara","Istanbul","İzmir","Bursa"],
-[1,"t","Fatih Akın's ‘Head-On’ (Duvara Karşı) won the top prize at which festival?","Berlin","Cannes","Venice","Sundance"],
-[1,"t","Müslüm Gürses is a legend of which genre?","Arabesk","Anatolian rock","Pop","Turkish jazz"],
-[1,"t","Who sang ‘Şımarık’, the song with the famous kissing sound?","Tarkan","Mustafa Sandal","Serdar Ortaç","Hande Yener"],
-[1,"t","Which singer was called ‘Sanat Güneşi’ (Sun of Art)?","Zeki Müren","Müzeyyen Senar","Bülent Ersoy","Ajda Pekkan"],
-[1,"t","What is Ajda Pekkan's famous nickname?","Süperstar","Megastar","Diva","Prenses"],
-[1,"t","Who is the frontman of the rock band Duman?","Kaan Tangöze","Teoman","Hayko Cepkin","Cem Adrian"],
-[1,"t","Who is the main character of ‘Kurtlar Vadisi’?","Polat Alemdar","Ezel Bayraktar","Behzat Ç.","Yaman Koper"],
-[1,"t","In the film ‘Vizontele’, what arrives in a small Hakkari town?","Television","Cinema","Electricity","The railway"],
-[1,"t","Cem Karaca is a key figure of which genre?","Anatolian rock","Arabesk","Turkish pop","Classical Turkish music"],
-[1,"t","Which Turkish film director made ‘Once Upon a Time in Anatolia’?","Nuri Bilge Ceylan","Ferzan Özpetek","Reha Erdem","Yeşim Ustaoğlu"],
-// global
-[1,"g","Which Studio Ghibli film won the Academy Award for Best Animated Feature?","Spirited Away","Princess Mononoke","My Neighbor Totoro","Howl's Moving Castle"],
-[1,"g","ABBA won Eurovision 1974 with which song?","Waterloo","Dancing Queen","Mamma Mia","SOS"],
-[1,"g","Which South Korean film won the Palme d'Or in 2019?","Parasite","Burning","Oldboy","Minari"],
-[1,"g","Which band released ‘Bohemian Rhapsody’?","Queen","The Beatles","Pink Floyd","Led Zeppelin"],
-[1,"g","Which company created Super Mario?","Nintendo","Sega","Sony","Capcom"],
-[1,"g","Tetris was created in which country?","Soviet Union","Japan","Finland","Hungary"],
-[1,"g","Angry Birds was made by a studio from which country?","Finland","Sweden","Estonia","Denmark"],
-[1,"g","Minecraft was originally created by a developer from…","Sweden","Norway","Denmark","Finland"],
-[1,"g","The series ‘Money Heist’ (La Casa de Papel) is from which country?","Spain","Mexico","Argentina","Italy"],
-[1,"g","What is the Hindi-language film industry based in Mumbai called?","Bollywood","Tollywood","Kollywood","Mollywood"],
-[1,"g","The electronic duo Daft Punk came from which country?","France","Belgium","Germany","Netherlands"],
-[1,"g","Which James Bond actor was Scottish?","Sean Connery","Roger Moore","Daniel Craig","Pierce Brosnan"],
-[1,"g","The time-travel series ‘Dark’ comes from which country?","Germany","Austria","Denmark","Switzerland"],
-[1,"g","In ‘Squid Game’, the prize money is counted in which currency?","Won","Yen","Yuan","Dollars"],
-[1,"g","Which French film follows a shy waitress in Montmartre?","Amélie","La Haine","The Intouchables","Léon"],
-[1,"g","Hayao Miyazaki co-founded which animation studio?","Studio Ghibli","Toei Animation","Madhouse","Sunrise"],
-[1,"g","Shakira comes from which country?","Colombia","Mexico","Spain","Argentina"],
-[1,"g","Nemo won Eurovision 2024 representing which country?","Switzerland","Croatia","Italy","Ukraine"],
-[1,"g","Which Swedish band recorded ‘The Final Countdown’?","Europe","Roxette","ABBA","Ace of Base"],
-[1,"g","‘The Witcher’ video games come from a studio in which country?","Poland","Czechia","Ukraine","Lithuania"],
-[1,"g","The band Rammstein sings mostly in which language?","German","Dutch","Swedish","English"],
-[1,"g","Tintin, the boy reporter, was created in which country?","Belgium","France","Switzerland","Netherlands"],
-[1,"g","Who directed both ‘Parasite’ and ‘Snowpiercer’?","Bong Joon-ho","Park Chan-wook","Kim Ki-duk","Lee Chang-dong"],
-[1,"g","Which Irish band recorded ‘With or Without You’?","U2","The Cranberries","Coldplay","Oasis"],
-[1,"g","Who played Mr. Bean?","Rowan Atkinson","Hugh Laurie","Stephen Fry","John Cleese"],
-[1,"g","Which K-pop group's fans are known as ARMY?","BTS","Blackpink","EXO","Twice"],
-[1,"g","The Eurovision Song Contest started in which decade?","1950s","1960s","1940s","1970s"],
-
-// ── 2 HISTORY ───────────────────────────────
-[2,"t","In which year was the Republic of Türkiye proclaimed?","1923","1920","1919","1938"],
-[2,"t","In which year did the Ottomans conquer Constantinople?","1453","1071","1299","1517"],
-[2,"t","In which year was the Battle of Manzikert (Malazgirt)?","1071","1176","1243","1402"],
-[2,"t","Which sultan conquered Constantinople?","Mehmed II","Süleyman I","Selim I","Murad II"],
-[2,"t","Mustafa Kemal landed in Samsun to start the national struggle on…","19 May 1919","23 April 1920","30 August 1922","29 October 1923"],
-[2,"t","The Grand National Assembly first met in Ankara on…","23 April 1920","19 May 1919","29 October 1923","3 March 1924"],
-[2,"t","Which 1923 treaty internationally recognised modern Türkiye's borders?","Treaty of Lausanne","Treaty of Sèvres","Armistice of Mudanya","Treaty of Karlowitz"],
-[2,"t","Roughly how old are the oldest structures at Göbeklitepe?","About 11,000 years","About 5,000 years","About 3,000 years","About 2,000 years"],
-[2,"t","The ancient city of Troy is in which modern province?","Çanakkale","İzmir","Balıkesir","Edirne"],
-[2,"t","In which year did women in Türkiye win the right to vote in national elections?","1934","1923","1946","1950"],
-[2,"t","Which Ottoman sultan is known in the West as ‘the Magnificent’?","Süleyman I","Mehmed II","Selim I","Ahmed I"],
-[2,"t","Who founded the Ottoman state around 1299?","Osman I","Orhan","Ertuğrul","Murad I"],
-[2,"t","Hattusa was the capital of which ancient people?","The Hittites","The Phrygians","The Lydians","The Urartians"],
-[2,"t","The world's first coins are credited to which Anatolian kingdom?","Lydia","Phrygia","Caria","Lycia"],
-[2,"t","King Midas ruled which Anatolian kingdom?","Phrygia","Lydia","Urartu","Pontus"],
-[2,"t","The ruins of Ephesus are next to which modern town?","Selçuk","Bergama","Didim","Fethiye"],
-[2,"t","In which year did Türkiye switch from Arabic to Latin letters?","1928","1923","1934","1946"],
-[2,"t","Which battle was the decisive victory of the Great Offensive in August 1922?","Dumlupınar","Sakarya","İnönü","Kut"],
-[2,"t","Mustafa Kemal was given the title ‘Gazi’ after which battle?","Sakarya","Dumlupınar","Çanakkale","İnönü"],
-[2,"t","The Hagia Sophia we see today was built under which Byzantine emperor?","Justinian I","Constantine I","Theodosius II","Basil II"],
-[2,"t","In which year did Türkiye join NATO?","1952","1949","1955","1960"],
-[2,"t","Çatalhöyük, one of the earliest known towns, is in which province?","Konya","Çorum","Şanlıurfa","Kayseri"],
-[2,"t","The Ottoman Tanzimat reform era began in which year?","1839","1808","1876","1908"],
-[2,"t","Which Wonder of the Ancient World stood in today's Bodrum?","The Mausoleum","The Colossus","The Lighthouse","The Temple of Artemis"],
-[2,"t","The Temple of Artemis, an Ancient Wonder, stood at which city?","Ephesus","Pergamon","Miletus","Halicarnassus"],
-[2,"t","The second Ottoman siege of which city failed in 1683?","Vienna","Budapest","Belgrade","Prague"],
-// global
-[2,"g","Which civilisation built Machu Picchu?","The Inca","The Aztecs","The Maya","The Olmecs"],
-[2,"g","In which year did the Berlin Wall fall?","1989","1987","1991","1985"],
-[2,"g","Who was the first emperor of a unified China?","Qin Shi Huang","Kublai Khan","Liu Bang","Wu Zetian"],
-[2,"g","The French Revolution began in which year?","1789","1776","1815","1848"],
-[2,"g","Great Zimbabwe was built by the ancestors of which people?","The Shona","The Zulu","The Maasai","The Berbers"],
-[2,"g","Which city was buried by Mount Vesuvius in 79 CE?","Pompeii","Ostia","Carthage","Syracuse"],
-[2,"g","Nelson Mandela became South Africa's president in which year?","1994","1990","1989","1999"],
-[2,"g","Who was the first person in space?","Yuri Gagarin","Valentina Tereshkova","Alexei Leonov","Gherman Titov"],
-[2,"g","The Rosetta Stone was the key to reading what?","Egyptian hieroglyphs","Cuneiform","Linear B","Mayan glyphs"],
-[2,"g","Marco Polo came from which city?","Venice","Genoa","Florence","Pisa"],
-[2,"g","Which general led Carthage's army and elephants across the Alps?","Hannibal","Hamilcar","Scipio","Hasdrubal"],
-[2,"g","The Meiji Restoration happened in which country?","Japan","China","Korea","Siam"],
-[2,"g","In which year did the First World War begin?","1914","1912","1916","1918"],
-[2,"g","The Taj Mahal was built by an emperor of which dynasty?","Mughal","Maurya","Gupta","Chola"],
-[2,"g","The Battle of Waterloo took place in present-day…","Belgium","France","Netherlands","Germany"],
-[2,"g","Which Soviet leader introduced glasnost and perestroika?","Mikhail Gorbachev","Leonid Brezhnev","Nikita Khrushchev","Yuri Andropov"],
-[2,"g","Which Egyptian queen was allied with Mark Antony?","Cleopatra VII","Nefertiti","Hatshepsut","Nefertari"],
-[2,"g","Euro banknotes and coins entered circulation in which year?","2002","1999","1995","2004"],
-[2,"g","Persepolis was the ceremonial capital of which empire?","Achaemenid","Sasanian","Parthian","Seleucid"],
-[2,"g","Who was Alexander the Great's tutor?","Aristotle","Plato","Socrates","Pythagoras"],
-[2,"g","Genghis Khan founded which empire?","Mongol","Timurid","Seljuk","Khwarazmian"],
-[2,"g","Which country was the first to give women the vote nationally, in 1893?","New Zealand","Finland","Norway","Australia"],
-[2,"g","The Hundred Years' War was fought between England and…","France","Spain","Scotland","Burgundy"],
-[2,"g","Which ancient city-state was famous for its strict military upbringing?","Sparta","Athens","Corinth","Thebes"],
-[2,"g","Tenochtitlan, today's Mexico City, was the capital of which empire?","Aztec","Inca","Maya","Toltec"],
-
-// ── 3 ARTS & LETTERS ────────────────────────
-[3,"t","Which Turkish author won the Nobel Prize in Literature in 2006?","Orhan Pamuk","Yaşar Kemal","Elif Şafak","Nazım Hikmet"],
-[3,"t","Yaşar Kemal's novel about a bandit of the Taurus Mountains is…","İnce Memed","Kuyucaklı Yusuf","Tutunamayanlar","Çalıkuşu"],
-[3,"t","Who wrote ‘Saatleri Ayarlama Enstitüsü’ (The Time Regulation Institute)?","Ahmet Hamdi Tanpınar","Oğuz Atay","Sabahattin Ali","Peyami Safa"],
-[3,"t","Which novel is Oğuz Atay's best-known work?","Tutunamayanlar","Kürk Mantolu Madonna","Huzur","Masumiyet Müzesi"],
-[3,"t","Who wrote ‘Kürk Mantolu Madonna’ (Madonna in a Fur Coat)?","Sabahattin Ali","Reşat Nuri Güntekin","Halide Edib Adıvar","Orhan Kemal"],
-[3,"t","Who wrote ‘Memleketimden İnsan Manzaraları’?","Nazım Hikmet","Orhan Veli Kanık","Cemal Süreya","Attilâ İlhan"],
-[3,"t","Mimar Sinan's ‘masterpiece’, the Selimiye Mosque, is in which city?","Edirne","Istanbul","Bursa","Konya"],
-[3,"t","Mimar Sinan called which mosque his ‘apprentice work’?","Şehzade Mosque","Süleymaniye Mosque","Selimiye Mosque","Rüstem Paşa Mosque"],
-[3,"t","Rumi (Mevlânâ) is buried in which city?","Konya","Bursa","Kayseri","Sivas"],
-[3,"t","Who wrote the lyrics of the İstiklal Marşı, the national anthem?","Mehmet Akif Ersoy","Ziya Gökalp","Namık Kemal","Tevfik Fikret"],
-[3,"t","Who painted ‘The Tortoise Trainer’ (Kaplumbağa Terbiyecisi)?","Osman Hamdi Bey","Şeker Ahmed Paşa","Hoca Ali Rıza","İbrahim Çallı"],
-[3,"t","Ebru is the traditional Turkish art of…","Paper marbling","Calligraphy","Tile painting","Miniature painting"],
-[3,"t","The town of İznik is historically famous for its…","Ceramic tiles","Carpets","Glassware","Copperwork"],
-[3,"t","The Book of Dede Korkut is a collection of…","Oghuz Turkish epic tales","Rumi's poems","Ottoman travel notes","Court recipes"],
-[3,"t","Evliya Çelebi is famous for which work?","Seyahatname (Book of Travels)","Divan-ı Kebir","Mesnevi","Nutuk"],
-[3,"t","Yunus Emre was a…","Sufi folk poet","Palace architect","Miniature painter","Court composer"],
-[3,"t","Who wrote the poem ‘İstanbul'u Dinliyorum’?","Orhan Veli Kanık","Nazım Hikmet","Can Yücel","Ahmet Haşim"],
-[3,"t","Elif Şafak's ‘The Forty Rules of Love’ centres on Rumi and…","Shams of Tabriz","Yunus Emre","Hafez","Hacı Bektaş"],
-[3,"t","Which architects designed Anıtkabir?","Emin Onat & Orhan Arda","Sedad Hakkı Eldem","Clemens Holzmeister","Vedat Tek"],
-[3,"t","Âşık Veysel is famous for playing which instrument?","Bağlama (saz)","Oud","Kanun","Ney"],
-[3,"t","Which novel by Orhan Pamuk is set around a museum of a lost love?","The Museum of Innocence","Snow","My Name Is Red","The White Castle"],
-[3,"t","The whirling ceremony (sema) is associated with which order?","The Mevlevi","The Bektashi","The Naqshbandi","The Qadiri"],
-// global
-[3,"g","Who painted ‘The Starry Night’?","Vincent van Gogh","Claude Monet","Paul Gauguin","Paul Cézanne"],
-[3,"g","Which Spanish artist co-founded Cubism?","Pablo Picasso","Salvador Dalí","Joan Miró","Francisco Goya"],
-[3,"g","Who wrote ‘One Hundred Years of Solitude’?","Gabriel García Márquez","Jorge Luis Borges","Pablo Neruda","Mario Vargas Llosa"],
-[3,"g","Who wrote ‘Crime and Punishment’?","Fyodor Dostoevsky","Leo Tolstoy","Anton Chekhov","Nikolai Gogol"],
-[3,"g","The Mona Lisa hangs in which museum?","The Louvre","The Uffizi","The Prado","The Hermitage"],
-[3,"g","Who wrote ‘Don Quixote’?","Miguel de Cervantes","Lope de Vega","Federico García Lorca","Calderón"],
-[3,"g","Who composed ‘The Four Seasons’?","Antonio Vivaldi","J. S. Bach","G. F. Handel","Arcangelo Corelli"],
-[3,"g","Who made the woodblock print ‘The Great Wave off Kanagawa’?","Hokusai","Hiroshige","Utamaro","Sesshū"],
-[3,"g","Who wrote ‘The Little Prince’?","Antoine de Saint-Exupéry","Jules Verne","Victor Hugo","Albert Camus"],
-[3,"g","Frida Kahlo was from which country?","Mexico","Spain","Cuba","Argentina"],
-[3,"g","Which Prague-born writer wrote ‘The Metamorphosis’?","Franz Kafka","Milan Kundera","Rainer Maria Rilke","Hermann Hesse"],
-[3,"g","Gaudí's unfinished basilica in Barcelona is called…","Sagrada Família","Casa Batlló","Park Güell","Casa Milà"],
-[3,"g","Who wrote ‘War and Peace’?","Leo Tolstoy","Fyodor Dostoevsky","Alexander Pushkin","Ivan Turgenev"],
-[3,"g","Who painted ‘The Scream’?","Edvard Munch","Gustav Klimt","Egon Schiele","Wassily Kandinsky"],
-[3,"g","Who composed the opera ‘La Traviata’?","Giuseppe Verdi","Giacomo Puccini","Gioachino Rossini","Georges Bizet"],
-[3,"g","Who wrote ‘The Alchemist’?","Paulo Coelho","Jorge Amado","Isabel Allende","José Saramago"],
-[3,"g","Who designed the Sydney Opera House?","Jørn Utzon","Le Corbusier","Alvar Aalto","Renzo Piano"],
-[3,"g","Who painted ‘The Kiss’ using gold leaf?","Gustav Klimt","Egon Schiele","Alphonse Mucha","Henri Matisse"],
-[3,"g","The Persian epic ‘Shahnameh’ was written by…","Ferdowsi","Hafez","Rumi","Omar Khayyam"],
-[3,"g","Which author created the detective Hercule Poirot?","Agatha Christie","Arthur Conan Doyle","Georges Simenon","Dorothy L. Sayers"],
-[3,"g","Who wrote ‘Les Misérables’?","Victor Hugo","Émile Zola","Alexandre Dumas","Gustave Flaubert"],
-[3,"g","Which Polish-born composer wrote many piano nocturnes?","Frédéric Chopin","Franz Liszt","Ignacy Paderewski","Antonín Dvořák"],
-[3,"g","Le Corbusier was born in which country?","Switzerland","France","Belgium","Germany"],
-[3,"g","Who wrote ‘Things Fall Apart’?","Chinua Achebe","Wole Soyinka","Ngũgĩ wa Thiong'o","Chimamanda Ngozi Adichie"],
-[3,"g","The Bauhaus school was founded in 1919 in which city?","Weimar","Dessau","Berlin","Munich"],
-[3,"g","Who painted ‘Girl with a Pearl Earring’?","Johannes Vermeer","Rembrandt","Peter Paul Rubens","Jan van Eyck"],
-[3,"g","Which Japanese author wrote ‘Norwegian Wood’?","Haruki Murakami","Yukio Mishima","Yasunari Kawabata","Kazuo Ishiguro"],
-[3,"g","Who wrote ‘The Divine Comedy’?","Dante Alighieri","Petrarch","Boccaccio","Virgil"],
-[3,"g","The architect Zaha Hadid was born in which city?","Baghdad","Beirut","Cairo","Tehran"],
-
-// ── 4 SCIENCE & NATURE ──────────────────────
-[4,"t","The Van cat is famous for often having…","Eyes of two different colours","No tail","Curled ears","A spotted coat"],
-[4,"t","Which scientist co-founded BioNTech and co-developed its COVID-19 vaccine?","Uğur Şahin","Aziz Sancar","Cahit Arf","Gazi Yaşargil"],
-[4,"t","Aziz Sancar won the 2015 Nobel Prize in Chemistry for work on…","DNA repair","Protein folding","CRISPR","Graphene"],
-[4,"t","Cahit Arf, who appears on the 10 lira note, was a…","Mathematician","Physicist","Chemist","Astronomer"],
-[4,"t","The Kangal is a Turkish breed of…","Dog","Horse","Cat","Sheep"],
-[4,"t","What kind of mountain is Mount Ararat?","Stratovolcano","Fold mountain","Block mountain","Coral atoll"],
-[4,"t","The North Anatolian Fault is mainly what type of fault?","Strike-slip","Normal","Reverse","Subduction zone"],
-[4,"t","Legend says Hezarfen Ahmed Çelebi glided with wings across…","The Bosphorus","The Dardanelles","Lake Van","The Golden Horn only"],
-[4,"t","Gazi Yaşargil is celebrated as a pioneer of…","Microneurosurgery","Heart transplants","Vaccines","Robotics"],
-[4,"t","Al-Jazari, who worked for the Artuqids in Anatolia, is famous for…","Mechanical automata","Star maps","Medical encyclopedias","Gunpowder"],
-[4,"t","Lake Salda, compared by NASA scientists to a crater on Mars, is in which province?","Burdur","Isparta","Denizli","Afyonkarahisar"],
-[4,"t","Türkiye holds most of the world's known reserves of which element?","Boron","Lithium","Cobalt","Tin"],
-[4,"t","Roughly what share of the world's hazelnuts does Türkiye grow?","About two-thirds","About 10%","About a quarter","About 95%"],
-[4,"t","At the surface, the Bosphorus current mainly flows…","From the Black Sea to the Marmara","From the Marmara to the Black Sea","East to west only at night","It has no current"],
-[4,"t","Who became the first Turkish astronaut, flying to the ISS in January 2024?","Alper Gezeravcı","Tuva Cihangir Atasever","Aziz Sancar","Cahit Arf"],
-[4,"t","Which fibre comes from the Angora goat?","Mohair","Cashmere","Angora","Alpaca"],
-[4,"t","Which flower, later central to the Dutch ‘mania’, was prized by the Ottomans?","Tulip","Rose","Carnation","Hyacinth"],
-[4,"t","Which salty lake gives the Anatolian flamingo one of its main breeding grounds?","Tuz Gölü","Lake Van","Lake Sapanca","Lake Abant"],
-// global
-[4,"g","Which planet has the most known moons?","Saturn","Jupiter","Uranus","Neptune"],
-[4,"g","What is the chemical symbol for gold?","Au","Ag","Gd","Go"],
-[4,"g","Marie Curie was born in which city?","Warsaw","Paris","Kraków","Vienna"],
-[4,"g","What is the hardest natural material?","Diamond","Quartz","Corundum","Titanium"],
-[4,"g","Which organ produces insulin?","Pancreas","Liver","Kidney","Spleen"],
-[4,"g","What is the largest living bird?","Ostrich","Emu","Albatross","Cassowary"],
-[4,"g","CERN's Large Hadron Collider crosses the border of Switzerland and…","France","Germany","Italy","Austria"],
-[4,"g","Which gas makes up about 78% of Earth's air?","Nitrogen","Oxygen","Argon","Carbon dioxide"],
-[4,"g","Roughly how fast does light travel in a vacuum?","300,000 km/s","30,000 km/s","3,000,000 km/s","150,000 km/s"],
-[4,"g","Who discovered penicillin?","Alexander Fleming","Louis Pasteur","Robert Koch","Joseph Lister"],
-[4,"g","Who published the periodic table in 1869?","Dmitri Mendeleev","Antoine Lavoisier","John Dalton","Niels Bohr"],
-[4,"g","Which blood type is the universal red-cell donor?","O negative","AB positive","A negative","B positive"],
-[4,"g","The Great Barrier Reef lies off the coast of which country?","Australia","Indonesia","Philippines","Papua New Guinea"],
-[4,"g","How many bones are in an adult human body?","206","201","212","198"],
-[4,"g","Which planet has the Great Red Spot?","Jupiter","Mars","Saturn","Neptune"],
-[4,"g","What is the pH of pure water at 25°C?","7","0","5","14"],
-[4,"g","Who discovered the electron?","J. J. Thomson","Ernest Rutherford","Niels Bohr","Michael Faraday"],
-[4,"g","Which mammal lays eggs?","Platypus","Pangolin","Armadillo","Wombat"],
-[4,"g","Which element has atomic number 1?","Hydrogen","Helium","Lithium","Oxygen"],
-[4,"g","Which Danish astronomer's data helped Kepler find his laws?","Tycho Brahe","Nicolaus Copernicus","Galileo Galilei","Ole Rømer"],
-[4,"g","Which vitamin does your skin make in sunlight?","Vitamin D","Vitamin C","Vitamin A","Vitamin B12"],
-[4,"g","Dolly the sheep, the first cloned mammal, was born in…","Scotland","England","Sweden","New Zealand"],
-[4,"g","The Higgs boson was confirmed at CERN in which year?","2012","2008","2015","2004"],
-[4,"g","What do bees collect from flowers to make honey?","Nectar","Pollen","Sap","Dew"],
-[4,"g","Which is the nearest star to Earth after the Sun?","Proxima Centauri","Sirius","Betelgeuse","Vega"],
-[4,"g","A light-year is a unit of…","Distance","Time","Brightness","Speed"],
-[4,"g","Which is the largest ocean?","Pacific","Atlantic","Indian","Southern"],
-[4,"g","Which part of a plant cell carries out photosynthesis?","Chloroplast","Mitochondrion","Nucleus","Vacuole"],
-[4,"g","Galileo discovered the four largest moons of which planet?","Jupiter","Saturn","Mars","Uranus"],
-
-// ── 5 SPORT & TABLE ─────────────────────────
-[5,"t","Galatasaray won which European trophy in 2000?","UEFA Cup","Champions League","Cup Winners' Cup","Conference League"],
-[5,"t","Where did Türkiye finish at the 2002 FIFA World Cup?","Third","Fourth","Quarter-finals","Second"],
-[5,"t","Naim Süleymanoğlu, the ‘Pocket Hercules’, was a champion in…","Weightlifting","Wrestling","Boxing","Judo"],
-[5,"t","Kırkpınar is a centuries-old tournament of…","Oil wrestling","Archery","Camel wrestling","Cirit"],
-[5,"t","The Kırkpınar tournament is held in which province?","Edirne","Kırklareli","Tekirdağ","Bursa"],
-[5,"t","Cirit is a traditional sport played…","On horseback with blunt javelins","With a bow on foot","On ice","In water"],
-[5,"t","Hidayet Türkoğlu played which sport professionally?","Basketball","Volleyball","Football","Handball"],
-[5,"t","What is the Turkish women's national volleyball team nicknamed?","Filenin Sultanları","12 Dev Adam","Altın Kızlar","Ay-Yıldızlılar"],
-[5,"t","‘12 Dev Adam’ is the nickname of Türkiye's national team in…","Basketball","Volleyball","Football","Handball"],
-[5,"t","Which club is nicknamed ‘Kara Kartallar’ (Black Eagles)?","Beşiktaş","Trabzonspor","Bursaspor","Fenerbahçe"],
-[5,"t","Fenerbahçe's home stadium is in which Istanbul district?","Kadıköy","Beşiktaş","Sarıyer","Başakşehir"],
-[5,"t","Hakan Şükür's record World Cup goal in 2002 came after about…","11 seconds","25 seconds","45 seconds","5 seconds"],
-[5,"t","İskender kebap comes from which city?","Bursa","Adana","Gaziantep","Konya"],
-[5,"t","Which dessert of shredded kadayıf and cheese is a Hatay speciality?","Künefe","Baklava","Kazandibi","Sütlaç"],
-[5,"t","Gaziantep is famous for which nut?","Pistachio","Hazelnut","Walnut","Almond"],
-[5,"t","In tavla (backgammon), how many checkers does each player start with?","15","12","16","10"],
-[5,"t","How many tiles are in a standard okey set?","106","104","108","96"],
-[5,"t","Türkiye's first Olympic gold medal, in 1936, came in which sport?","Wrestling","Weightlifting","Athletics","Boxing"],
-[5,"t","Arda Güler joined which club in 2023?","Real Madrid","Barcelona","Bayern Munich","AC Milan"],
-[5,"t","Which anise-flavoured spirit is Türkiye's traditional drink?","Rakı","Boza","Şalgam","Ayran"],
-[5,"t","Simit is traditionally coated with…","Sesame seeds","Poppy seeds","Sunflower seeds","Black cumin"],
-[5,"t","What is the small pot used to make Turkish coffee called?","Cezve","Çaydanlık","Demlik","Güğüm"],
-[5,"t","Ayran is made from yogurt, water and…","Salt","Sugar","Mint","Lemon"],
-[5,"t","Which Turkish city became a UNESCO City of Gastronomy in 2015?","Gaziantep","İzmir","Trabzon","Ankara"],
-[5,"t","Mantı from Kayseri are famous for being…","Tiny","Fried","Sweet","Square sheets"],
-// global
-[5,"g","Which country has won the most FIFA World Cups?","Brazil","Germany","Italy","Argentina"],
-[5,"g","The Tour de France is a race in which sport?","Cycling","Motor racing","Sailing","Running"],
-[5,"g","Wimbledon is played on which surface?","Grass","Clay","Hard court","Carpet"],
-[5,"g","Judo was developed in which country?","Japan","China","Korea","Brazil"],
-[5,"g","Cricket's Ashes series is contested by England and…","Australia","India","New Zealand","South Africa"],
-[5,"g","Usain Bolt represents which country?","Jamaica","Trinidad and Tobago","Bahamas","Barbados"],
-[5,"g","Which city hosted the 2024 Summer Olympics?","Paris","London","Tokyo","Madrid"],
-[5,"g","Paella comes from which Spanish region?","Valencia","Andalusia","Catalonia","Galicia"],
-[5,"g","Pizza Margherita is traditionally from which city?","Naples","Rome","Milan","Florence"],
-[5,"g","In chess, which piece moves only diagonally?","Bishop","Rook","Knight","Queen"],
-[5,"g","Which country won the 2022 FIFA World Cup?","Argentina","France","Croatia","Morocco"],
-[5,"g","Taekwondo originated in which country?","Korea","Japan","China","Thailand"],
-[5,"g","How many players does each volleyball team have on court?","6","5","7","9"],
-[5,"g","The Dakar Rally originally finished in which country?","Senegal","Morocco","Mali","Mauritania"],
-[5,"g","Which driver shares the record of seven F1 titles with Michael Schumacher?","Lewis Hamilton","Sebastian Vettel","Ayrton Senna","Alain Prost"],
-[5,"g","In which event would you see a ‘Fosbury Flop’?","High jump","Pole vault","Long jump","Diving"],
-[5,"g","Which country hosted the first modern Olympics in 1896?","Greece","France","United Kingdom","Sweden"],
-[5,"g","Traditional feta cheese is made mainly from which milk?","Sheep's milk","Cow's milk","Buffalo milk","Camel milk"],
-[5,"g","Which Brazilian is known as ‘the King of Football’?","Pelé","Ronaldo","Zico","Garrincha"],
-[5,"g","A ‘birdie’ in golf means how many strokes under par?","One","Two","Three","None"],
-[5,"g","Goulash is a national dish of which country?","Hungary","Poland","Czechia","Romania"],
-[5,"g","What is the highest score possible with three darts?","180","150","170","200"],
-[5,"g","The Six Nations Championship is played in which sport?","Rugby union","Football","Cricket","Field hockey"],
-[5,"g","Kimchi is a staple of which cuisine?","Korean","Japanese","Chinese","Thai"],
-[5,"g","Lionel Messi began his professional career at which club?","Barcelona","Newell's Old Boys","PSG","River Plate"],
-[5,"g","The croissant's ancestor, the kipferl, comes from which country?","Austria","France","Switzerland","Hungary"],
-[5,"g","Sumo is the national sport of which country?","Japan","Mongolia","Korea","China"],
+// ── 0 COĞRAFYA ──────────────────────
+[0,"t","Türkiye'nin en büyük gölü hangisi?","Van Gölü","Tuz Gölü","Beyşehir Gölü","Eğirdir Gölü"],
+[0,"t","Türkiye'nin en yüksek dağı hangisi?","Ağrı Dağı","Erciyes Dağı","Uludağ","Çamlıca Tepesi"],
+[0,"t","Peri bacalarıyla ünlü Göreme hangi ilde?","Nevşehir","Konya","Kayseri","Aksaray"],
+[0,"t","Yüzölçümü en büyük ilimiz hangisi?","Konya","Sivas","Erzurum","Ankara"],
+[0,"t","Türkiye'nin kaç ülkeyle kara sınırı var?","8","6","7","10"],
+[0,"t","81. ve en yeni ilimiz hangisi?","Düzce","Kilis","Osmaniye","Yalova"],
+[0,"t","2022'de açıldığında dünyanın en uzun orta açıklıklı asma köprüsü olan köprü?","1915 Çanakkale Köprüsü","Osmangazi Köprüsü","Yavuz Sultan Selim Köprüsü","Akashi Kaikyō Köprüsü"],
+[0,"t","1915 Çanakkale Köprüsü'nün orta açıklığı neden tam 2.023 metre?","Cumhuriyet'in 100. yılı","Boğaz tam o kadar geniş","Çelik o kadar yetti","İstanbul'un fethine atıf"],
+[0,"t","2022'de açılan Rize-Artvin Havalimanı nereye kuruldu?","Denize dolgu üzerine","Bir dağın zirvesine","Eski bir çay bahçesine","Yerin altına"],
+[0,"t","BM'de 2022'den beri ülkemizin resmi adı nasıl yazılıyor?","Türkiye","Turkey","Turkiya","Türkei"],
+[0,"t","Türkiye'nin en kuzey noktası İnceburun hangi ilde?","Sinop","Kastamonu","Samsun","Bartın"],
+[0,"t","Dev taş başlarıyla ünlü Nemrut Dağı hangi ilde?","Adıyaman","Malatya","Şanlıurfa","Diyarbakır"],
+[0,"t","NASA'nın Mars'taki Jezero kraterine benzettiği Salda Gölü hangi ilde?","Burdur","Isparta","Denizli","Afyonkarahisar"],
+[0,"t","Plaka kodu 01 olan il hangisi?","Adana","Ankara","Adıyaman","Ağrı"],
+[0,"t","Ege'yi Marmara'ya bağlayan boğaz hangisi?","Çanakkale Boğazı","İstanbul Boğazı","Kerç Boğazı","Cebelitarık Boğazı"],
+[0,"g","2023'te Çin'i geçip dünyanın en kalabalık ülkesi olan hangisi?","Hindistan","Endonezya","ABD","Pakistan"],
+[0,"g","Endonezya'nın Borneo adasında inşa ettiği yeni başkentin adı ne?","Nusantara","Cakarta","Bali","Surabaya"],
+[0,"g","BM'nin 2025 raporuna göre dünyanın en kalabalık şehri hangisi?","Cakarta","Tokyo","Delhi","İstanbul"],
+[0,"g","Kazakistan'ın başkenti 2022'de yeniden hangi adı aldı?","Astana","Nur-Sultan","Almatı","Bişkek"],
+[0,"g","Avustralya'nın başkenti neresi?","Canberra","Sidney","Melbourne","Kanguru Köyü"],
+[0,"g","Kanada ile Danimarka 2022'de hangi adayı bölüşüp ‘Viski Savaşı’nı bitirdi?","Hans Adası","Grönland","Viski Adası","İzlanda"],
+[0,"g","Fransa'nın en uzun kara sınırı hangi ülkeyle?","Brezilya","İspanya","Belçika","Almanya"],
+[0,"g","Lesotho dört bir yandan hangi ülkeyle çevrili?","Güney Afrika","Nijerya","Kenya","Mısır"],
+[0,"g","Dört kenarlı olmayan tek ulusal bayrak hangi ülkenin?","Nepal","Bhutan","İsviçre","Japonya"],
+[0,"g","2020'de yeniden ölçülen Everest'in resmi yüksekliği kaç metre?","8.848,86","8.611","7.999,99","9.120"],
+[0,"g","Hollanda hükümeti 2020'de tanıtımlarda hangi adı kullanmayı bıraktı?","Holland","Nederland","Netherlands","Benelux"],
+[0,"g","Dünyanın en küçük ülkesi hangisi?","Vatikan","Monako","San Marino","Lihtenştayn"],
+[0,"g","Dünyanın en büyük adası hangisi?","Grönland","Yeni Gine","Borneo","Madagaskar"],
+[0,"g","Hiç kıyısı olmayan tek deniz hangisi?","Sargasso Denizi","Hazar Denizi","Lut Gölü","Mercan Denizi"],
+[0,"g","BM'ye göre dünya nüfusu Kasım 2022'de hangi eşiği aştı?","8 milyar","6 milyar","10 milyar","80 milyar"],
+[0,"g","Denizaşırı toprakları sayılınca en çok saat dilimine yayılan ülke?","Fransa","Rusya","ABD","Çin"],
+[0,"g","Koca Çin resmen kaç saat dilimi kullanır?","1","3","5","Her şehir kendi seçer"],
+[0,"g","Belçika-Hollanda sınırının evlerin içinden geçtiği kasaba hangisi?","Baarle","Brugge","Maastricht","Anvers"],
+// ── 1 TARİH ─────────────────────────
+[1,"t","Cumhuriyet'in 100. yıl dönümü hangi tarihte kutlandı?","29 Ekim 2023","29 Ekim 2022","23 Nisan 2023","19 Mayıs 2024"],
+[1,"t","İstanbul hangi yıl fethedildi?","1453","1071","1299","1517"],
+[1,"t","Malazgirt Meydan Muharebesi hangi yıl yapıldı?","1071","1176","1243","1402"],
+[1,"t","Mustafa Kemal Samsun'a hangi tarihte çıktı?","19 Mayıs 1919","23 Nisan 1920","30 Ağustos 1922","29 Ekim 1923"],
+[1,"t","Türkiye'nin sınırlarını büyük ölçüde tanıyan 1923 antlaşması hangisi?","Lozan","Sevr","Mudanya","Karlofça"],
+[1,"t","Göbeklitepe, Keops Piramidi'nden yaklaşık kaç yıl daha eski?","7.000 yıl","700 yıl","70 yıl","Piramit daha eski"],
+[1,"t","Şanlıurfa'daki ‘Taş Tepeler’ kazılarıyla ünlenen, Göbeklitepe'nin komşusu?","Karahantepe","Çatalhöyük","Hattuşa","Truva"],
+[1,"t","Türkiye hangi yıl Latin harflerine geçti?","1928","1923","1934","1946"],
+[1,"t","Türk kadınları milletvekili seçme ve seçilme hakkını hangi yıl aldı?","1934","1923","1946","1950"],
+[1,"t","Dünyada ilk madeni parayı basan Anadolu krallığı hangisi?","Lidya","Frigya","Karya","Bitcoin Krallığı"],
+[1,"t","Dokunduğunu altına çeviren efsanevi Kral Midas nerenin kralıydı?","Frigya","Lidya","Urartu","Pontus"],
+[1,"t","Osmanlı Devleti'ni 1299 civarında kim kurdu?","Osman Bey","Orhan Bey","Ertuğrul Gazi","Dizinin yönetmeni"],
+[1,"t","Fetih sırasında Osmanlı gemileri karadan yürütülüp nereye indirildi?","Haliç","Van Gölü","Sapanca Gölü","Ege Denizi"],
+[1,"t","Antik Dünyanın Yedi Harikası'ndan Mausoleion bugün hangi ilçede?","Bodrum","Selçuk","Didim","Marmaris"],
+[1,"t","Mustafa Kemal'e ‘Gazi’ unvanı hangi savaştan sonra verildi?","Sakarya","Dumlupınar","Çanakkale","İnönü"],
+[1,"g","II. Elizabeth'in 70 yıllık saltanatının ardından 2022'de kral olan kim?","III. Charles","Prens William","Prens Harry","VIII. Henry"],
+[1,"g","2025'te seçilen ilk Amerikalı papa hangi adı aldı?","XIV. Leo","II. Francis","XVII. Benedict","XXIV. John"],
+[1,"g","Paris'teki Notre-Dame Katedrali restorasyonun ardından ne zaman yeniden açıldı?","Aralık 2024","Nisan 2019","Mart 2022","Temmuz 2025"],
+[1,"g","2023'te Ay'ın güney kutbu yakınına ilk inişi yapan ülke hangisi?","Hindistan","Japonya","ABD","Rusya"],
+[1,"g","2021'de Süveyş Kanalı'nı 6 gün tıkayan dev konteyner gemisi hangisi?","Ever Given","Kara İnci","Queen Mary 2","Emma Mærsk"],
+[1,"g","Kasım 2025'te açılan Büyük Mısır Müzesi'nde ilk kez tamamı sergilenen hazine kimin?","Tutankamon","Kleopatra","Büyük İskender","Karun"],
+[1,"g","4 Temmuz 2026, ABD'nin bağımsızlığının kaçıncı yıl dönümüydü?","250.","200.","300.","100."],
+[1,"g","Hangisi Kleopatra'nın yaşadığı döneme zamanca daha yakın?","iPhone'un çıkışı","Keops Piramidi'nin yapımı","Stonehenge'in yapımı","Göbeklitepe'nin yapımı"],
+[1,"g","Hangisi en eski?","Oxford Üniversitesi","Tenochtitlan (Aztek)","İnka İmparatorluğu","Osmanlı Devleti"],
+[1,"g","Nintendo 1889'da kurulduğunda hangisi vardı?","Osmanlı İmparatorluğu","Sovyetler Birliği","Avrupa Birliği","Türkiye Cumhuriyeti"],
+[1,"g","Keops Piramidi yapılırken Dünya'da hâlâ hangisi yaşıyordu?","Yünlü mamutlar","Dinozorlar","Megalodon","Kılıç dişli kaplanlar"],
+[1,"g","Hangisi ABD İç Savaşı'ndan (1861) önce icat edildi?","Faks makinesi","Uçak","Radyo","Televizyon"],
+[1,"g","Berlin Duvarı hangi yıl yıkıldı?","1989","1987","1991","1985"],
+[1,"g","Machu Picchu'yu hangi uygarlık inşa etti?","İnkalar","Aztekler","Mayalar","Olmekler"],
+[1,"g","Fransız Devrimi hangi yıl başladı?","1789","1776","1815","1848"],
+[1,"g","Uzaya çıkan ilk insan kimdir?","Yuri Gagarin","Neil Armstrong","Valentina Tereşkova","Köpek Layka"],
+[1,"g","Hannibal, Alpler'i neyle geçmesiyle ünlüdür?","Fillerle","Develerle","Kayakla","Teleferikle"],
+[1,"g","Rosetta Taşı hangi yazının çözülmesini sağladı?","Mısır hiyeroglifleri","Çivi yazısı","Maya yazısı","Göktürk yazısı"],
+[1,"g","1893'te kadınlara ulusal seçimlerde oy hakkı tanıyan ilk ülke?","Yeni Zelanda","Finlandiya","Norveç","Avustralya"],
+// ── 2 BİLİM & DOĞA ──────────────────
+[2,"t","Aziz Sancar 2015 Nobel Kimya Ödülü'nü hangi çalışmasıyla aldı?","DNA onarımı","Protein katlanması","CRISPR","Grafen"],
+[2,"t","Ocak 2024'te ISS'e giden ilk Türk astronot kim?","Alper Gezeravcı","Tuva Cihangir Atasever","Aziz Sancar","GORA'daki Arif"],
+[2,"t","Türkiye'nin ikinci astronotu Tuva Cihangir Atasever 2024'te hangi şirketle uçtu?","Virgin Galactic","SpaceX","Blue Origin","Boeing"],
+[2,"t","mRNA aşılarıyla tanınan BioNTech'in kurucularından Türk bilim insanı?","Uğur Şahin","Aziz Sancar","Cahit Arf","Canan Dağdeviren"],
+[2,"t","Yüzmeyi sevmesiyle ünlü, Van Gölü çevresine özgü kedi hangisi?","Van kedisi","Sfenks","İran kedisi","Garfield"],
+[2,"t","Kangal hangi hayvanın ırkıdır?","Köpek","At","Kedi","Koyun"],
+[2,"t","Dünyadaki bor rezervlerinin büyük kısmı hangi ülkede?","Türkiye","Şili","Çin","Avustralya"],
+[2,"t","Dünyadaki fındığın yaklaşık ne kadarı Türkiye'de yetişir?","Üçte ikisi","Onda biri","Dörtte biri","Yüzde 99'u"],
+[2,"g","2021'de fırlatılan, Hubble'ın ‘halefi’ sayılan dev uzay teleskobu?","James Webb","Kepler","Spitzer","Chandra"],
+[2,"g","2023 ve 2025'teki yeni keşiflerle en çok uydusu olan gezegen hangisi?","Satürn","Jüpiter","Uranüs","Dünya"],
+[2,"g","Sadece 5 uçuş için tasarlanan Mars helikopteri Ingenuity toplam kaç uçuş yaptı?","72","5","12","500"],
+[2,"g","2024 Nobel Fizik Ödülü yapay sinir ağları çalışmaları için kime verildi?","Hopfield ve Hinton","Musk ve Altman","Hawking ve Penrose","Einstein ve Bohr"],
+[2,"g","Hassabis ve Jumper'a 2024 Nobel Kimya'yı getiren, protein yapısını tahmin eden YZ?","AlphaFold","ChatGPT","Siri","Deep Blue"],
+[2,"g","8 Nisan 2024 tam güneş tutulmasının tam evresi hangi kıtadan geçti?","Kuzey Amerika","Avrupa","Avustralya","Antarktika"],
+[2,"g","NASA'nın DART aracı 2022'de bir asteroide neyi denemek için çarptı?","Yörüngesini değiştirmeyi","Üzerinde maden kazmayı","Onu Dünya'ya çekmeyi","Uzaylılara selam vermeyi"],
+[2,"g","2022'de Samanyolu'nun merkezindeki neyin ilk fotoğrafı yayımlandı?","Süper kütleli kara delik","Güneş'in ikizi","Bir uzaylı üssü","Büyük Patlama'nın izi"],
+[2,"g","NASA'nın OSIRIS-REx aracı 2023'te Dünya'ya ne getirdi?","Asteroit örneği","Mars toprağı","Ay taşı","Uzaylı yumurtası"],
+[2,"g","SpaceX, Ekim 2024'te Starship'in dev iticisini inişte nasıl yakaladı?","Kulenin dev kollarıyla","Dev bir fileyle","Paraşütle havada","Vantuzlu bir vinçle"],
+[2,"g","Bir ahtapotun kaç kalbi vardır?","3","1","2","8"],
+[2,"g","Hangisi Dünya'da daha önce ortaya çıktı?","Köpekbalıkları","Ağaçlar","Dinozorlar","Çiçekli bitkiler"],
+[2,"g","Potasyumu yüzünden ‘hafif radyoaktif’ diye ünlü meyve hangisi?","Muz","Elma","Çilek","Karpuz"],
+[2,"g","Yeniden gençleşebildiği için ‘ölümsüz’ denen deniz canlısı hangisi?","Bir denizanası türü","Deniz kaplumbağası","Yunus","Ahtapot"],
+[2,"g","Uzay boşluğunda bile hayatta kalabilen minik ‘su ayısı’nın diğer adı?","Tardigrad","Amip","Planarya","Hiç duymadım"],
+[2,"g","Venüs hakkında hangisi doğru?","Günü, yılından uzun","Halkaları vardır","En soğuk gezegendir","İki uydusu vardır"],
+[2,"g","Doğru saklanırsa binlerce yıl bozulmayan yiyecek hangisi?","Bal","Ekmek","Yoğurt","Ayran"],
+[2,"g","Botanik olarak hangisi gerçek bir ‘üzümsü meyve’ (berry) sayılır?","Muz","Çilek","Ahududu","Böğürtlen"],
+[2,"g","Flamingolar neden pembedir?","Yedikleri besinlerden","Sürekli utandıkları için","Pembe doğdukları için","Güneşte yandıkları için"],
+[2,"g","Altının kimyasal sembolü nedir?","Au","Ag","Al","Gd"],
+[2,"g","Yetişkin bir insanda kaç kemik vardır?","206","201","212","300"],
+[2,"g","Işık yılı neyin birimidir?","Uzaklık","Zaman","Parlaklık","Hız"],
+// ── 3 SPOR ──────────────────────────
+[3,"t","Euro 2024’te Türkiye’yi çeyrek finalde hangi takım eledi?","Hollanda","İspanya","Portekiz","Avusturya"],
+[3,"t","Euro 2024 son 16 turunda Avusturya’ya iki gol atan milli yıldız kim?","Merih Demiral","Arda Güler","Kerem Aktürkoğlu","Barış Alper Yılmaz"],
+[3,"t","Arda Güler Euro 2024’teki o füze golünü hangi takıma attı?","Gürcistan","Portekiz","Çekya","Hollanda"],
+[3,"t","Kenan Yıldız 2024–25 sezonunda Juventus’ta kaç numarayı giydi?","10","7","9","99"],
+[3,"t","Hakan Çalhanoğlu 2023–24’te hangi takımla Serie A şampiyonu oldu?","Inter","Milan","Juventus","Napoli"],
+[3,"t","Galatasaray 2023–24’te kaç puanla Süper Lig rekoru kırarak şampiyon oldu?","102","99","95","110"],
+[3,"t","Victor Osimhen 2024’te Galatasaray’a hangi kulüpten kiralık geldi?","Napoli","Lille","Chelsea","Al Hilal"],
+[3,"t","José Mourinho 2024 yazında hangi Türk takımının başına geçti?","Fenerbahçe","Beşiktaş","Trabzonspor","Survivor Ünlüler takımı"],
+[3,"t","Filenin Sultanları 2023’te Avrupa Şampiyonluğu’nun yanında neyi kazandı?","Milletler Ligi (VNL)","Olimpiyat altını","Dünya Şampiyonası","Tavla Şampiyonası"],
+[3,"t","Filenin Sultanları 2025 Dünya Şampiyonası finalinde kime 3–2 kaybetti?","İtalya","Brezilya","Japonya","Sırbistan"],
+[3,"t","Filenin Sultanları’nın Küba doğumlu süperstar pasör çaprazı kim?","Melissa Vargas","Ebrar Karakurt","Eda Erdem","Zehra Güneş"],
+[3,"t","NBA All-Star’a seçilen İLK Türk basketbolcu kim?","Mehmet Okur","Alperen Şengün","Hidayet Türkoğlu","Cedi Osman"],
+[3,"t","Mete Gazoz Tokyo 2020’de hangi dalda olimpiyat şampiyonu oldu?","Okçuluk","Atıcılık","Eskrim","Cirit"],
+[3,"t","Fenerbahçe Beko 2025’te Abu Dabi’de hangi kupayı kaldırdı?","EuroLeague","NBA","EuroCup","FIBA Dünya Kupası"],
+[3,"t","Galatasaray 2000’de UEFA Kupası finalinde hangi takımı yendi?","Arsenal","Real Madrid","Chelsea","Liverpool"],
+[3,"t","Hakan Şükür 2002’de Güney Kore’ye yaklaşık kaçıncı saniyede gol attı?","11","3","45","90"],
+[3,"t","Lewis Hamilton 7. dünya şampiyonluğunu 2020’de hangi pistte garantiledi?","İstanbul Park","Monza","Silverstone","Abu Dabi"],
+[3,"g","Euro 2024’ü hangi ülke kazandı?","İspanya","İngiltere","Fransa","Almanya"],
+[3,"g","Euro 2024’te 16 yaşında gol atıp tarihe geçen İspanyol kim?","Lamine Yamal","Pedri","Gavi","Nico Williams"],
+[3,"g","2024 Ballon d’Or ödülünü kim kazandı?","Rodri","Vinícius Júnior","Jude Bellingham","Lamine Yamal"],
+[3,"g","2025 Ballon d’Or ödülünü kim kazandı?","Ousmane Dembélé","Lamine Yamal","Mohamed Salah","Kylian Mbappé"],
+[3,"g","PSG 2025 Şampiyonlar Ligi finalinde Inter’i kaç kaç yendi?","5–0","1–0","2–1","3–2"],
+[3,"g","Luke Littler 2025’te dart dünya şampiyonu olduğunda kaç yaşındaydı?","17","21","15","25"],
+[3,"g","Gukesh 2024’te en genç dünya satranç şampiyonu olurken kimi yendi?","Ding Liren","Magnus Carlsen","Hikaru Nakamura","Garry Kasparov"],
+[3,"g","Magnus Carlsen 2024 Dünya Hızlı Satranç Şampiyonası’nda neden ceza aldı?","Kot pantolon giydiği için","Geç kaldığı için","Maçta sakız çiğnediği için","Tavla zarı attığı için"],
+[3,"g","2025 NBA şampiyonu hangi takım oldu?","Oklahoma City Thunder","Indiana Pacers","Boston Celtics","Denver Nuggets"],
+[3,"g","2026 FIFA Dünya Kupası’nda kaç takım yer alıyor?","48","32","40","64"],
+[3,"g","Hangisi 2026 Dünya Kupası’nın ev sahiplerinden biri DEĞİL?","Brezilya","ABD","Kanada","Meksika"],
+[3,"g","2032 Yaz Olimpiyatları hangi şehirde yapılacak?","Brisbane","Los Angeles","Doha","İstanbul"],
+[3,"g","LA 2028 Olimpiyatları’na eklenen sporlardan biri hangisi?","Kriket","Okey","Bilardo","Tavla"],
+[3,"g","Paris 2024’te olimpiyatlara ilk kez giren spor hangisi?","Breaking (breakdans)","Kaykay","Sörf","Spor tırmanış"],
+[3,"g","2025’te Formula 1 dünya şampiyonu olan pilot kim?","Lando Norris","Max Verstappen","Oscar Piastri","Charles Leclerc"],
+[3,"g","Lewis Hamilton 2025’te hangi takıma geçti?","Ferrari","Red Bull","Aston Martin","Tofaş Şahin Racing"],
+[3,"g","Novak Djokovic Paris 2024 Olimpiyatları’nda hangi madalyayı aldı?","Altın","Gümüş","Bronz","Katılım belgesi"],
+[3,"g","2025 Wimbledon erkekler şampiyonu kim oldu?","Jannik Sinner","Carlos Alcaraz","Novak Djokovic","Alexander Zverev"],
+[3,"g","‘Faker’ hangi oyunun efsane oyuncusu?","League of Legends","Counter-Strike","EA FC","Kızma Birader"],
+[3,"g","2030 Dünya Kupası’nın ana ev sahiplerinden biri hangisi?","Fas","Mısır","Suudi Arabistan","Katar"],
+[3,"t","Yusuf Dikeç ve Şevval İlayda Tarhan Paris 2024’te hangi madalyayı aldı?","Gümüş","Altın","Bronz","Çikolata madalya"],
+// ── 4 DİZİ & FİLM ───────────────────
+[4,"t","Haluk Bilginer 2019’da Uluslararası Emmy’yi hangi diziyle kazandı?","Şahsiyet","Masumiyet","Behzat Ç.","Kulüp"],
+[4,"t","Netflix’in ‘Bir Başkadır’ dizisinin yaratıcısı kim?","Berkun Oya","Gülse Birsel","Çağan Irmak","Selçuk Aydemir"],
+[4,"t","G.O.R.A.’daki kötü komutanın adı ne?","Logar","Arif","Ceku","Bob Marley Faruk"],
+[4,"t","Cem Yılmaz’ın Netflix dizisi ‘Erşan Kuneri’de Erşan’ın mesleği ne?","Film yönetmeni","Futbol hakemi","Berber","Astronot"],
+[4,"t","‘Leyla ile Mecnun’da Mecnun’u kim canlandırdı?","Ali Atay","Serkan Keskin","Ahmet Mümtaz Taylan","Engin Günaydın"],
+[4,"t","‘Leyla ile Mecnun’da Erdal’ın mesleği ne?","Bakkal","Hacker","Taksici","NASA mühendisi"],
+[4,"t","‘Muhteşem Yüzyıl’da Hürrem Sultan’ı ilk kim canlandırdı?","Meryem Uzerli","Nur Fettahoğlu","Beren Saat","Hande Erçel"],
+[4,"t","‘Kuruluş Osman’da Osman Bey’i kim canlandırdı?","Burak Özçivit","Engin Altan Düzyatan","Kıvanç Tatlıtuğ","Çağatay Ulusoy"],
+[4,"t","‘Yalı Çapkını’nda Ferit Korhan’ı kim oynadı?","Mert Ramazan Demir","Kerem Bürsin","Aras Bulut İynemli","Burak Deniz"],
+[4,"t","‘Yalı Çapkını’nda Seyran’ın ailesi hangi şehirden?","Gaziantep","Trabzon","Mardin","Eskişehir"],
+[4,"t","‘Kızılcık Şerbeti’ 2022’de hangi kanalda yayına başladı?","Show TV","Kanal D","Star TV","TRT 1"],
+[4,"t","Merve Dizdar 2023 Cannes’da hangi filmle En İyi Kadın Oyuncu oldu?","Kuru Otlar Üstüne","Kış Uykusu","Bergen","Ayla"],
+[4,"t","Netflix’in ilk Türk orijinal dizisi (2018) hangisi?","Hakan: Muhafız","Bir Başkadır","Aşk 101","Atiye"],
+[4,"t","‘Gibi’ dizisi ilk hangi dijital platformda yayınlandı?","Exxen","Netflix","BluTV","Disney+"],
+[4,"t","Haluk Bilginer 80’lerde hangi İngiliz dizisinde rol aldı?","EastEnders","Doctor Who","Peaky Blinders","Mr. Bean"],
+[4,"t","‘Vizontele’de Hakkari’nin küçük kasabasına ne gelir?","Televizyon","Sinema","Metro","Fiber internet"],
+[4,"g","‘Squid Game’de Seong Gi-hun kaç numaralı oyuncu?","456","001","067","218"],
+[4,"g","‘Squid Game’in ilk sezonundaki ilk oyun hangisi?","Kırmızı Işık, Yeşil Işık","Sandalye kapmaca","Yağ satarım bal satarım","Körebe"],
+[4,"g","‘Wednesday’de Wednesday Addams hangi okula gider?","Nevermore Akademisi","Hogwarts","Riverdale Lisesi","Özel Çamlıca Lisesi"],
+[4,"g","‘Wednesday’in 2025’teki 2. sezonuna konuk olan pop yıldızı kim?","Lady Gaga","Taylor Swift","Billie Eilish","Dua Lipa"],
+[4,"g","‘Stranger Things’ 4 sayesinde 2022’de yeniden zirveye çıkan Kate Bush şarkısı?","Running Up That Hill","Wuthering Heights","Take On Me","Babooshka"],
+[4,"g","Netflix’in 2025 dizisi ‘Adolescence’ın her bölümü nasıl çekildi?","Tek plan, hiç kesmeden","Tamamen animasyonla","Siyah-beyaz ve sessiz","Dikey, telefonla"],
+[4,"g","2025’te Emmy kazanan en genç erkek oyuncu olan Owen Cooper hangi dizide oynadı?","Adolescence","Stranger Things","Wednesday","The Last of Us"],
+[4,"g","‘KPop Demon Hunters’taki kız grubunun adı ne?","HUNTR/X","Saja Boys","BLACKPINK","NewJeans"],
+[4,"g","2025’te ‘Red Notice’i geçip Netflix’in en çok izlenen filmi olan yapım?","KPop Demon Hunters","Glass Onion","Extraction 2","Leave the World Behind"],
+[4,"g","‘Barbenheimer’ akımı hangi iki filmin aynı gün vizyona girmesiyle doğdu?","Barbie ve Oppenheimer","Batman ve Oppenheimer","Barbie ve Frankenstein","Ben-Hur ve Heimer"],
+[4,"g","2024’te En İyi Film Oscar’ını hangi film kazandı?","Oppenheimer","Barbie","Poor Things","Killers of the Flower Moon"],
+[4,"g","2025’te En İyi Film Oscar’ını hangi film kazandı?","Anora","Conclave","Dune: Part Two","Wicked"],
+[4,"g","2025’te En İyi Animasyon Oscar’ını alan ‘Flow’un kahramanı hangi hayvan?","Kedi","Penguen","Tavşan","Sincap"],
+[4,"g","Miyazaki 2024’te hangi filmiyle ikinci Oscar’ını kazandı?","Çocuk ve Balıkçıl","Ruhların Kaçışı","Prenses Mononoke","Komşum Totoro"],
+[4,"g","‘Dune’da değerli baharatın çıkarıldığı çöl gezegeni hangisi?","Arrakis","Tatooine","Pandora","Kripton"],
+[4,"g","‘Deadpool & Wolverine’de (2024) Wolverine’i kim oynadı?","Hugh Jackman","Ryan Reynolds","Jason Momoa","Cüneyt Arkın"],
+[4,"g","James Gunn’ın ‘Superman’ (2025) filmindeki süper köpeğin adı ne?","Krypto","Rex","Ace","Karabaş"],
+[4,"g","‘Arcane’ dizisi hangi oyunun evreninde geçer?","League of Legends","Overwatch","Valorant","Dota 2"],
+[4,"g","HBO’nun ‘The Last of Us’ dizisinde Joel’u kim oynadı?","Pedro Pascal","Oscar Isaac","Joel Kinnaman","Kıvanç Tatlıtuğ"],
+[4,"g","Hangisi ‘La Casa de Papel’de bir soyguncunun takma adı DEĞİL?","İstanbul","Tokyo","Nairobi","Berlin"],
+[4,"g","2025’te tüm zamanların en çok kazanan animasyon filmi olan ‘Ne Zha 2’ hangi ülkenin?","Çin","Japonya","Güney Kore","ABD"],
+// ── 5 MÜZİK ─────────────────────────
+[5,"t","Sertab Erener 2003’te Eurovision’u hangi şarkıyla kazandı?","Everyway That I Can","Love Me Back","Düm Tek Tek","For Real"],
+[5,"t","Can Bonomo 2012 Eurovision’da hangi şarkıyla yarıştı?","Love Me Back","Deli","Shake It Up Şekerim","We Could Be the Same"],
+[5,"t","Hadise 2009 Eurovision’da hangi şarkıyı söyledi?","Düm Tek Tek","Şıkıdım","Bangır Bangır","Cevapsız Çınlama"],
+[5,"t","Tarkan’ın öpücük sesiyle ünlü şarkısı hangisi?","Şımarık","Kuzu Kuzu","Dudu","Kış Güneşi"],
+[5,"t","Hangisi Sezen Aksu’nun lakabı?","Minik Serçe","Megastar","Süperstar","Kral Şakir"],
+[5,"t","Ajda Pekkan 1980’de Eurovision’da hangi şarkıyı söyledi?","Petr’oil","Bambaşka Biri","Yakar Geçerim","Düm Tek Tek"],
+[5,"t","Barış Manço’nun ‘Arkadaşım …’ şarkısındaki arkadaşı hangi hayvan?","Eşek","Kedi","Kaplumbağa","Ahtapot"],
+[5,"t","Cem Karaca hangi türün efsane isimlerinden?","Anadolu rock","Arabesk","Caz","Trap"],
+[5,"t","Spotify’a göre 2022’de Türkiye’nin en çok dinlenen şarkısı ‘Bi’ Tek Ben Anlarım’ kimin?","KÖFN","Dedublüman","Mabel Matiz","Semicenk"],
+[5,"t","Semicenk ile Doğu Swag’in 2023 yazına damga vuran şarkısı?","Pişman Değilim","Bilmem Mi?","Antidepresan","Merhem"],
+[5,"t","TikTok’ta patlayan ‘Bilmem Mi?’ kimin şarkısı?","Sefo","Ezhel","Uzi","Edis"],
+[5,"t","Mabel Matiz’in Mert Demir’le söylediği hit şarkı hangisi?","Antidepresan","Pişman Değilim","Bilmem Mi?","Merhem"],
+[5,"t","Melike Şahin’in 2021’de çıkan ilk solo albümü hangisi?","Merhem","Akkor","Müptezhel","Antidepresan"],
+[5,"t","maNga 2010 Eurovision’da kaçıncı oldu?","İkinci","Birinci","Beşinci","Sonuncu"],
+[5,"t","‘Sanat Güneşi’ lakabıyla bilinen sanatçı kim?","Zeki Müren","Müslüm Gürses","Barış Manço","Cem Karaca"],
+[5,"t","Ezhel’in 2017’de çıkan efsane ilk albümü hangisi?","Müptezhel","Merhem","Karma","Ölürüm Sana"],
+[5,"t","Müslüm Gürses’e hayranlarının taktığı isim ne?","Müslüm Baba","Müslüm Abi","Müslüm Dayı","Müslüm Kanka"],
+[5,"g","Eurovision 2024’ü ‘The Code’ ile kazanan Nemo hangi ülkeyi temsil etti?","İsviçre","Hırvatistan","İtalya","Ukrayna"],
+[5,"g","Eurovision 2025’i ‘Wasted Love’ ile kazanan JJ hangi ülkeden?","Avusturya","İsveç","Finlandiya","Fransa"],
+[5,"g","Eurovision 2026 hangi şehirde düzenlendi?","Viyana","Basel","Malmö","Liverpool"],
+[5,"g","Taylor Swift’in tarihin en çok kazanan turnesi hangisi?","The Eras Tour","Reputation Tour","1989 World Tour","Speak Now Tour"],
+[5,"g","Taylor Swift’in Ekim 2025’te çıkan albümü hangisi?","The Life of a Showgirl","Midnights","The Tortured Poets Department","Lover"],
+[5,"g","Bad Bunny 2026 Grammy’lerinde hangi albümüyle Yılın Albümü’nü aldı?","Debí Tirar Más Fotos","Un Verano Sin Ti","YHLQMDLG","Nadie Sabe"],
+[5,"g","Şubat 2026 Super Bowl devre arası şovunun yıldızı kimdi?","Bad Bunny","Taylor Swift","Kendrick Lamar","Rihanna"],
+[5,"g","Beyoncé’nin 2025’te Yılın Albümü Grammy’sini alan ‘Cowboy Carter’ı hangi türde?","Country","K-pop","Death metal","Arabesk"],
+[5,"g","ROSÉ ile Bruno Mars’ın 2024’te dünyayı sallayan şarkısı hangisi?","APT.","Dynamite","Die With a Smile","Espresso"],
+[5,"g","ROSÉ’nin ‘APT.’ şarkısının adı aslında nereden geliyor?","Koreli bir parti oyunu","Apartman aidatı","Bir uzay aracı","Bir taksi şirketi"],
+[5,"g","BTS’in Billboard Hot 100’de 1 numara olan ilk şarkısı (2020) hangisi?","Dynamite","Butter","Permission to Dance","Gangnam Style"],
+[5,"g","‘KPop Demon Hunters’ta HUNTR/X’in söylediği dev hit hangisi?","Golden","Gangnam Style","How You Like That","Super Shy"],
+[5,"g","2024’ün ‘brat summer’ akımını başlatan albüm kimin?","Charli XCX","Dua Lipa","Billie Eilish","Sabrina Carpenter"],
+[5,"g","Kendrick Lamar’ın 2025’te Yılın Kaydı Grammy’sini alan şarkısı hangisi?","Not Like Us","HUMBLE.","Alright","Espresso"],
+[5,"g","Sabrina Carpenter’ın 2024 yaz hiti hangisi?","Espresso","Latte","Americano","Türk Kahvesi"],
+[5,"g","Robot kasklarıyla bilinen ve 2021’de ayrılan Fransız ikili kim?","Daft Punk","Justice","The Chemical Brothers","Air"],
+[5,"g","‘Bohemian Rhapsody’ filminde Freddie Mercury’yi kim oynadı?","Rami Malek","Austin Butler","Timothée Chalamet","Freddie Highmore"],
+[5,"g","Billie Eilish ‘What Was I Made For?’ ile hangi film için Oscar aldı?","Barbie","Oppenheimer","Wicked","Dune"],
+[5,"g","Eurovision 2023’ü ‘Tattoo’ ile kazanıp ikinci zaferini alan şarkıcı kim?","Loreen","Käärijä","Måneskin","Céline Dion"],
+[5,"g","2023’te ‘Shape of You’u geçip Spotify’ın en çok dinlenen şarkısı olan hangisi?","Blinding Lights","Dance Monkey","Bad Guy","Despacito"],
+[5,"g","Queen’in ‘We Will Rock You’ ritmi nasıl yapılır?","Ayak vurup el çırparak","Kaşık çalarak","Davul zurnayla","Düdük öttürerek"],
+// ── 6 OYUN DÜNYASI ──────────────────
+[6,"t","Valorant’ın Türk ajanı kim?","Fade","Reyna","Jett","Sage"],
+[6,"t","Steam, 2023’te Türkiye’deki oyun fiyatlarını hangi para birimine geçirdi?","ABD Doları","Euro","İngiliz Sterlini","Bitcoin"],
+[6,"t","Mount & Blade II: Bannerlord hangi yıl erken erişime çıktı?","2020","2016","2018","2022"],
+[6,"t","Bannerlord’da bozkır göçebelerinden esinlenen krallık hangisi?","Khuzait","Vlandia","Sturgia","Battania"],
+[6,"t","Metin2’deki üç krallık: Shinsoo, Chunjo ve…?","Jinno","Calradia","Karus","Azeroth"],
+[6,"t","Knight Online’da El Morad’ın ezeli rakibi olan ulus hangisi?","Karus","Shinsoo","Horde","Vlandia"],
+[6,"t","Hangisi Türk yapımı bir online FPS oyunudur?","Zula","Wolfteam","Point Blank","CrossFire"],
+[6,"t","Türk CS efsanesi Can Dörtkardeş hangi nick’le tanınır?","XANTARES","s1mple","ZywOo","m0NESY"],
+[6,"t","Dream Games’in Royal Match’indeki sevimli kralın adı ne?","Kral Robert","Kral Arthur","Kral Julien","Kral Kel Mahmut"],
+[6,"t","Türkiye’nin profesyonel LoL ligi hangi kısaltmayla bilinir?","TCL","LCK","LEC","TSL"],
+[6,"t","Age of Empires II’de Türklerin özel birimi hangisi?","Yeniçeri","Samuray","Mangudai","Uzun Yaycı"],
+[6,"t","İstanbul’da (Konstantiniyye) geçen Assassin’s Creed oyunu hangisi?","Revelations","Black Flag","Origins","Unity"],
+[6,"t","Hangisi VCT EMEA’da yarışmış bir Türk Valorant takımıdır?","FUT Esports","Fnatic","Team Heretics","Karmine Corp"],
+[6,"g","The Game Awards 2024’te Yılın Oyunu hangisi oldu?","Astro Bot","Black Myth: Wukong","Balatro","Elden Ring"],
+[6,"g","The Game Awards 2023’te Yılın Oyunu seçilen oyun hangisi?","Baldur’s Gate 3","Alan Wake 2","Zelda: Tears of the Kingdom","Spider-Man 2"],
+[6,"g","The Game Awards 2025’te rekor 9 ödülle Yılın Oyunu seçilen oyun?","Clair Obscur: Expedition 33","Hollow Knight: Silksong","Hades II","Donkey Kong Bananza"],
+[6,"g","Yıllarca meme olan Hollow Knight: Silksong sonunda hangi yıl çıktı?","2025","2023","2024","Çıkmadı ki"],
+[6,"g","Silksong başlangıçta ne olarak planlanmıştı?","Hollow Knight DLC’si","Mobil oyun","Animasyon dizisi","Kart oyunu"],
+[6,"g","GTA VI hangi kurgusal eyalette geçiyor?","Leonida","San Andreas","Liberty State","North Yankton"],
+[6,"g","GTA VI’ın ilk fragmanında çalan ‘Love Is a Long Road’ kimin şarkısı?","Tom Petty","The Weeknd","Daft Punk","Eminem"],
+[6,"g","Nintendo Switch 2 hangi tarihte satışa çıktı?","5 Haziran 2025","20 Mart 2025","3 Ekim 2025","25 Aralık 2024"],
+[6,"g","Switch 2’nin Joy-Con’ları masada kaydırılınca neye dönüşüyor?","Fare (mouse)","Telefon","Hesap makinesi","Powerbank"],
+[6,"g","Roblox’un 2025 hiti Grow a Garden’da temelde ne yapıyorsun?","Ekip biçip satıyorsun","Brainrot çalıyorsun","Zombilerden kaçıyorsun","Araba yarışıyorsun"],
+[6,"g","Steal a Brainrot’taki ‘Tralalero Tralala’ gibi karakterler hangi akımdan?","Italian Brainrot","Skibidi Toilet","Backrooms","Gangnam Style"],
+[6,"g","2024’te çıkan Palworld’e internette hangi lakap takıldı?","Silahlı Pokémon","Uzaydaki Minecraft","Fakir GTA","Sessiz Sims"],
+[6,"g","Helldivers 2’de ‘yönetilen demokrasi’ adına hangi gezegen için savaşırsın?","Süper Dünya","Arrakis","Pandora","Mars Bar"],
+[6,"g","Hades II’nin baş karakteri kim?","Melinoë","Zagreus","Persephone","Kratos"],
+[6,"g","Cyberpunk 2077’de Keanu Reeves’in canlandırdığı karakter kim?","Johnny Silverhand","John Wick","Neo","Jackie Welles"],
+[6,"g","Animal Crossing: New Horizons’ta sana ev borcu yükleyen tanuki kim?","Tom Nook","Isabelle","K.K. Slider","Banka Müdürü Rakun"],
+[6,"g","Super Mario Bros. Wonder’da Mario yeni güçlendirmeyle neye dönüşür?","Fil","Ejderha","Zürafa","Kaktüs"],
+[6,"g","Fortnite’ta 2020’de ‘Astronomical’ konserini veren rapçi kim?","Travis Scott","Drake","Kanye West","Ezhel"],
+[6,"g","Black Myth: Wukong hangi klasik Çin romanından esinlenir?","Batıya Yolculuk","Üç Krallık","Su Kenarı","Dede Korkut"],
+[6,"g","2020’de patlayan Among Us aslında ilk kez hangi yıl çıkmıştı?","2018","2020","2019","2016"],
+[6,"g","Roblox’un efsane ‘oof’ ölüm sesi 2022’de neden kaldırıldı?","Lisans/telif sorunu","Oyuncu oylaması","Ses dosyası bozuldu","Yeni logoya uymadı"],
+[6,"g","Counter-Strike 2 hangi yıl CS:GO’nun yerini aldı?","2023","2021","2024","2025"],
+[6,"g","Lies of P hangi masal karakterinin karanlık yorumu?","Pinokyo","Keloğlan","Kırmızı Başlıklı Kız","Alice"],
+[6,"g","Zelda serisinde yeşiller giyen, kılıçlı kahramanın adı ne?","Link","Zelda","Ganondorf","Navi"],
+// ── 7 GAME DEV ──────────────────────
+[7,"t","Zynga, Peak Games’i 2020’de kaça satın aldı?","1,8 milyar $","180 milyon $","18 milyar $","3 simit 1 çay"],
+[7,"t","Royal Match’i geliştiren Türk stüdyo hangisi?","Dream Games","Peak Games","Gram Games","Rollic"],
+[7,"t","Dream Games’in Royal Match’ten sonraki ikinci oyunu hangisi?","Royal Kingdom","Clash Royale","Kingdom Rush","Royal Revolt"],
+[7,"t","Dream Games’in kurucu ekibi daha önce hangi şirkette çalışıyordu?","Peak Games","TaleWorlds","Rollic","Supercell"],
+[7,"t","Peak Games’in çizgi film karakterli hit bulmaca oyunu hangisi?","Toon Blast","Candy Crush Saga","Homescapes","Royal Match"],
+[7,"t","Peak’in sahibi Zynga’yı 2022’de satın alan, GTA’nın da sahibi şirket?","Take-Two","Electronic Arts","Ubisoft","Tencent"],
+[7,"t","Zynga’nın 2020’de satın aldığı İstanbullu hyper-casual stüdyo hangisi?","Rollic","Dream Games","TaleWorlds","Supercell"],
+[7,"t","Mount & Blade’in yapımcısı TaleWorlds hangi şehirde?","Ankara","İstanbul","İzmir","Eskişehir"],
+[7,"t","TaleWorlds Entertainment’ın kurucusu kim?","Armağan Yavuz","Sidar Şahin","Soner Aydemir","Hideo Kojima"],
+[7,"g","Unity’de script yazmak için kullanılan ana dil hangisi?","C#","Java","Python","GDScript"],
+[7,"g","Godot’nun Python’a benzeyen kendi script dili hangisi?","GDScript","Luau","Verse","HolyC"],
+[7,"g","Fortnite’ın UEFN aracıyla gelen yeni programlama dili hangisi?","Verse","Luau","GDScript","Blueprint"],
+[7,"g","Roblox Studio’da oyunlar hangi dille yazılır?","Luau (Lua)","C#","GDScript","Verse"],
+[7,"g","UE5’te milyonlarca poligonlu modeli verimli çizen sanal geometri sistemi?","Nanite","Lumen","Niagara","Chaos"],
+[7,"g","UE5’in dinamik global aydınlatma (GI) sistemi hangisi?","Lumen","Nanite","MetaHuman","Niagara"],
+[7,"g","Unity’nin 2023’teki ‘Runtime Fee’si neye göre ücret alacaktı?","Oyunun kurulum sayısı","Kod satırı sayısı","Oynanan saat","Kel Mahmut başına"],
+[7,"g","Tepki çeken Unity Runtime Fee hangi yıl tamamen iptal edildi?","2024","2023","2025","Hiç iptal edilmedi"],
+[7,"g","Unity, 2023 sürümlerinden sonra yeni ana sürümüne ne ad verdi?","Unity 6","Unity 2024","Unity X","Unity Pro Max"],
+[7,"g","Platformdan düştükten sonra kısa süre zıplamaya izin veren tasarım hilesi?","Coyote time","Delta time","Bunny hop","Frame skip"],
+[7,"g","Hareketi FPS’ten bağımsız yapmak için hızı neyle çarparsın?","Delta time","Coyote time","Ekran çözünürlüğü","Yerçekimi sabiti"],
+[7,"g","Uzaktaki objeleri daha az detaylı modelle göstermeye ne denir?","LOD","Culling","Anti-aliasing","Ray tracing"],
+[7,"g","Aynı derinlikteki iki yüzeyin titreşip birbirine geçmesine ne denir?","Z-fighting","Screen tearing","Ghosting","Motion blur"],
+[7,"g","Düşük poligonlu modele sahte yüzey detayı veren doku türü hangisi?","Normal map","Albedo map","Lightmap","Mini map"],
+[7,"g","Bir noktadan ışın gönderip neye çarptığını bulmaya ne denir?","Raycast","Podcast","Broadcast","Forecast"],
+[7,"g","Bir saldırının vurabildiği görünmez çarpışma alanına ne denir?","Hitbox","Lootbox","Skybox","Bilmem, lag vardı"],
+[7,"g","Oyun AI’ında yol bulmak için en çok kullanılan klasik algoritma?","A*","Bubble Sort","RSA","Schrödinger’in kedisi"],
+[7,"g","Oyunun tek, cilalı ve son kalitede bir kesitini gösteren demoya ne denir?","Vertical slice","Gold master","Pizza slice","Day one patch"],
+[7,"g","Ludum Dare’in tek kişilik ‘Compo’ kategorisinde kaç saatin var?","48 saat","24 saat","72 saat","1 hafta"],
+[7,"g","Hollow Knight hangi oyun motoruyla yapıldı?","Unity","Unreal Engine","Godot","GameMaker"],
+[7,"g","Balatro hangi Lua tabanlı framework ile yapıldı?","LÖVE","Defold","Unity","Godot"],
+[7,"g","Vampire Survivors ilk olarak hangi teknolojiyle yazılmıştı?","JavaScript (Phaser)","C++ (Unreal)","Lua (LÖVE)","Java (LibGDX)"],
+[7,"g","Clair Obscur: Expedition 33 hangi motorla geliştirildi?","Unreal Engine 5","Unity","Godot","RE Engine"],
+[7,"g","Stardew Valley’i tek başına geliştiren Eric Barone’un lakabı ne?","ConcernedApe","LocalThunk","Notch","Toby Fox"],
+[7,"g","Toby Fox, Undertale’i hangi motorla yaptı?","GameMaker","Unity","RPG Maker","Godot"],
+[7,"g","Blender’ı açar açmaz yapılan efsane ilk ritüel nedir?","Varsayılan küpü silmek","Eklenti kurmak","Ekrana bakıp ağlamak","Temayı değiştirmek"],
+[7,"g","Minecraft’taki Creeper aslında hangi hayvanın hatalı modelinden doğdu?","Domuz","İnek","Tavuk","Koyun"],
+[7,"g","Geliştiricinin klasik bahanesi: ‘Bu bir bug değil, …’","feature","hata","virüs","kader"],
+[7,"g","UE5’in 2020’deki ilk teknoloji demosu hangi cihazda çalıştı?","PlayStation 5","Xbox Series X","Nintendo Switch","Google Stadia"],
+// ── 8 BRAIN ROT ─────────────────────
+[8,"t","Yusuf Dikeç’in Paris 2024’teki viral pozunda boştaki eli nerede?","Cebinde","Belinde","Başının üstünde","Çay bardağında"],
+[8,"t","Leyla ile Mecnun’un efsane ‘İsmail Abi’sini kim oynadı?","Ahmet Mümtaz Taylan","Cengiz Bozkurt","Serkan Keskin","Ali Atay"],
+[8,"t","Avrupa Yakası’nın meme makinesi Burhan Altıntop’u kim oynadı?","Engin Günaydın","Cem Yılmaz","Gürkan Uygun","Zafer Ergin"],
+[8,"t","Kurtlar Vadisi’nin ‘Memati’sine hayat veren oyuncu kim?","Gürkan Uygun","Necati Şaşmaz","Kenan İmirzalıoğlu","Kıvanç Tatlıtuğ"],
+[8,"t","G.O.R.A.’da Arif’in sevimli robot arkadaşının adı ne?","216","R2-D2","007","Logar"],
+[8,"t","Hababam Sınıfı’nda ‘Kel Mahmut’ lakaplı müdürü kim oynadı?","Münir Özkul","Kemal Sunal","Halit Akçatepe","Tarık Akan"],
+[8,"t","Cem Yılmaz’ın Erşan Kuneri karakteri 2022’de hangi platformda dizi oldu?","Netflix","Exxen","BluTV","Disney+"],
+[8,"t","Seyirciyle sohbet ettiği ‘Konuşanlar’ programının sunucusu kim?","Hasan Can Kaya","Cem Yılmaz","Hasan Kaçan","Acun Ilıcalı"],
+[8,"t","Reynmen’i bir anda rekorların adamı yapan meşhur şarkı?","Ela","Kuzu Kuzu","Aşkın Olayım","Dudu"],
+[8,"t","Türk Twitch’inin efsanesi Jahrein’in gerçek adı?","Ahmet Sonuç","Tuğkan Gönültaş","Enes Batur","Hasan Can Kaya"],
+[8,"t","MSN Messenger’da karşındakinin penceresini sarsan özellik?","Titreşim","Dürtme","Gıdıklama","Zıplatma"],
+[8,"t","‘Kanka’ kelimesi neyin kısaltması?","Kan kardeş","Kantin kardeşi","Kanepe arkadaşı","Kankalanmış dost"],
+[8,"t","Arka Sokaklar’ın ölümsüz ‘Rıza Baba’sı kim?","Zafer Ergin","Haluk Bilginer","Uğur Polat","Tuncel Kurtiz"],
+[8,"t","Ekşi Sözlük’te henüz yazar olamamış yeni üyelere ne denir?","Çaylak","Acemi","Noob","Stajyer"],
+[8,"g","Italian brainrot’un yıldızı Tralalero Tralala aslında ne?","Nike giymiş köpekbalığı","Uçak gövdeli timsah","Kapuçino kafalı balerin","Muz kılığında şempanze"],
+[8,"g","‘Bombardiro Crocodilo’ hangi ikilinin karışımı?","Timsah + bombardıman uçağı","Köpekbalığı + spor ayakkabı","Penguen + pizza","Kaplumbağa + helikopter"],
+[8,"g","‘Italian brainrot’ sanılsa da Tung Tung Tung Sahur aslen hangi ülkenin internetinden çıktı?","Endonezya","İtalya","Brezilya","Japonya"],
+[8,"g","Skibidi Toilet’te tuvalet kafalılarla savaşan, kafası kamera olan ekibin adı?","Cameraman","Kumandaman","Lambaman","Klozetman"],
+[8,"g","Dictionary.com’un 2025 ‘yılın kelimesi’ neydi?","6-7","Rizz","Skibidi","Brain rot"],
+[8,"g","Oxford 2024’te yılın kelimesi olarak hangisini seçti?","Brain rot","Rizz","Rage bait","Goblin mode"],
+[8,"g","Oxford’un 2023 kelimesi ‘rizz’ hangi İngilizce kelimeden türedi?","Charisma","Rice","Risotto","Horizon"],
+[8,"g","‘Fanum tax’ ne demek?","Arkadaşın yemeğini araklamak","Twitch abonelik vergisi","Yakışıklılık vergisi","Kantine gelen zam"],
+[8,"g","‘Mewing’ yapan biri aslında ne yapıyor?","Dilini damağına bastırıyor","Kedi gibi miyavlıyor","Kaşlarını kaldırıyor","Nefesini tutuyor"],
+[8,"g","‘Aura farming’ akımının yüzü olan çocuk hangi yarışta dans ediyordu?","Endonezya tekne yarışı","Japon sumo turnuvası","Brezilya karnavalı","Hollanda bisiklet turu"],
+[8,"g","‘Just a chill guy’ meme’indeki rahat karakter hangi hayvan?","Köpek","Kedi","Kurbağa","Kapibara"],
+[8,"g","2024’ün internet sevgilisi Moo Deng hangi hayvan?","Cüce su aygırı","Kırmızı panda","Yavru fil","Kapibara"],
+[8,"g","Annesinden iri olmasıyla viral olan Avustralyalı yavru kral penguenin adı?","Pesto","Pingu","Moo Deng","Pedro"],
+[8,"g","Labubu’ları ‘kör kutu’ ile satıp servet yapan Çinli şirket?","Pop Mart","Shein","Temu","Xiaomi"],
+[8,"g","‘Pedro Pedro Pedro’ şarkısıyla dönüp duran meşhur hayvan?","Rakun","Kedi","Kapibara","Penguen"],
+[8,"g","Doge meme’inin yüzü olan Shiba Inu’nun gerçek adı?","Kabosu","Cheems","Hachiko","Pesto"],
+[8,"g","Acısını gülümsemeyle saklayan ‘Hide the Pain Harold’ hangi ülkeden?","Macaristan","Almanya","ABD","Polonya"],
+[8,"g","IShowSpeed’in idolü olan, ‘SIUUU’ diye taklit ettiği futbolcu?","Cristiano Ronaldo","Lionel Messi","Neymar","Erling Haaland"],
+[8,"g","Minecraft Filmi’nde salonları çıldırtan ‘Chicken jockey!’ repliğini kim haykırıyor?","Jack Black","Jason Momoa","Keanu Reeves","Ryan Reynolds"],
+[8,"g","TikTok’ta ‘dikkatin dağılmasın’ diye videoların altına hangi oyun konur?","Subway Surfers","Tetris","Mayın Tarlası","Candy Crush"],
+[8,"g","Meme olan ‘low taper fade’ aslında neyin adı?","Bir saç kesimi","Bir dans figürü","Bir enerji içeceği","Bir yoga pozisyonu"],
+[8,"g","2025’te Cambridge Sözlüğü’ne resmen eklenen kelime hangisi?","Skibidi","Tralalero","Bombardiro","Patapim"],
+// ── 9 İNTERNET & TEKNO ──────────────
+[9,"t","Togg’un ilk seri üretim modelinin adı ne?","T10X","T1","Anadol","Model T"],
+[9,"t","2024’te uzaya fırlatılan Türksat 6A’yı özel yapan ne?","İlk yerli haberleşme uydusu","İlk Ay uydusu","İçinde çaycı olması","Uzayda kebap yapması"],
+[9,"t","Milli muharip uçak KAAN ilk uçuşunu hangi yıl yaptı?","2024","2020","2022","2026"],
+[9,"t","Mor scooter’lı hızlı market uygulaması Getir’in kurucusu kim?","Nazım Salur","Demet Mutlu","Sedat Kapanoğlu","Hüsnü Özyeğin"],
+[9,"t","Trendyol’un çoğunluk hissesini 2018’de alan teknoloji devi?","Alibaba","Amazon","Tencent","eBay"],
+[9,"t","Ekşi Sözlük’ü 1999’da kuran kişi kim?","Sedat Kapanoğlu","Nazım Salur","Demet Mutlu","Enes Batur"],
+[9,"t","e-Devlet şifresini elden almak için hangi kuruma gidersin?","PTT","Bakkal","Noter","Belediye"],
+[9,"t","Klavyedeki ‘@’ işaretinin Türkçedeki adı ne?","Et","Salyangoz","Kuyruklu ü","Anten"],
+[9,"t","Türkiye’ye özgü, harfleri Türkçeye göre dizilmiş klavye düzeni?","F klavye","Q klavye","T klavye","Z klavye"],
+[9,"g","ChatGPT hangi yıl herkesin kullanımına açıldı?","2022","2019","2020","2024"],
+[9,"g","Ocak 2025’te Nvidia hisselerini sarsan yapay zekâ DeepSeek hangi ülkeden?","Çin","Japonya","Güney Kore","Hindistan"],
+[9,"g","2025’te piyasa değeri 5 trilyon doları aşan ilk şirket hangisi?","Nvidia","Apple","Microsoft","Tesla"],
+[9,"g","Twitter’ın adı hangi yıl ‘X’ oldu?","2023","2020","2021","2025"],
+[9,"g","2023’te çıkan Threads’e başlangıçta hangi hesapla giriliyordu?","Instagram","WhatsApp","LinkedIn","Snapchat"],
+[9,"g","Mayıs 2025’te kapanan Skype’ın kullanıcıları nereye yönlendirildi?","Microsoft Teams","Zoom","Discord","Google Meet"],
+[9,"g","Windows 10’un resmi desteği hangi yıl sona erdi?","2025","2022","2023","2030"],
+[9,"g","Adobe Flash Player’ın fişi hangi yıl resmen çekildi?","2020","2015","2012","2023"],
+[9,"g","ChatGPT’deki ‘GPT’nin ‘T’si neyi ifade eder?","Transformer","Turbo","Türkçe","Terminal"],
+[9,"g","OpenAI’ın yazdığın metinden video üreten modelinin adı?","Sora","Gemini","Copilot","Midjourney"],
+[9,"g","Temmuz 2024’te havalimanlarını kilitleyen ‘mavi ekran’ krizine hangi şirketin güncellemesi yol açtı?","CrowdStrike","Apple","Nvidia","Zoom"],
+[9,"g","Viral kelime oyunu Wordle’ı 2022’de satın alan şirket?","The New York Times","Google","Netflix","Microsoft"],
+[9,"g","Apple hangi modelle Lightning’i bırakıp USB-C’ye geçti?","iPhone 15","iPhone 12","iPhone 13","iPhone 17"],
+[9,"g","Elon Musk 2022’de Twitter’ı kaç dolara satın aldı?","44 milyar","4,4 milyar","440 milyon","1 milyar ve 1 Doge"],
+[9,"g","Bluetooth adını kimden alır?","Bir Viking kralından","Mucidinin mavi dişinden","Bir Fin dişçiden","Mavi bir köpekbalığından"],
+[9,"g","‘Google’ adı hangi sayıdan geliyor?","1’in ardından 100 sıfır","Bir milyon","Pi sayısı","Sonsuz"],
+[9,"g","‘Emoji’ kelimesi hangi dilden geliyor?","Japonca","İngilizce","Korece","Emojice"],
+[9,"g","Günde bir kez rastgele saatte ‘2 dakikan var, fotoğraf çek!’ diyen uygulama?","BeReal","Snapchat","Instagram","Lemon8"],
+[9,"g","Collins Sözlüğü’nün 2025 kelimesi, yapay zekâya ‘his’le kod yazdırmayı anlatıyor. Hangisi?","Vibe coding","Prompt farming","Brain coding","Chill coding"],
+[9,"g","GTA VI’nın Aralık 2023’te rekor kıran ilk fragmanı hangi şehirde geçiyordu?","Vice City","Los Santos","Liberty City","San Fierro"],
+// ── 10 YEME & İÇME ───────────────────
+[10,"t","Üstüne tereyağı gezdirilen İskender kebabın doğduğu şehir?","Bursa","Adana","Gaziantep","Konya"],
+[10,"t","Tantuni denince akla gelen şehir hangisi?","Mersin","Adana","Antalya","Hatay"],
+[10,"t","İzmir'in meşhur ‘kumru’su aslında nedir?","Sucuklu kaşarlı sandviç","Kızarmış güvercin","Fıstıklı bir tatlı","Bir tür midye dolma"],
+[10,"t","İzmir'de simit istersen ne demen gerekir?","Gevrek","Boyoz","Halka","Çıtır"],
+[10,"t","İzmir'de boyozun yanına klasik olarak ne alınır?","Haşlanmış yumurta","Lahmacun","Bal ve kaymak","Şalgam"],
+[10,"t","Döner gibi ama yatay şişte pişen cağ kebabı hangi şehrin?","Erzurum","Kars","Trabzon","Edirne"],
+[10,"t","Peynirli, şerbetli, sıcak servis edilen künefenin memleketi?","Hatay","Rize","Kars","Edirne"],
+[10,"t","2013'te AB'den coğrafi işaret alan ilk Türk ürünü hangisi?","Antep baklavası","Malatya kayısısı","Aydın inciri","Kayseri pastırması"],
+[10,"t","İstanbul'un meşhur ıslak hamburgeri hangi meydanla özdeşleşmiştir?","Taksim","Kadıköy","Eminönü","Bakırköy"],
+[10,"t","Hangisi menemene tartışmasız giren bir malzemedir?","Domates","Soğan","Patates","Mayonez"],
+[10,"t","Pamuk gibi tel tel bir tatlı olan pişmaniye hangi ilin?","Kocaeli","Bolu","Sakarya","Afyonkarahisar"],
+[10,"t","Türk kahvesi kültürü UNESCO listesine hangi yıl girdi?","2013","2005","2018","2022"],
+[10,"t","Adana'nın şalgam suyunun ana malzemesi aslında nedir?","Mor havuç","Şalgam","Kırmızı pancar","Kırmızı lahana"],
+[10,"t","Geleneksel tarifle yapılan tavuk göğsü tatlısında ne vardır?","Gerçekten tavuk eti","Sadece süt ve nişasta","Tavuk yumurtası","Tavuk aromalı şurup"],
+[10,"t","Kışın içilen salep hangi bitkinin yumrularından yapılır?","Orkide","Lale","Patates","Papatya"],
+[10,"t","Michelin Rehberi Türkiye'de (İstanbul) ilk yıldızlarını hangi yıl dağıttı?","2022","2010","2017","2025"],
+[10,"t","Eti kesip tuzu dirseğinden serpmesiyle viral olan ‘Salt Bae’ kim?","Nusret Gökçe","CZN Burak","Mehmet Yalçınkaya","Somer Sivrioğlu"],
+[10,"t","Bol isotuyla meşhur, çiğ köftenin memleketi sayılan şehir?","Şanlıurfa","Rize","Edirne","Bolu"],
+[10,"g","2024'te viral olan ‘Dubai çikolatası’nın içinde ne var?","Antep fıstığı ve kadayıf","Hurma ve deve sütü","Altın varak ve havyar","Fındık ve karamel"],
+[10,"g","Squid Game'de (2021) iğneyle şekli kırmadan oyulan şekerleme?","Dalgona","Mochi","Pişmaniye","Lokum"],
+[10,"g","MrBeast'in 2022'de piyasaya sürdüğü çikolata markası?","Feastables","Prime","Snickers","Milka"],
+[10,"g","2023'te TikTok'u sallayan McDonald's ‘Grimace Shake’ ne renkti?","Mor","Yeşil","Turuncu","Mavi"],
+[10,"g","2020'de TikTok kullanıcılarının ortaklaşa müzikalini yazdığı yemek filmi?","Ratatouille","Köfte Yağmuru","Sosis Partisi","Şef"],
+[10,"g","2024'te TikTok'ta patlayan Paris tatlısı ‘crookie’ neyin karışımı?","Kruvasan ve kurabiye","Kruvasan ve donut","Krep ve kurabiye","Kraker ve kek"],
+[10,"g","2021'de sosyal medyayı kasıp kavuran fırın makarnasının yıldız peyniri?","Feta","Mozzarella","Parmesan","Cheddar"],
+[10,"g","2020'lerin kafe yıldızı ‘matcha’ aslında nedir?","Toz yeşil çay","Yosun tozu","Kurutulmuş avokado","Yeşil kahve çekirdeği"],
+[10,"g","Kafelerin gözdesi ‘San Sebastian cheesecake’ adını hangi ülkedeki şehirden alır?","İspanya","İtalya","Fransa","Arjantin"],
+[10,"g","İngilizcede ‘turkey’ denen hindi aslen nereli?","Kuzey Amerika","Türkiye","Hindistan","Avustralya"],
+[10,"g","Ananaslı ‘Hawaii pizzası’ ilk nerede yapıldı?","Kanada","Hawaii","İtalya","Meksika"],
+[10,"g","Pizza Margherita hangi şehrin klasiğidir?","Napoli","Roma","Milano","Venedik"],
+[10,"g","Fermente lahanadan yapılan kimchi hangi mutfağın simgesi?","Kore","Japon","Çin","Tayland"],
+// ── 11 SANAT & EDEBİYAT ──────────────
+[11,"t","2006'da Nobel Edebiyat Ödülü'nü kazanan Türk yazar kim?","Orhan Pamuk","Yaşar Kemal","Elif Şafak","Ahmet Ümit"],
+[11,"t","Orhan Pamuk'un 2021'de çıkan, hayalî bir adada salgını anlatan romanı?","Veba Geceleri","Kırmızı Saçlı Kadın","Kafamda Bir Tuhaflık","Sessiz Ev"],
+[11,"t","Orhan Pamuk'un hangi romanının İstanbul'da gerçekten gezebileceğin bir müzesi var?","Masumiyet Müzesi","Kara Kitap","Beyaz Kale","Benim Adım Kırmızı"],
+[11,"t","‘Kürk Mantolu Madonna’ 2019'dan sonra neden onlarca yayınevinden basılmaya başladı?","Telif süresi doldu","Yazarı izin verdi","Yasağı kaldırıldı","Kayıp son bölümü bulundu"],
+[11,"t","Hangisi Oğuz Atay'ın romanıdır?","Tutunamayanlar","Huzur","Kuyucaklı Yusuf","Çalıkuşu"],
+[11,"t","‘Saatleri Ayarlama Enstitüsü’nü kim yazdı?","Ahmet Hamdi Tanpınar","Oğuz Atay","Peyami Safa","Sait Faik Abasıyanık"],
+[11,"t","‘Memleketimden İnsan Manzaraları’ kimin eseri?","Nazım Hikmet","Orhan Veli Kanık","Cemal Süreya","Attilâ İlhan"],
+[11,"t","Yaşar Kemal'in Toros dağlarına çıkan eşkıyayı anlatan romanı?","İnce Memed","Eşkıya","Kuyucaklı Yusuf","Yaban"],
+[11,"t","Mimar Sinan'ın ‘ustalık eserim’ dediği Selimiye Camii hangi şehirde?","Edirne","İstanbul","Bursa","Konya"],
+[11,"t","‘Kaplumbağa Terbiyecisi’ tablosunu kim yaptı?","Osman Hamdi Bey","Şeker Ahmed Paşa","İbrahim Çallı","Usta Splinter"],
+[11,"t","Su yüzeyine boyayla desen yapıp kâğıda aktarma sanatına ne denir?","Ebru","Hat","Tezhip","Minyatür"],
+[11,"t","İznik tarihte en çok hangi sanatıyla ünlüdür?","Çini","Halı dokuma","Cam üfleme","Bakırcılık"],
+[11,"t","2022'de MoMA'da yapay zekâ eseri ‘Unsupervised’ sergilenen Türk sanatçı?","Refik Anadol","Burhan Doğançay","Bedri Rahmi Eyüboğlu","Fahrelnissa Zeid"],
+[11,"t","Eski AKM'nin mimarı Hayati Tabanlıoğlu'ydu. 2021'de açılan yeni AKM'yi kim tasarladı?","Oğlu Murat Tabanlıoğlu","Zaha Hadid","Emre Arolat","Bjarke Ingels"],
+[11,"t","‘Kötü Kedi Şerafettin’i yaratan çizer kim?","Bülent Üstün","Erdil Yaşaroğlu","Yiğit Özgür","Selçuk Erdem"],
+[11,"g","2024 Nobel Edebiyat Ödülü'nü kazanan Han Kang hangi ülkeden?","Güney Kore","Japonya","Çin","Tayvan"],
+[11,"g","2024 Booker ödüllü ‘Orbital’ romanı nerede geçer?","Uluslararası Uzay İstasyonu","Bir denizaltıda","Mars'ta bir kolonide","Antarktika'da bir üste"],
+[11,"g","2025 Nobel Edebiyat Ödülü'nü hangi Macar yazar kazandı?","László Krasznahorkai","Péter Nádas","Imre Kertész","Magda Szabó"],
+[11,"g","2024'te Cattelan'ın duvara bantlı muzunu 6,2 milyon $'a alan Justin Sun ne yaptı?","Muzu yedi","Altınla kaplattı","Uzaya gönderdi","Müzeye bağışladı"],
+[11,"g","Ekim 2025'teki Louvre soygununda hırsızlar ne çaldı?","Taç mücevherlerini","Mona Lisa'yı","Bir Mısır mumyasını","Milo Venüsü'nü"],
+[11,"g","Banksy'nin 2018'de açık artırmada kendini kısmen parçalayan eserinin yeni adı?","Love is in the Bin","Art is Dead","Shredded Dreams","Balloon Gone"],
+[11,"g","Mona Lisa'nın yüzünde bugün neredeyse hiç görünmeyen şey ne?","Kaşları","Gülümsemesi","Burnu","Gözleri"],
+[11,"g","Van Gogh'un ‘Yıldızlı Gece’si hangi müzenin koleksiyonunda?","MoMA (New York)","Louvre (Paris)","Van Gogh Müzesi","Tate Modern"],
+[11,"g","Frida Kahlo en çok hangi tür tablolarıyla tanınır?","Otoportreler","Deniz manzaraları","Soyut tablolar","Savaş sahneleri"],
+[11,"g","2023'te Netflix dizisi de çıkan ‘One Piece’in yaratıcısı kim?","Eiichiro Oda","Masashi Kishimoto","Akira Toriyama","Tite Kubo"],
+[11,"g","Hajime Isayama'nın ‘Attack on Titan’ mangası hangi yıl bitti?","2021","2017","2019","2023"],
+[11,"g","2024'te sona eren ‘Jujutsu Kaisen’ mangasının yazarı kim?","Gege Akutami","Tatsuki Fujimoto","Koyoharu Gotouge","Kohei Horikoshi"],
+[11,"g","Mart 2025'te yapay zekâyla fotoğrafları çizgi filme çevirme akımı hangi stüdyonun tarzındaydı?","Studio Ghibli","Pixar","DreamWorks","Cartoon Network"],
+[11,"g","BookTok fenomeni ‘Fourth Wing’de (2023) öğrenciler hangi yaratıklarla bağ kurar?","Ejderhalar","Grifonlar","Kurt adamlar","Tek boynuzlu atlar"],
+[11,"g","Tolkien ‘Yüzüklerin Efendisi’ni yazarken Oxford'da ne iş yapıyordu?","Dil bilimci profesör","Kuyumcu","Avukat","Tren makinisti"],
+[11,"g","Harry Potter'da Hogwarts Ekspresi hangi perondan kalkar?","9¾","7½","10¼","13"],
+// ── 12 TROLL SORULAR ─────────────────
+[12,"t","Türk inanışına göre kedinin kaç canı vardır?","7","9","3","1"],
+[12,"t","Türkçede hangi kelime her zaman yanlış yazılır?","Yanlış","Yalnız","Herkes","Şoför"],
+[12,"t","‘Alfabe’ kelimesinde kaç harf var?","6","29","26","7"],
+[12,"t","Türkçede ‘ğ’ harfiyle başlayan kaç kelime var?","0","3","12","Sadece ‘ğıcık’"],
+[12,"t","Deveye ‘Boynun eğri’ demişler. Deve ne demiş?","Nerem doğru ki","Seninki düz mü","Fizyoterapiye gidiyorum","Ben zürafa değilim"],
+[12,"t","‘Pazartesi’ kelimesi aslında nereden gelir?","Pazar ertesi","Pazara gidilen gün","Pazar tesisi","Pazarlık günü"],
+[12,"t","‘Hindi’ kuşu Türkçedeki adını hangi ülkeden alır?","Hindistan","Türkiye","Endonezya","Hollanda"],
+[12,"t","Türk kahvesinin çekirdekleri genelde nerede yetişir?","Brezilya","Rize","Antep","Ordu"],
+[12,"g","Bir yılda kaç ayda 28 gün var?","12","1","2","Artık yıla göre değişir"],
+[12,"g","Maratonda ikinciyi geçersen kaçıncı olursun?","İkinci","Birinci","Üçüncü","Viral"],
+[12,"g","Horoz çatının tepesinde yumurtlarsa yumurta hangi tarafa düşer?","Horoz yumurtlamaz","Rüzgârın estiği yöne","Sağa","Komşunun bahçesine"],
+[12,"g","Yüz Yıl Savaşları kaç yıl sürdü?","116","100","99","101"],
+[12,"g","Panama şapkası aslen hangi ülkede yapılır?","Ekvador","Panama","Meksika","Küba"],
+[12,"g","Kanarya Adaları adını hangi hayvandan alır?","Köpek","Kanarya kuşu","Kertenkele","Papağan"],
+[12,"g","Kutup ayıları neden penguen yemez?","Farklı kutuplarda yaşarlar","Penguenler çok tuzlu","Ayılar vejetaryen","Penguenler takım elbiseli"],
+[12,"g","Zürafanın o upuzun boynunda kaç omur var?","7","21","48","2"],
+[12,"g","Şu an oynadığın oyunun adına göre kaç dilim var?","Altı","Sekiz","On iki","Ne kadar acıktığına bağlı"],
+[12,"g","Elektrikli tren kuzeye, rüzgâr güneye gidiyor. Trenin dumanı hangi yöne gider?","Elektrikli trenin dumanı olmaz","Kuzeye","Güneye","Yukarı"],
+[12,"g","Doktor 3 hap verip ‘yarım saatte bir iç’ dedi. Haplar kaç dakikada biter?","60","90","120","45"],
+[12,"g","Hangisi daha ağır: 1 kilo pamuk mu, 1 kilo demir mi?","İkisi de aynı","Demir","Pamuk","Bakkalın terazisine bağlı"],
+[12,"g","İskoçya’nın ulusal hayvanı hangisi?","Tek boynuzlu at","Kızıl geyik","Koyun","Loch Ness Canavarı"],
+[12,"g","Venüs’te hangisi daha uzun sürer?","Kendi etrafında bir tur","Güneş etrafında bir tur","İkisi tam eşit","Bir Netflix dizisi"],
+[12,"g","Mısır kraliçesi Kleopatra’nın hanedanı aslen nereliydi?","Makedon Yunanlar","Mısırlılar","Romalılar","Persler"],
+[12,"g","Çin Seddi Ay’dan çıplak gözle görülebilir mi?","Hayır, görülemez","Evet, net görünür","Sadece geceleri","Sadece dolunayda"],
+[12,"g","Çin restoranlarındaki ‘şans kurabiyesi’ aslında nerede yaygınlaştı?","ABD","Çin","Tayvan","Hong Kong"],
+[12,"g","Bembeyaz kutup ayısının derisi aslında ne renk?","Siyah","Beyaz","Pembe","Açık mavi"],
+[12,"g","Bir saatin akrep ve yelkovanı 24 saatte kaç kez üst üste gelir?","22","24","12","23"],
+[12,"g","Rusya ile ABD arasındaki en kısa mesafe yaklaşık ne kadar?","4 km","150 km","800 km","3.000 km"],
+[12,"g","Dünyanın en büyük çölü hangisi?","Antarktika","Sahra","Gobi","Kalahari"],
+[12,"g","Kimin kemiği daha fazladır?","Yeni doğmuş bebeğin","Yetişkin insanın","İkisi eşit","Vücut geliştiricinin"],
+[12,"g","Eyfel Kulesi sıcak yaz günlerinde ne yapar?","15 cm’ye kadar uzar","15 cm’ye kadar kısalır","Hafifçe döner","Renk değiştirir"],
+[12,"g","Bir çobanın 17 koyunu var. 9’u hariç hepsi kaçtı. Kaç koyun kaldı?","9","8","17","0"],
+[12,"g","Hangi hayvan küp şeklinde kaka yapar?","Vombat","Koala","Kanguru","Rubik ayısı"],
 ];
 
 
-// ───────── basics ─────────
+// ───────── temel ─────────
+// s: çarktaki kısa etiket (zaten büyük harf), l: büyük harfe çevrilirken kullanılacak dil
 const CATS=[
-  {n:"Geography",s:"GEO"},{n:"Screen & Song",s:"SCREEN"},{n:"History",s:"HISTORY"},
-  {n:"Arts & Letters",s:"ARTS"},{n:"Science & Nature",s:"SCIENCE"},{n:"Sport & Table",s:"SPORT"}];
+  {n:"Coğrafya",s:"COĞRAFYA",e:"🌍"},
+  {n:"Tarih",s:"TARİH",e:"🏛️"},
+  {n:"Bilim & Doğa",s:"BİLİM",e:"🔬"},
+  {n:"Spor",s:"SPOR",e:"⚽"},
+  {n:"Dizi & Film",s:"EKRAN",e:"🎬"},
+  {n:"Müzik",s:"MÜZİK",e:"🎵"},
+  {n:"Oyun Dünyası",s:"OYUN",e:"🎮"},
+  {n:"Game Dev",s:"GAMEDEV",e:"🛠️",l:"en"},
+  {n:"Brain Rot",s:"BRAINROT",e:"🧠",l:"en"},
+  {n:"İnternet & Tekno",s:"TEKNO",e:"📱"},
+  {n:"Yeme & İçme",s:"MUTFAK",e:"🍢"},
+  {n:"Sanat & Edebiyat",s:"SANAT",e:"🎨"},
+  {n:"Troll Sorular",s:"TROLL",e:"🤡"}];
+const PRESETS=[["Parti",[6,8,4,5,3,12]],["Gamer",[6,7,8,9,4,12]],["Genel kültür",[0,1,2,3,10,11]]];
+const TEAMS=[{n:"Turkuaz",c:"#27B3BE"},{n:"Mercan",c:"#E8644C"}];
 const PCOL=["#F2C14E","#5BC0EB","#FF8A65","#9BD15A","#C792FF","#FF9F1C","#4ECDC4","#FF7AA8","#C9CEE6","#7AE582"];
 const MAXP=10;
-const byCat=[[],[],[],[],[],[]];
-QS.forEach((q,i)=>byCat[q[0]].push(i));
+const byCat=CATS.map(()=>[]);
+QS.forEach((q,i)=>{if(byCat[q[0]])byCat[q[0]].push(i)});
 const store={get(k,d){try{const v=localStorage.getItem("dilim:"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
   set(k,v){try{localStorage.setItem("dilim:"+k,JSON.stringify(v))}catch(e){}}};
 const $=s=>document.querySelector(s);
@@ -537,25 +717,41 @@ function h(t,a,...kids){const e=document.createElement(t);a=a||{};
   for(const c of kids.flat()){if(c==null||c===false)continue;e.append(c.nodeType?c:document.createTextNode(String(c)));}
   return e;}
 function rng(seed){let a=seed>>>0;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-function shuffled(arr,r){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-const clean=s=>String(s||"").replace(/[\u0000-\u001f\u007f-\u009f​-‏‪-‮⁠-⁯]/g,"").trim().slice(0,16);
+function shuffled(arr,r){r=r||Math.random;const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const CTRL=/[\u0000-\u001f\u007f-\u009f​-‏‪-‮⁠-⁯]/g;
+const clean=s=>String(s||"").replace(CTRL,"").trim().slice(0,16);
+const cleanLong=s=>String(s||"").replace(CTRL,"").trim().slice(0,60);
 const initial=n=>(clean(n)[0]||"?").toLocaleUpperCase("tr");
 const pcol=i=>PCOL[((i|0)%PCOL.length+PCOL.length)%PCOL.length];
-function disc(p){return h("div",{class:"disc",style:`background:${pcol(p.c)}`,"aria-hidden":"true"},initial(p.n))}
+const fmt=n=>(n|0).toLocaleString("tr-TR");
+const sign=n=>n>0?`+${fmt(n)}`:n<0?`−${fmt(-n)}`:"0";
+const pickOne=a=>a[Math.floor(Math.random()*a.length)];
+// null/false çocukları atlayan append
+const add=(el,...kids)=>el.append(...kids.flat().filter(k=>k!=null&&k!==false));
+const catLabel=c=>h("span",{lang:c.l||null},`${c.e} ${c.n}`);
+function disc(p){return h("div",{class:"disc",style:`background:${p.hex||pcol(p.c)}`,"aria-hidden":"true"},initial(p.n))}
+function teamDot(t){return h("i",{class:"tdot",style:`background:${TEAMS[t?1:0].c}`,title:TEAMS[t?1:0].n})}
 let toastT;function toast(msg){document.querySelectorAll(".toast").forEach(e=>e.remove());const t=h("div",{class:"toast",role:"status"},msg);document.body.append(t);clearTimeout(toastT);toastT=setTimeout(()=>t.remove(),3200)}
 
-// ───────── sound ─────────
+// çarktaki 6 dilim: kategori numaraları, boş dilim -1
+const DEF_K=PRESETS[0][1];
+function validK(k){if(!Array.isArray(k)||k.length!==6)return false;const used=k.filter(x=>x>=0);
+  return k.every(x=>x===-1||(Number.isInteger(x)&&x>=0&&x<CATS.length))&&new Set(used).size===used.length}
+function fullK(k){k=k.slice();const free=shuffled(CATS.map((_,i)=>i).filter(i=>!k.includes(i)));for(let i=0;i<6;i++)if(k[i]<0)k[i]=free.pop();return k}
+const kCount=k=>k.filter(x=>x>=0).length;
+
+// ───────── ses ─────────
 let actx=null,muted=store.get("muted",false);
 document.addEventListener("pointerdown",()=>{try{if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)();if(actx.state==="suspended")actx.resume()}catch(e){}},{capture:true});
 function beep(seq){if(muted||!actx)return;try{const t0=actx.currentTime;for(const[f,d,st]of seq){const o=actx.createOscillator(),g=actx.createGain();o.type="triangle";o.frequency.value=f;g.gain.setValueAtTime(.0001,t0+st);g.gain.exponentialRampToValueAtTime(.16,t0+st+.012);g.gain.exponentialRampToValueAtTime(.0001,t0+st+d);o.connect(g).connect(actx.destination);o.start(t0+st);o.stop(t0+st+d+.03)}}catch(e){}}
 const SND={ok:[[660,.12,0],[990,.22,.1]],no:[[240,.22,0],[180,.3,.14]],go:[[520,.07,0],[780,.09,.07]],tick:[[880,.05,0]],win:[[523,.15,0],[659,.15,.12],[784,.15,.24],[1047,.4,.36]],pick:[[440,.06,0]]};
 
-// ───────── svg pieces ─────────
+// ───────── svg parçaları ─────────
 const RAD=Math.PI/180;
 function pt(r,deg){return[(100+r*Math.sin(deg*RAD)).toFixed(2),(100-r*Math.cos(deg*RAD)).toFixed(2)]}
 function slicePath(r0,r1,a0,a1){const[x0,y0]=pt(r1,a0),[x1,y1]=pt(r1,a1),[x2,y2]=pt(r0,a1),[x3,y3]=pt(r0,a0);
   return `M${x3},${y3} L${x0},${y0} A${r1},${r1} 0 0 1 ${x1},${y1} L${x2},${y2} A${r0},${r0} 0 0 0 ${x3},${y3} Z`}
-// small token: w = "000000" with 0 empty, 1 half, 2 full
+// küçük jeton: w = "000000", 0 boş, 1 yarım, 2 tam
 function pie(w,size){w=w||"222222";let s=`<svg viewBox="0 0 200 200" width="${size}" height="${size}" aria-hidden="true" style="flex:none"><circle cx="100" cy="100" r="98" fill="var(--ink)" stroke="var(--line)" stroke-width="4"/>`;
   for(let i=0;i<6;i++){const a0=i*60+3,a1=i*60+57,v=w[i];
     if(v==="2")s+=`<path d="${slicePath(14,88,a0,a1)}" fill="var(--c${i})"/>`;
@@ -563,33 +759,40 @@ function pie(w,size){w=w||"222222";let s=`<svg viewBox="0 0 200 200" width="${si
     else s+=`<path d="${slicePath(14,88,a0,a1)}" fill="var(--c${i})" opacity=".13"/>`;}
   return s+"</svg>"}
 function pieEl(w,size){const d=h("span",{style:"display:inline-flex"});d.innerHTML=pie(w,size);return d}
-function wheelSVG(opts){ // opts: live, w (wedges of picker), rot
-  let s=`<svg class="wheel${opts.live?" live":""}" viewBox="-6 -14 212 220" role="${opts.live?"group":"img"}" aria-label="Category wheel">`;
+function wheelSVG(opts){ // opts: live, w (seçenin dilimleri), rot, k (kategoriler)
+  const k=opts.k||(G?G.set.k:settings.k);
+  let s=`<svg class="wheel${opts.live?" live":""}" viewBox="-6 -14 212 220" role="${opts.live?"group":"img"}" aria-label="Kategori çarkı">`;
   s+=`<g class="rot" style="transform:rotate(${opts.rot||0}deg)">`;
-  for(let i=0;i<6;i++){const a0=i*60+1.2,a1=i*60+58.8,v=(opts.w||"")[i];
-    const ca=i*60+30,tr=ca<180?ca-90:ca+90;const[lx,ly]=pt(58,ca);
-    s+=`<g class="slice" data-cat="${i}"${opts.live?` tabindex="0" role="button" aria-label="${CATS[i].n}"`:""}><path d="${slicePath(26,96,a0,a1)}" fill="var(--c${i})"/>`;
-    s+=`<text class="lab" x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" transform="rotate(${tr} ${lx} ${ly})">${CATS[i].s}</text>`;
-    if(opts.w){const[nx,ny]=pt(88,ca);const t=v==="2"?"HAVE":v==="1"?"HALF":"";if(t)s+=`<text class="lab need" x="${nx}" y="${ny}" text-anchor="middle" dominant-baseline="middle" transform="rotate(${tr} ${nx} ${ny})">${t}</text>`}
+  for(let i=0;i<6;i++){const a0=i*60+1.2,a1=i*60+58.8,v=(opts.w||"")[i],c=CATS[k[i]];
+    const lab=c?c.s:"?",fs=lab.length>=7?7.1:lab.length>=6?7.8:8.6;
+    const ca=i*60+30,tr=ca<180?ca-90:ca+90;const[lx,ly]=pt(57,ca);
+    s+=`<g class="slice" data-cat="${i}"${opts.live?` tabindex="0" role="button" aria-label="${c?c.n:"Boş dilim"}"`:""}><path d="${slicePath(26,96,a0,a1)}" fill="var(--c${i})"/>`;
+    s+=`<text class="lab" x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" style="font-size:${fs}px" transform="rotate(${tr} ${lx} ${ly})">${lab}</text>`;
+    if(opts.w){const[nx,ny]=pt(89,ca);const t=v==="2"?"✓":v==="1"?"½":"";if(t)s+=`<text class="lab need" x="${nx}" y="${ny}" text-anchor="middle" dominant-baseline="middle" transform="rotate(${tr} ${nx} ${ny})">${t}</text>`}
     s+=`</g>`;}
   s+=`</g><circle cx="100" cy="100" r="22" fill="var(--ink)" stroke="var(--paper)" stroke-width="2.5"/>`;
   s+=`<path d="M100,-10 L91,6 L109,6 Z" fill="var(--paper)"/>`;
   return s+"</svg>"}
 
-// ───────── state ─────────
+// ───────── durum ─────────
 let me={name:store.get("name",""),col:store.get("col",Math.floor(Math.random()*PCOL.length))};
 let mode="home";           // home | localsetup | online | local
-let room;                  // undefined = connecting, null = unavailable
+let room;                  // undefined = bağlanıyor, null = yok
 let game=null,unsubPeers=null;
 let G=null,isHost=false,myPeer=null,peers=[],peerMap=new Map(),myPres={};
 let code="",hostGoneAt=0,joinedAt=0,lastAnn="";
 let hostDeadline=0,allDoneAt=0,loop=null;
 let localAns={},localPick=null;
 const ui={phaseKey:"",phaseStart:0,ans:null,ff:false,dbl:false,picked:false,leaveArm:0,quitArm:0};
-let settings=Object.assign({m:"classic",n:12,x:"mix",t:20},store.get("set",{}));
+let settings=Object.assign({m:"classic",n:12,x:"mix",t:20,tm:0,k:DEF_K.slice()},store.get("set",{}));
+if(!validK(settings.k))settings.k=DEF_K.slice();
+settings.tm=settings.tm?1:0;
+if(![15,20,30].includes(settings.t))settings.t=20;
 let localPlayers=store.get("lp",null)||[{n:"",c:0},{n:"",c:1}];
+let localTeams=store.get("lt",null);
+if(!Array.isArray(localTeams)||localTeams.length!==2)localTeams=[{n:"",m:""},{n:"",m:""}];
 
-// ───────── IO adapters ─────────
+// ───────── IO ─────────
 const IO={
   ans(id){if(mode==="local")return localAns[id];if(id===myPeer)return myPres.a;const p=peerMap.get(id);return p&&p.presence&&p.presence.a},
   pick(id){if(mode==="local")return localPick;if(id===myPeer)return myPres.k;const p=peerMap.get(id);return p&&p.presence&&p.presence.k},
@@ -597,78 +800,125 @@ const IO={
 };
 const myId=()=>mode==="local"?(G&&G.pk):myPeer;
 const plOf=id=>G&&G.pl.find(p=>p.i===id);
+// online takım modu: herkes kendi telefonunda, puan ve dilimler takımın
+const teamOn=()=>!!(G&&G.set.tm&&mode==="online");
+// tek cihazda takım modu: her "oyuncu" aslında bir takım
+const teamLocal=()=>!!(G&&G.set.tm&&mode==="local");
+const wOf=p=>p?(teamOn()&&G.tm&&G.tm[p.t]?G.tm[p.t].w:p.w):"000000";
 
-// ───────── host engine ─────────
-function newG(){return{v:0,ph:"lobby",set:Object.assign({},settings),seed:0,r:0,pi:0,pk:null,cat:-1,qid:-1,left:0,pl:[],u:[],fx:null,win:null,code}}
+// ───────── ev sahibi motoru ─────────
+const newTeam=()=>({s:0,w:"000000",d:0,gw:0,c:0,n:0,ok:false});
+function newG(){return{v:0,ph:"lobby",set:Object.assign({},settings,{k:settings.k.slice()}),seed:0,r:0,pi:0,pk:null,cat:-1,qid:-1,left:0,pl:[],u:[],fx:null,win:null,tie:false,tm:[newTeam(),newTeam()],tt:0,tq:[-1,-1],tw:-1,code}}
 function setPhase(ph,left){G.ph=ph;G.left=left;hostDeadline=Date.now()+left;allDoneAt=0}
 function commit(){G.v=(G.v||0)+1;if(mode==="online"){setMyPres({g:G});announce()}render()}
-function freshPl(p){p.s=0;p.w="000000";p.p=0;p.k=-1;p.d=0;p.gw=0;return p}
+function freshPl(p){p.s=0;p.w="000000";p.p=0;p.k=-1;p.d=0;p.gw=0;p.x=0;return p}
+function smallerTeam(){let a=0,b=0;for(const p of G.pl){if(p.t===0)a++;else if(p.t===1)b++}return a<=b?0:1}
+function ensureTeams(){let ch=false;for(const p of G.pl)if(p.t!==0&&p.t!==1){p.t=smallerTeam();ch=true}return ch}
+function shuffleTeams(){const first=Math.random()<.5?0:1;shuffled(G.pl).forEach((p,i)=>{p.t=(i+first)%2})}
 function syncPlayers(){
   if(!G||mode!=="online")return;
   let changed=false;const act=IO.active();
   if(G.ph==="lobby"){const before=G.pl.length;G.pl=G.pl.filter(p=>act.has(p.i));if(G.pl.length!==before)changed=true}
   for(const p of peers){
     if(p.kind!=="viewer"||typeof p.presence.n!=="string")continue;
-    const ex=plOf(p.peer),n=clean(p.presence.n)||"Player",c=(p.presence.c|0)%PCOL.length;
-    if(ex){if(ex.n!==n||ex.c!==c){ex.n=n;ex.c=c;changed=true}}
-    else if(G.pl.length<MAXP&&G.ph!=="over"){G.pl.push(freshPl({i:p.peer,n,c}));changed=true}
+    const ex=plOf(p.peer),n=clean(p.presence.n)||"Oyuncu",c=(p.presence.c|0)%PCOL.length,tr=p.presence.tr;
+    const trOk=tr&&typeof tr==="object"&&typeof tr.s==="number"&&(tr.t===0||tr.t===1);
+    if(ex){
+      if(ex.n!==n||ex.c!==c){ex.n=n;ex.c=c;changed=true}
+      // takım değiştirme isteği: yalnızca lobide uygulanır
+      if(trOk&&tr.s!==ex.ts&&G.ph==="lobby"){ex.t=tr.t;ex.ts=tr.s;changed=true}
+    }
+    else if(G.pl.length<MAXP&&G.ph!=="over"){const np=freshPl({i:p.peer,n,c});np.t=trOk?tr.t:smallerTeam();np.ts=trOk?tr.s:0;G.pl.push(np);changed=true}
   }
+  if(ensureTeams())changed=true;
   if(changed)commit();
+}
+function teamTurn(t){
+  const act=IO.active();
+  for(const tt of [t,1-t]){
+    const list=G.pl.filter(p=>p.t===tt&&act.has(p.i));
+    if(list.length){G.tq[tt]=(G.tq[tt]+1)%list.length;const p=list[G.tq[tt]];G.tt=tt;G.pk=p.i;G.pi=G.pl.indexOf(p);return}
+  }
 }
 function startGame(){
   if(!G)return;
   if(mode==="online"){const act=IO.active();G.pl=G.pl.filter(p=>act.has(p.i))}
   if(!G.pl.length)return;
-  G.pl.forEach(freshPl);G.seed=(Math.random()*2**31)|0;G.u=[];G.r=1;G.win=null;G.fx=null;
-  G.pi=0;G.pk=G.pl[0].i;localAns={};localPick=null;
+  if(!validK(G.set.k))G.set.k=DEF_K.slice();
+  if(kCount(G.set.k)<6){G.set.k=fullK(G.set.k);settings.k=G.set.k.slice();store.set("set",settings);toast("Boş dilimlere rastgele kategori kondu.")}
+  G.pl.forEach(freshPl);G.seed=(Math.random()*2**31)|0;G.r=1;G.win=null;G.tie=false;G.tw=-1;G.fx=null;
+  G.tm=[newTeam(),newTeam()];G.tq=[-1,-1];localAns={};localPick=null;
+  if(teamOn()){ensureTeams();if(!G.pl.some(p=>p.t===0)||!G.pl.some(p=>p.t===1))shuffleTeams();teamTurn(Math.random()<.5?0:1)}
+  else{G.pi=0;G.pk=G.pl[0].i}
   setPhase("pick",mode==="online"?12000:0);commit();
 }
-function autoCat(id){const p=plOf(id);const need=[0,1,2,3,4,5].filter(i=>!p||p.w[i]!=="2");const pool=need.length?need:[0,1,2,3,4,5];return pool[Math.floor(Math.random()*pool.length)]}
-function pickQ(c){
+function autoCat(id){const w=wOf(plOf(id))||"000000";const need=[0,1,2,3,4,5].filter(i=>w[i]!=="2");const pool=need.length?need:[0,1,2,3,4,5];return pool[Math.floor(Math.random()*pool.length)]}
+function pickQ(slot){
+  const c=G.set.k[slot],all=byCat[c]&&byCat[c].length?byCat[c]:QS.map((_,i)=>i);
   const x=G.set.x,used=new Set(G.u),reg=i=>x==="mix"||(x==="t"?QS[i][1]==="t":QS[i][1]==="g");
-  let pool=byCat[c].filter(i=>reg(i)&&!used.has(i));
-  if(!pool.length)pool=byCat[c].filter(i=>!used.has(i));
-  if(!pool.length)pool=byCat[c].slice();
-  // in Mixed, lean toward a Türkiye question about 45% of the time
+  let pool=all.filter(i=>reg(i)&&!used.has(i));
+  if(!pool.length)pool=all.filter(i=>!used.has(i));
+  if(!pool.length)pool=all.slice();
+  // Karışık'ta sorular yaklaşık %45 Türkiye ağırlıklı
   if(x==="mix"){const t=pool.filter(i=>QS[i][1]==="t"),g=pool.filter(i=>QS[i][1]==="g");if(t.length&&g.length)pool=Math.random()<.45?t:g}
   return pool[Math.floor(Math.random()*pool.length)];
 }
-function chooseCat(c){G.cat=c;G.qid=pickQ(c);G.u.push(G.qid);if(G.u.length>60)G.u=G.u.slice(-60);setPhase("cat",2100);commit()}
+function chooseCat(c){G.cat=c;G.qid=pickQ(c);G.u.push(G.qid);if(G.u.length>120)G.u=G.u.slice(-120);setPhase("cat",2100);commit()}
 function toQuestion(){setPhase("q",G.set.t*1000);commit()}
 function scoreRound(){
-  const T=G.set.t*1000;let fastest=null,fms=1e9;
+  const T=G.set.t*1000,tO=teamOn();let fastest=null,fms=1e9;
   for(const p of G.pl){
-    const a=IO.ans(p.i);p.k=-1;p.d=0;p.gw=0;
+    const a=IO.ans(p.i);p.k=-1;p.d=0;p.gw=0;p.x=0;
     if(!a||a.r!==G.r||typeof a.c!=="number")continue;
     const pw=(a.p|0)&3,ff=(pw&1)&&!(p.p&1),dbl=(pw&2)&&!(p.p&2);
     p.p|=(ff?1:0)|(dbl?2:0);
-    p.k=a.c|0;p.x=dbl?1:0;
+    p.k=Math.max(0,Math.min(3,a.c|0));p.x=dbl?1:0;
     const ms=Math.max(0,Math.min(T,+a.ms||T));
     if(p.k===0){
       let pts=500+Math.round(500*(1-ms/T));if(dbl)pts*=2;
       p.s+=pts;p.d=pts;
-      const w=+p.w[G.cat],nw=p.i===G.pk?2:Math.min(2,w+1);
-      if(nw>w){p.w=p.w.slice(0,G.cat)+nw+p.w.slice(G.cat+1);p.gw=nw-w}
+      if(!tO){const w=+p.w[G.cat],nw=p.i===G.pk?2:Math.min(2,w+1);
+        if(nw>w){p.w=p.w.slice(0,G.cat)+nw+p.w.slice(G.cat+1);p.gw=nw-w}}
       if(ms<fms){fms=ms;fastest=p.i}
     }else if(dbl){const loss=Math.min(300,p.s);p.s-=loss;p.d=-loss}
+  }
+  if(tO){
+    // takımın en az yarısı doğru bilirse dilim takıma yazılır; puan, takımın tur ortalaması
+    const act=IO.active(),pk=plOf(G.pk);
+    G.tm.forEach((tm,ti)=>{
+      const mem=G.pl.filter(p=>p.t===ti&&(act.has(p.i)||p.k>=0));
+      const n=mem.length,c=mem.filter(p=>p.k===0).length;
+      tm.n=n;tm.c=c;tm.gw=0;tm.ok=n>0&&c*2>=n;
+      tm.d=n?Math.round(mem.reduce((s,p)=>s+p.d,0)/n):0;
+      if(tm.s+tm.d<0)tm.d=-tm.s;tm.s+=tm.d;
+      if(tm.ok){const w=+tm.w[G.cat],nw=pk&&pk.t===ti?2:Math.min(2,w+1);
+        if(nw>w){tm.w=tm.w.slice(0,G.cat)+nw+tm.w.slice(G.cat+1);tm.gw=nw-w}}
+    });
   }
   G.fx=fastest;setPhase("reveal",mode==="online"?7500:0);commit();
 }
 function nextRound(){
-  const full=p=>p.w==="222222";
-  if(G.set.m==="classic"){if(G.pl.some(full)||G.r>=40)return finish()}
+  const full=w=>w==="222222",tO=teamOn();
+  if(G.set.m==="classic"){if((tO?G.tm.some(t=>full(t.w)):G.pl.some(p=>full(p.w)))||G.r>=40)return finish()}
   else if(G.r>=G.set.n)return finish();
-  const act=IO.active(),n=G.pl.length;
-  for(let k=1;k<=n;k++){const j=(G.pi+k)%n;if(mode==="local"||act.has(G.pl[j].i)){G.pi=j;G.pk=G.pl[j].i;break}}
+  if(tO)teamTurn(1-G.tt);
+  else{const act=IO.active(),n=G.pl.length;
+    for(let k=1;k<=n;k++){const j=(G.pi+k)%n;if(mode==="local"||act.has(G.pl[j].i)){G.pi=j;G.pk=G.pl[j].i;break}}}
   G.r++;localAns={};localPick=null;
   setPhase("pick",mode==="online"?12000:0);commit();
 }
 function finish(){
-  const cnt=w=>[...w].filter(c=>c==="2").length;
-  const r=G.pl.slice().sort((a,b)=>G.set.m==="classic"?(cnt(b.w)-cnt(a.w))||(b.s-a.s):(b.s-a.s)||(cnt(b.w)-cnt(a.w)));
-  G.win=r.map(p=>p.i);setPhase("over",0);commit();
+  const cnt=w=>[...w].filter(c=>c==="2").length,cl=G.set.m==="classic";
+  const key=x=>cl?[cnt(x.w),x.s]:[x.s,cnt(x.w)];
+  const cmp=(a,b)=>{const A=key(a),B=key(b);return(B[0]-A[0])||(B[1]-A[1])};
+  const tO=teamOn();
+  const r=G.pl.slice().sort((a,b)=>tO?(b.s-a.s):cmp(a,b));
+  G.win=r.map(p=>p.i);
+  if(tO){const c=cmp(G.tm[0],G.tm[1]);G.tw=c<0?0:c>0?1:-1;G.tie=G.tw<0}
+  else G.tie=r.length>1&&cmp(r[0],r[1])===0;
+  setPhase("over",0);commit();
 }
-function toLobby(){G.ph="lobby";G.left=0;G.win=null;if(mode==="online")G.pl=G.pl.filter(p=>IO.active().has(p.i));G.pl.forEach(freshPl);commit()}
+function toLobby(){G.ph="lobby";G.left=0;G.win=null;G.tie=false;G.tw=-1;G.tm=[newTeam(),newTeam()];if(mode==="online")G.pl=G.pl.filter(p=>IO.active().has(p.i));G.pl.forEach(freshPl);commit()}
 function hostTick(){
   if(!G||!(isHost||mode==="local"))return;
   const now=Date.now();
@@ -689,11 +939,11 @@ function hostTick(){
 function startLoop(){if(!loop)loop=setInterval(hostTick,200)}
 function stopLoop(){clearInterval(loop);loop=null}
 
-// ───────── online plumbing ─────────
+// ───────── online tesisat ─────────
 function setMyPres(patch){Object.assign(myPres,patch);if(game)game.presence(patch).catch(()=>{})}
 function announce(){
   if(!room||!isHost||mode!=="online"||!G)return;
-  const info={code:G.code,n:clean(me.name)||"Host",c:G.pl.length,st:G.ph==="lobby"?"open":"playing"};
+  const info={code:G.code,n:clean(me.name)||"Ev sahibi",c:G.pl.length,st:G.ph==="lobby"?"open":"playing",tm:G.set.tm?1:0};
   const s=JSON.stringify(info);if(s!==lastAnn){lastAnn=s;room.presence({host:info}).catch(()=>{})}
 }
 function onGamePeers(ch){
@@ -702,7 +952,7 @@ function onGamePeers(ch){
   if(!isHost){
     let best=null;
     for(const p of peers){const g=p.presence&&p.presence.g;if(g&&typeof g==="object"&&Array.isArray(g.pl)&&(!best||g.v>best.v||(g.v===best.v&&p.peer<best.peer)))best=g}
-    if(best){G=best;hostGoneAt=0}
+    if(best){G=best;if(!validK(G.set&&G.set.k))G.set=Object.assign({},G.set,{k:DEF_K.slice()});if(!Array.isArray(G.tm))G.tm=[newTeam(),newTeam()];hostGoneAt=0}
   }else syncPlayers();
   render();
 }
@@ -716,23 +966,23 @@ function migrateCheck(){
   if(cands[0]&&cands[0]===myPeer){
     isHost=true;G=JSON.parse(JSON.stringify(G));
     setPhase(G.ph,G.ph==="pick"?12000:G.ph==="q"?G.set.t*1000:G.ph==="cat"?1500:G.ph==="reveal"?6000:0);
-    startLoop();commit();toast("The host left. You're hosting now.");
+    startLoop();commit();toast("Ev sahibi ayrıldı. Odayı artık sen yönetiyorsun.");
   }
 }
 setInterval(migrateCheck,700);
 
 async function enterGame(c,asHost){
   if(!room)return;
-  me.name=clean(me.name);if(!me.name){toast("Type your name first.");const f=$("#nm");f&&f.focus();return}
+  me.name=clean(me.name);if(!me.name){toast("Önce adını yaz.");const f=$("#nm");f&&f.focus();return}
   store.set("name",me.name);
   code=c.toUpperCase();mode="online";isHost=asHost;G=null;myPeer=null;peers=[];peerMap=new Map();myPres={};hostGoneAt=0;joinedAt=Date.now();
   render();
   try{game=await room.join("dilim-"+code.toLowerCase())}
-  catch(e){game=null;mode="home";render();toast(e&&e.code==="limit_reached"?"Too many rooms open right now. Try again in a moment.":"Couldn't open that room. Try again.");return}
+  catch(e){game=null;mode="home";render();toast(e&&e.code==="limit_reached"?"Şu an çok fazla oda açık. Birazdan tekrar dene.":"Oda açılamadı. Tekrar dene.");return}
   myPres={n:me.name,c:me.col};
   if(asHost){G=newG();myPres.g=G;startLoop()}
   game.presence(myPres).catch(()=>{});
-  unsubPeers=game.onPeers(onGamePeers,()=>{toast("Lost the connection to the room.");leave(true)});
+  unsubPeers=game.onPeers(onGamePeers,()=>{toast("Odayla bağlantı koptu.");leave(true)});
   if(asHost)announce();
   render();
 }
@@ -744,18 +994,23 @@ function leave(silent){
   render();
 }
 
-
-// ───────── local play ─────────
+// ───────── tek cihaz ─────────
 function startLocal(){
-  const list=localPlayers.map((p,i)=>({n:clean(p.n)||`Player ${i+1}`,c:p.c|0}));
-  if(list.length<1)return;
-  store.set("lp",localPlayers);
+  let list;
+  if(settings.tm){
+    store.set("lt",localTeams);
+    list=localTeams.map((T,i)=>({n:clean(T.n)||TEAMS[i].n,hex:TEAMS[i].c,mem:cleanLong(T.m),t:i,tE:1}));
+  }else{
+    store.set("lp",localPlayers);
+    list=localPlayers.map((p,i)=>({n:clean(p.n)||`Oyuncu ${i+1}`,c:p.c|0}));
+  }
+  if(!list.length)return;
   mode="local";isHost=false;code="";G=newG();G.local=true;
-  G.pl=list.map((p,i)=>freshPl({i:"L"+i,n:p.n,c:p.c}));
+  G.pl=list.map((p,i)=>freshPl(Object.assign({i:"L"+i},p)));
   startLoop();startGame();
 }
 
-// ───────── player actions ─────────
+// ───────── oyuncu hamleleri ─────────
 function pickCat(c){
   if(!G||G.ph!=="pick"||ui.picked)return;
   if(myId()!==G.pk)return;
@@ -771,10 +1026,15 @@ function answer(orig){
   if(mode==="local")localAns[id]=a;else setMyPres({a});
   render();
 }
+function switchTeam(id){
+  const p=plOf(id||myPeer);if(!p||G.ph!=="lobby")return;
+  if(isHost){p.t=p.t===1?0:1;commit()}
+  else if(p.i===myPeer)setMyPres({tr:{t:p.t===1?0:1,s:Date.now()}});
+}
 function optOrder(){return shuffled([0,1,2,3],rng((G.seed^Math.imul(G.qid+7,2654435761))>>>0))}
 function ffGone(){const r=rng((G.seed+G.qid*31+5)>>>0);return shuffled([1,2,3],r).slice(0,2)}
 
-// ───────── rendering ─────────
+// ───────── çizim ─────────
 const main=$("#main");
 let cur={key:null,upd:null};
 function screenKey(){
@@ -800,184 +1060,255 @@ function render(){
 function renderTop(){
   $("#logo").replaceChildren(pieEl("222222",28));
   const r=$("#topR");r.replaceChildren();
-  if(mode==="online"&&code)r.append(h("span",{class:"chip",title:"Room code"},code));
-  if(mode==="local")r.append(h("span",{class:"chip"},"ONE DEVICE"));
-  r.append(h("button",{class:"ibtn",type:"button","aria-pressed":String(!muted),onclick:()=>{muted=!muted;store.set("muted",muted);renderTop()}},muted?"Sound off":"Sound on"));
+  if(mode==="online"&&code)r.append(h("span",{class:"chip",title:"Oda kodu"},code));
+  if(mode==="local")r.append(h("span",{class:"chip"},G&&G.set.tm?"TAKIMLAR":"TEK CİHAZ"));
+  r.append(h("button",{class:"ibtn",type:"button","aria-pressed":String(!muted),onclick:()=>{muted=!muted;store.set("muted",muted);renderTop()}},muted?"Ses kapalı":"Ses açık"));
   if(mode==="online"||mode==="local"||mode==="localsetup"){
     const armed=Date.now()-ui.leaveArm<3000;
     r.append(h("button",{class:"ibtn",type:"button",style:armed?"color:var(--bad);border-color:var(--bad)":"",onclick:()=>{
       if(mode==="localsetup"){mode="home";render();return}
       if(Date.now()-ui.leaveArm<3000){ui.leaveArm=0;leave()}else{ui.leaveArm=Date.now();renderTop();setTimeout(renderTop,3100)}
-    }},armed?"Tap again to leave":"Leave"));
+    }},armed?"Çıkmak için tekrar dokun":"Ayrıl"));
   }
-  // Back to the arcade launcher. Mid-game it needs a second tap, like Leave.
+  // Oyun salonuna dönüş. Oyun sırasında Ayrıl gibi ikinci dokunuş ister.
   if(window.KQuit&&KQuit.onSite){
     const qa=Date.now()-ui.quitArm<3000;
     r.append(h("button",{class:"ibtn",type:"button",style:qa?"color:var(--bad);border-color:var(--bad)":"",onclick:()=>{
       if(mode==="home"||qa){KQuit.go();return}
       ui.quitArm=Date.now();renderTop();setTimeout(renderTop,3100);
-    }},qa?"Tap again to quit":KQuit.LABEL));
+    }},qa?"Çıkmak için tekrar dokun":KQuit.LABEL));
   }
 }
 $("#brand").onclick=()=>{if(mode==="home")return;if(mode==="localsetup"){mode="home";render()}};
 
+function teamCards(opts){
+  opts=opts||{};const pk=plOf(G.pk);
+  return h("div",{class:"teams"},G.tm.map((T,ti)=>{
+    const turn=G.ph!=="lobby"&&G.ph!=="over"&&pk&&pk.t===ti;
+    const sub=opts.reveal?`${T.c}/${T.n} doğru · ${T.gw===2?"tam dilim":T.gw===1?"yarım dilim":T.ok?"dilim zaten vardı":"dilim yok"}`:null;
+    return h("div",{class:"tcard"+(turn?" turn":""),style:`--tc:${TEAMS[ti].c}`},pieEl(T.w,opts.reveal?36:40),
+      h("div",{class:"mid"},h("span",{class:"tn"},TEAMS[ti].n),sub?h("span",{class:"mem"},sub):h("span",{class:"sc"},fmt(T.s)+" puan")),
+      opts.reveal?h("span",{class:"d "+(T.d>0?"pos":T.d<0?"neg":"")},sign(T.d)):null)}));
+}
 function playerStrip(opts){
-  opts=opts||{};const wrap=h("div",{class:"strip"});if(!G)return wrap;
+  opts=opts||{};const box=h("div",{style:"display:flex;flex-direction:column;gap:8px"});if(!G)return box;
+  const tO=teamOn();if(tO&&!opts.noTeams)box.append(teamCards());
+  const wrap=h("div",{class:"strip"});box.append(wrap);
   const act=IO.active(),mine=myId();
   for(const p of G.pl){
     let cls="pc";if(p.i===G.pk&&G.ph!=="lobby")cls+=" turn";if(mode==="online"&&!act.has(p.i))cls+=" away";
     if(mode==="online"&&p.i===mine)cls+=" me";
     if(opts.answered){const a=IO.ans(p.i);if(a&&a.r===G.r)cls+=" done"}
-    wrap.append(h("div",{class:cls},disc(p),h("div",{class:"mid"},h("span",{class:"nm"},p.n),h("span",{class:"sc"},p.s.toLocaleString("en-US")+" pts")),pieEl(p.w,30)));
+    wrap.append(h("div",{class:cls},disc(p),
+      h("div",{class:"mid"},h("span",{class:"nm"},p.n),p.tE&&p.mem?h("span",{class:"mem"},p.mem):null,h("span",{class:"sc"},fmt(p.s)+" puan")),
+      tO?teamDot(p.t):pieEl(p.w,30)));
   }
-  return wrap;
+  return box;
 }
-function settingsBlock(editable,onChange){
+function settingsBlock(editable,onChange,opts){
+  opts=opts||{};
   const s=G?G.set:settings;const box=h("div",{class:"card"});
+  // yeni ev sahibi (ya da tek cihaz) ayarları G'deki hâlinden düzenler
+  const base=()=>{if(G&&mode==="online")Object.assign(settings,G.set,{k:G.set.k.slice()})};
+  const save=()=>{store.set("set",settings);onChange&&onChange()};
   const seg=(key,items)=>{const el=h("div",{class:"seg",role:"group"});
-    for(const[val,label]of items)el.append(h("button",{type:"button","aria-pressed":String(s[key]===val),disabled:!editable,onclick:()=>{settings[key]=val;store.set("set",settings);onChange&&onChange()}},label));return el};
+    for(const[val,label]of items)el.append(h("button",{type:"button","aria-pressed":String(s[key]===val),disabled:!editable,onclick:()=>{base();settings[key]=val;save()}},label));return el};
+  const k=s.k,nSel=kCount(k);
+  const chips=h("div",{class:"catgrid"},CATS.map((c,ci)=>{const slot=k.indexOf(ci);
+    return h("button",{class:"cchip",type:"button","aria-label":c.n,"aria-pressed":String(slot>=0),disabled:!editable,onclick:()=>{
+      base();const kk=settings.k.slice(),j=kk.indexOf(ci);
+      if(j>=0)kk[j]=-1;else{const e=kk.indexOf(-1);if(e<0){toast("Çarkta 6 dilim var. Önce birini çıkar.");return}kk[e]=ci}
+      settings.k=kk;save()}},
+      slot>=0?h("i",{class:"slot",style:`background:var(--c${slot})`}):null,catLabel(c))}));
+  const presets=h("div",{class:"presets"},
+    PRESETS.map(([nm,pk])=>h("button",{type:"button",disabled:!editable,onclick:()=>{base();settings.k=pk.slice();save()}},nm)),
+    h("button",{type:"button",disabled:!editable,onclick:()=>{base();settings.k=shuffled(CATS.map((_,i)=>i)).slice(0,6);save()}},"🎲 Rastgele"));
   box.append(
-    h("div",{class:"setting"},h("div",{},h("div",{class:"lbl"},"Mode"),h("div",{class:"sub"},s.m==="classic"?"First to fill all six wedges wins":`${s.n} rounds, most points wins`)),seg("m",[["classic","Classic"],["sprint","Sprint"]])),
-    h("div",{class:"setting"},h("div",{},h("div",{class:"lbl"},"Questions"),h("div",{class:"sub"},s.x==="mix"?"Global questions with a Türkiye streak":s.x==="t"?"Mostly about Türkiye":"Worldwide, no US focus")),seg("x",[["mix","Mixed"],["g","Global"],["t","Türkiye"]])),
-    h("div",{class:"setting"},h("div",{},h("div",{class:"lbl"},"Answer time")),seg("t",[[15,"15s"],[20,"20s"],[30,"30s"]]))
+    h("div",{class:"setting"},h("div",{},h("div",{class:"lbl"},"Çarktaki kategoriler"),h("div",{class:"sub"},nSel===6?"6 dilim hazır":`${nSel}/6 seçili · boş kalanlar rastgele dolar`)),editable?presets:null),
+    chips);
+  if(!opts.noTeam)box.append(h("div",{class:"setting"},h("div",{},h("div",{class:"lbl"},"Oyun tipi"),h("div",{class:"sub"},s.tm?"Turkuaz ve Mercan. Takımın en az yarısı bilirse dilim takıma.":"Herkes kendi dilimleri için oynar")),seg("tm",[[0,"Herkes kendine"],[1,"İki takım"]])));
+  box.append(
+    h("div",{class:"setting"},h("div",{},h("div",{class:"lbl"},"Mod"),h("div",{class:"sub"},s.m==="classic"?"Altı dilimi ilk dolduran kazanır":`${s.n} tur, en çok puan kazanır`)),seg("m",[["classic","Klasik"],["sprint","Sprint"]])),
+    h("div",{class:"setting"},h("div",{},h("div",{class:"lbl"},"Sorular"),h("div",{class:"sub"},s.x==="mix"?"Dünyadan sorular, bol Türkiye":s.x==="t"?"Çoğunlukla Türkiye":"Dünyadan, Türkiye'siz")),seg("x",[["mix","Karışık"],["g","Global"],["t","Türkiye"]])),
+    h("div",{class:"setting"},h("div",{},h("div",{class:"lbl"},"Cevap süresi")),seg("t",[[15,"15 sn"],[20,"20 sn"],[30,"30 sn"]]))
   );
   return box;
 }
 
 const BUILD={
 home(root){
-  const nameIn=h("input",{id:"nm",class:"field",maxlength:"16",placeholder:"Your name",autocomplete:"off",value:me.name,"aria-label":"Your name"});
+  const nameIn=h("input",{id:"nm",class:"field",maxlength:"16",placeholder:"Adın",autocomplete:"off",value:me.name,"aria-label":"Adın"});
   nameIn.addEventListener("input",()=>{me.name=nameIn.value;store.set("name",clean(me.name))});
-  const sw=h("div",{class:"sw",role:"group","aria-label":"Your colour"});
-  const drawSw=()=>{sw.replaceChildren(...PCOL.map((c,i)=>h("button",{type:"button",style:`background:${c}`,"aria-label":`Colour ${i+1}`,"aria-pressed":String(me.col===i),onclick:()=>{me.col=i;store.set("col",i);drawSw()}})))};drawSw();
-  const codeIn=h("input",{id:"code",class:"field code-in",maxlength:"4",placeholder:"CODE",autocomplete:"off","aria-label":"Room code"});
-  codeIn.addEventListener("input",()=>{codeIn.value=codeIn.value.toUpperCase().replace(/[^A-Z]/g,"")});
-  const joinBtn=h("button",{class:"btn ghost",type:"button",onclick:()=>{const c=codeIn.value.trim();if(c.length!==4){toast("Room codes are 4 letters.");codeIn.focus();return}enterGame(c,false)}},"Join");
+  const sw=h("div",{class:"sw",role:"group","aria-label":"Rengin"});
+  const drawSw=()=>{sw.replaceChildren(...PCOL.map((c,i)=>h("button",{type:"button",style:`background:${c}`,"aria-label":`Renk ${i+1}`,"aria-pressed":String(me.col===i),onclick:()=>{me.col=i;store.set("col",i);drawSw()}})))};drawSw();
+  const codeIn=h("input",{id:"code",class:"field code-in",maxlength:"4",placeholder:"KOD",autocomplete:"off","aria-label":"Oda kodu"});
+  codeIn.addEventListener("input",()=>{codeIn.value=codeIn.value.toLocaleUpperCase("en").replace(/[^A-Z]/g,"")});
+  const joinBtn=h("button",{class:"btn ghost",type:"button",onclick:()=>{const c=codeIn.value.trim();if(c.length!==4){toast("Oda kodu 4 harften oluşur.");codeIn.focus();return}enterGame(c,false)}},"Katıl");
   codeIn.addEventListener("keydown",e=>{if(e.key==="Enter")joinBtn.click()});
-  const hostBtn=h("button",{class:"btn big",type:"button",onclick:()=>{const L="ABCDEFGHJKLMNPRSTUVYZ";let c="";for(let i=0;i<4;i++)c+=L[Math.floor(Math.random()*L.length)];enterGame(c,true)}},"Host a room");
+  const hostBtn=h("button",{class:"btn big",type:"button",onclick:()=>{const L="ABCDEFGHJKLMNPRSTUVYZ";let c="";for(let i=0;i<4;i++)c+=L[Math.floor(Math.random()*L.length)];enterGame(c,true)}},"Oda kur");
   const games=h("div",{class:"games"});const onlineNote=h("p",{class:"muted",style:"margin:0;font-size:14px"});
-  const tCount=QS.filter(q=>q[1]==="t").length;
-  root.append(
+  add(root,
     h("section",{class:"hero"},
-      h("div",{},h("div",{class:"eyebrow"},"Six-wedge trivia · up to 10 players"),h("h1",{class:"display"},"Altı Dilim"),
-        h("p",{},`Spin the wheel, answer fast, fill your six slices. ${QS.length} questions from around the world, ${tCount} of them about Türkiye.`)),
+      h("div",{},h("div",{class:"eyebrow"},"Altı dilimli bilgi yarışması · 10 kişiye kadar"),h("h1",{class:"display"},"Altı Dilim"),
+        h("p",{},`Çarkı çevir, hızlı cevapla, altı dilimini doldur. ${CATS.length} kategori, ${QS.length} soru: oyunlardan brain rot'a, Türkiye'den dünyaya. Tek başına ya da iki takım halinde.`)),
       h("div",{class:"wheelwrap",html:wheelSVG({}).replace('class="rot"','class="rot spin-slow"')})),
     h("div",{class:"card"},
-      h("div",{class:"eyebrow"},"You"),
+      h("div",{class:"eyebrow"},"Sen"),
       h("div",{class:"row",style:"flex-wrap:nowrap"},nameIn),sw),
     h("div",{class:"card"},
-      h("div",{class:"eyebrow"},"Play online, everyone on their own phone"),
-      h("div",{class:"row"},hostBtn,h("span",{class:"muted"},"or"),codeIn,joinBtn),
+      h("div",{class:"eyebrow"},"Online oyna, herkes kendi telefonundan"),
+      h("div",{class:"row"},hostBtn,h("span",{class:"muted"},"ya da"),codeIn,joinBtn),
       onlineNote,games),
     h("div",{class:"card"},
-      h("div",{class:"eyebrow"},"Play on one device"),
-      h("p",{class:"muted",style:"margin:0"},"Pass the phone or laptop around. Players take turns, classic board-game style."),
-      h("div",{class:"row"},h("button",{class:"btn ghost",type:"button",onclick:()=>{mode="localsetup";render()}},"Set up players"))),
+      h("div",{class:"eyebrow"},"Tek cihazda oyna"),
+      h("p",{class:"muted",style:"margin:0"},"Telefonu ya da laptopu elden ele gezdirin. Sırayla oynayın; ister herkes kendine, ister iki takım halinde."),
+      h("div",{class:"row"},h("button",{class:"btn ghost",type:"button",onclick:()=>{mode="localsetup";render()}},"Oyuncuları ayarla"))),
     h("div",{class:"card"},
-      h("div",{class:"eyebrow"},"How it works"),
+      h("div",{class:"eyebrow"},"Nasıl oynanır"),
       h("ul",{class:"rules"},
-        h("li",{},h("b",{},"Each round one player spins. "),"They pick one of six categories. Everyone answers the same question at once."),
-        h("li",{},h("b",{},"Slices. "),"Answer right and you earn half a slice of that colour, or the whole slice if it was your pick. Two halves make a slice."),
-        h("li",{},h("b",{},"Points. "),"500 for a right answer, plus up to 500 for speed."),
-        h("li",{},h("b",{},"Once per game: "),"50:50 removes two wrong answers. Double or nothing doubles your points, or costs you 300 if you're wrong.")),
-      h("div",{class:"cats"},CATS.map((c,i)=>h("div",{class:"cat-tag"},h("i",{style:`background:var(--c${i})`}),c.n))))
+        h("li",{},h("b",{},"Her tur biri çarkı çevirir. "),"Altı kategoriden birini seçer, herkes aynı soruyu aynı anda cevaplar."),
+        h("li",{},h("b",{},"Dilimler. "),"Doğru cevap o rengin yarım dilimini verir; seçen sensen dilimin tamamı senin. İki yarım bir dilim eder."),
+        h("li",{},h("b",{},"Puanlar. "),"Doğru cevaba 500, hızına göre 500'e kadar bonus."),
+        h("li",{},h("b",{},"Oyunda bir kez: "),"50:50 iki yanlış şıkkı siler. Ya hep ya hiç puanını ikiye katlar, yanılırsan 300 puan götürür."),
+        h("li",{},h("b",{},"İki takım. "),"Turkuaz ve Mercan sırayla çevirir. Online'da takımın en az yarısı doğru bilirse dilim takıma yazılır, puan takımın ortalamasıdır. Tek cihazda takım kafa kafaya verip tek cevap seçer."),
+        h("li",{},h("b",{},"Kategoriler. "),`Odayı kuran, ${CATS.length} kategoriden 6'sını çarka koyar.`)),
+      h("div",{class:"cats"},CATS.map(c=>h("div",{class:"cat-tag"},catLabel(c)))))
   );
   return()=>{
     hostBtn.disabled=!room;joinBtn.disabled=!room;
     games.replaceChildren();
-    if(room===undefined){onlineNote.textContent="Connecting…";return}
-    if(!room){onlineNote.textContent="Couldn’t start online play. Check your connection and reload. You can still play on one device below.";return}
+    if(room===undefined){onlineNote.textContent="Bağlanıyor…";return}
+    if(!room){onlineNote.textContent="Online oyun başlatılamadı. Bağlantını kontrol edip sayfayı yenile. Aşağıdan tek cihazda oynayabilirsin.";return}
     const list=[];for(const p of room.peers()){const x=p.presence&&p.presence.host;if(!p.sameTab&&x&&/^[A-Z]{4}$/.test(x.code))list.push(x)}
-    onlineNote.textContent=list.length?"Open rooms right now:":"Host a room and share the 4-letter code. Open rooms also show up here for anyone with this page open.";
+    onlineNote.textContent=list.length?"Şu an açık odalar:":"Bir oda kur ve 4 harfli kodu paylaş. Açık odalar, bu sayfayı açan herkese burada da görünür.";
     for(const x of list.slice(0,8))games.append(h("div",{class:"game-row"},
-      h("div",{style:"min-width:0"},h("b",{},x.code)," ",h("span",{class:"muted"},`${clean(x.n)} · ${x.c|0}/10 · ${x.st==="open"?"in lobby":"playing"}`)),
-      h("button",{class:"btn ghost",type:"button",disabled:(x.c|0)>=MAXP,onclick:()=>enterGame(x.code,false)},(x.c|0)>=MAXP?"Full":"Join")));
+      h("div",{style:"min-width:0"},h("b",{},x.code)," ",h("span",{class:"muted"},`${clean(x.n)} · ${x.c|0}/10 · ${x.tm?"takımlı · ":""}${x.st==="open"?"lobide":"oyunda"}`)),
+      h("button",{class:"btn ghost",type:"button",disabled:(x.c|0)>=MAXP,onclick:()=>enterGame(x.code,false)},(x.c|0)>=MAXP?"Dolu":"Katıl")));
   };
 },
 localsetup(root){
-  const list=h("div",{class:"local-list"});
-  const draw=()=>{list.replaceChildren();localPlayers.forEach((p,i)=>{
-    const inp=h("input",{id:"lp"+i,class:"field",maxlength:"16",placeholder:`Player ${i+1}`,value:p.n,autocomplete:"off","aria-label":`Player ${i+1} name`});
-    inp.addEventListener("input",()=>{p.n=inp.value;store.set("lp",localPlayers)});
-    const d=h("button",{class:"disc",type:"button",style:`background:${pcol(p.c)};width:44px;height:44px;border:0`,"aria-label":"Change colour",onclick:()=>{p.c=(p.c+1)%PCOL.length;store.set("lp",localPlayers);draw()}},String(i+1));
-    list.append(h("div",{class:"local-row"},d,inp,localPlayers.length>1?h("button",{class:"xbtn",type:"button","aria-label":"Remove player",onclick:()=>{localPlayers.splice(i,1);draw()}},"×"):null));
-  });addBtn.disabled=localPlayers.length>=MAXP};
-  const addBtn=h("button",{class:"btn ghost",type:"button",onclick:()=>{const used=new Set(localPlayers.map(p=>p.c));let c=0;while(used.has(c)&&c<9)c++;localPlayers.push({n:"",c});draw();const f=$("#lp"+(localPlayers.length-1));f&&f.focus()}},"Add player");
-  const setBox=h("div");const drawSet=()=>setBox.replaceChildren(settingsBlock(true,drawSet));
-  draw();drawSet();
-  root.append(
-    h("div",{},h("div",{class:"eyebrow"},"One device"),h("h2",{class:"display",style:"font-size:clamp(28px,6vw,40px);margin-top:6px"},"Who's playing?")),
-    h("div",{class:"card"},list,h("div",{class:"row"},addBtn,h("span",{class:"muted",style:"font-size:14px"},"Tap a number to change colour. Up to 10."))),
+  const list=h("div",{class:"local-list"}),foot=h("div",{class:"row"}),typeBox=h("div"),setBox=h("div");
+  const addBtn=h("button",{class:"btn ghost",type:"button",onclick:()=>{const used=new Set(localPlayers.map(p=>p.c));let c=0;while(used.has(c)&&c<9)c++;localPlayers.push({n:"",c});draw();const f=$("#lp"+(localPlayers.length-1));f&&f.focus()}},"Oyuncu ekle");
+  const drawType=()=>{const el=h("div",{class:"seg",role:"group","aria-label":"Oyun tipi"});
+    for(const[v,l]of[[0,"Herkes kendine"],[1,"İki takım"]])el.append(h("button",{type:"button","aria-pressed":String(settings.tm===v),onclick:()=>{settings.tm=v;store.set("set",settings);drawType();draw()}},l));
+    typeBox.replaceChildren(el)};
+  const draw=()=>{
+    list.replaceChildren();foot.replaceChildren();
+    if(settings.tm){
+      list.append(h("div",{class:"tcols"},localTeams.map((T,i)=>{
+        const nm=h("input",{id:"lt"+i,class:"field",maxlength:"16",placeholder:TEAMS[i].n,value:T.n||"",autocomplete:"off","aria-label":`${i+1}. takımın adı`});
+        nm.addEventListener("input",()=>{T.n=nm.value;store.set("lt",localTeams)});
+        const mm=h("input",{class:"field",maxlength:"60",placeholder:"Oyuncular (isteğe bağlı)",value:T.m||"",autocomplete:"off","aria-label":`${i+1}. takımın oyuncuları`});
+        mm.addEventListener("input",()=>{T.m=mm.value;store.set("lt",localTeams)});
+        return h("div",{class:"tcol",style:`--tc:${TEAMS[i].c}`},h("h3",{},`${i+1}. takım`,h("i",{class:"tdot",style:`background:${TEAMS[i].c};width:14px;height:14px`})),nm,mm)})));
+      foot.append(h("span",{class:"muted",style:"font-size:14px"},"Takımlar sırayla çarkı çevirir. Soruyu takımca konuşup tek cevap verin."));
+      return;
+    }
+    localPlayers.forEach((p,i)=>{
+      const inp=h("input",{id:"lp"+i,class:"field",maxlength:"16",placeholder:`Oyuncu ${i+1}`,value:p.n,autocomplete:"off","aria-label":`${i+1}. oyuncunun adı`});
+      inp.addEventListener("input",()=>{p.n=inp.value;store.set("lp",localPlayers)});
+      const d=h("button",{class:"disc",type:"button",style:`background:${pcol(p.c)};width:44px;height:44px;border:0`,"aria-label":"Rengi değiştir",onclick:()=>{p.c=(p.c+1)%PCOL.length;store.set("lp",localPlayers);draw()}},String(i+1));
+      list.append(h("div",{class:"local-row"},d,inp,localPlayers.length>1?h("button",{class:"xbtn",type:"button","aria-label":"Oyuncuyu çıkar",onclick:()=>{localPlayers.splice(i,1);draw()}},"×"):null));
+    });
+    addBtn.disabled=localPlayers.length>=MAXP;
+    foot.append(addBtn,h("span",{class:"muted",style:"font-size:14px"},"Rengi değiştirmek için numaraya dokun. En fazla 10 kişi."));
+  };
+  const drawSet=()=>setBox.replaceChildren(settingsBlock(true,drawSet,{noTeam:true}));
+  drawType();draw();drawSet();
+  add(root,
+    h("div",{},h("div",{class:"eyebrow"},"Tek cihaz"),h("h2",{class:"display",style:"font-size:clamp(28px,6vw,40px);margin-top:6px"},"Kimler oynuyor?")),
+    h("div",{class:"card"},typeBox,list,foot),
     setBox,
-    h("div",{class:"row"},h("button",{class:"btn big",type:"button",onclick:startLocal},"Start game"))
+    h("div",{class:"row"},h("button",{class:"btn big",type:"button",onclick:startLocal},"Oyunu başlat"))
   );
 },
 waiting(root){
-  const msg=h("p",{class:"muted"},"Connecting to the room…");
-  root.append(h("div",{class:"card center",style:"padding-block:40px"},h("div",{class:"eyebrow"},"Room"),h("div",{class:"code-big"},code),msg));
-  return()=>{if(game&&Date.now()-joinedAt>6000)msg.textContent=`Nobody is hosting ${code} yet. Check the code with your host, or leave and host your own.`;};
+  const msg=h("p",{class:"muted"},"Odaya bağlanılıyor…");
+  add(root,h("div",{class:"card center",style:"padding-block:40px"},h("div",{class:"eyebrow"},"Oda"),h("div",{class:"code-big"},code),msg));
+  return()=>{if(game&&Date.now()-joinedAt>6000)msg.textContent=`${code} odasını henüz kimse açmamış. Kodu ev sahibine sor ya da çıkıp kendi odanı kur.`;};
 },
 lobby(root){
-  const plist=h("div",{class:"plist"}),setBox=h("div"),actions=h("div",{class:"row"}),head=h("p",{class:"muted",style:"margin:0"});
-  root.append(
+  const plist=h("div"),setBox=h("div"),actions=h("div",{class:"row"}),head=h("p",{class:"muted",style:"margin:0"});
+  add(root,
     h("div",{class:"card center",style:"padding-block:26px"},
-      h("div",{class:"eyebrow"},"Room code"),h("div",{class:"code-big"},code),head),
-    h("div",{class:"card"},h("div",{class:"row",style:"justify-content:space-between"},h("div",{class:"eyebrow"},"Players"),h("span",{class:"eyebrow",id:"pcount"})),plist),
+      h("div",{class:"eyebrow"},"Oda kodu"),h("div",{class:"code-big"},code),head),
+    h("div",{class:"card"},h("div",{class:"row",style:"justify-content:space-between"},h("div",{class:"eyebrow"},"Oyuncular"),h("span",{class:"eyebrow",id:"pcount"})),plist),
     setBox,actions);
   return()=>{
-    const host=isHost;
-    head.textContent=host?"Send friends this page’s link and tell them the code. They join from the home screen.":"You're in. The host will start the game.";
-    plist.replaceChildren();const act=IO.active();
-    for(const p of G.pl)plist.append(h("div",{class:"pslot"},disc(p),h("span",{class:"nm"},p.n),p.i===myPeer?h("span",{class:"tag"},"You"):null));
-    for(let i=G.pl.length;i<Math.min(MAXP,Math.max(G.pl.length+1,4));i++)plist.append(h("div",{class:"pslot empty"},"Waiting for a player…"));
+    const host=isHost,tm=!!G.set.tm,mineP=plOf(myPeer);
+    head.textContent=host?"Arkadaşlarına bu sayfanın linkini at ve kodu söyle. Ana ekrandan katılırlar.":"İçeridesin. Oyunu ev sahibi başlatacak.";
+    plist.replaceChildren();
+    const slot=p=>{const kids=[disc(p),h("span",{class:"nm"},p.n),p.i===myPeer?h("span",{class:"tag"},"Sen"):null];
+      const cls="pslot"+(p.i===myPeer?" me":"");
+      return tm&&host?h("button",{class:cls,type:"button",title:"Diğer takıma taşı",onclick:()=>switchTeam(p.i)},...kids):h("div",{class:cls},...kids)};
+    if(tm){
+      plist.className="tcols";
+      for(let ti=0;ti<2;ti++){const mem=G.pl.filter(p=>p.t===ti);
+        plist.append(h("div",{class:"tcol",style:`--tc:${TEAMS[ti].c}`},h("h3",{},h("span",{},TEAMS[ti].n),h("span",{class:"tag",style:"margin:0"},String(mem.length))),
+          mem.map(slot),mem.length?null:h("div",{class:"pslot empty"},"Henüz kimse yok")))}
+    }else{
+      plist.className="plist";
+      for(const p of G.pl)plist.append(slot(p));
+      for(let i=G.pl.length;i<Math.min(MAXP,Math.max(G.pl.length+1,4));i++)plist.append(h("div",{class:"pslot empty"},"Oyuncu bekleniyor…"));
+    }
     $("#pcount").textContent=`${G.pl.length} / ${MAXP}`;
-    if(!plOf(myPeer)&&G.pl.length>=MAXP&&myPeer)head.textContent="This room is full. You can watch.";
-    setBox.replaceChildren(settingsBlock(host,()=>{G.set=Object.assign({},settings);commit()}));
-    actions.replaceChildren(host?h("button",{class:"btn big",type:"button",onclick:startGame},G.pl.length<2?"Start solo":`Start game · ${G.pl.length} players`):h("span",{class:"muted"},"Waiting for the host to start…"));
-    void act;
+    if(!mineP&&G.pl.length>=MAXP&&myPeer)head.textContent="Bu oda dolu. İzleyebilirsin.";
+    setBox.replaceChildren(settingsBlock(host,()=>{G.set=Object.assign({},settings,{k:settings.k.slice()});if(G.set.tm)ensureTeams();commit()}));
+    actions.replaceChildren();
+    if(tm&&mineP)actions.append(h("button",{class:"btn ghost",type:"button",onclick:()=>switchTeam(myPeer)},"Takım değiştir"));
+    if(tm&&host)actions.append(h("button",{class:"btn ghost",type:"button",onclick:()=>{shuffleTeams();commit()}},"🎲 Takımları karıştır"));
+    if(host){const ok=!tm||G.pl.length>=2;
+      actions.prepend(h("button",{class:"btn big",type:"button",disabled:!ok,onclick:startGame},tm?(ok?`Başlat · ${G.pl.length} kişi, 2 takım`:"Takım için en az 2 kişi lazım"):G.pl.length<2?"Tek başına başla":`Başlat · ${G.pl.length} oyuncu`))}
+    else actions.append(h("span",{class:"muted"},"Ev sahibinin başlatması bekleniyor…"));
   };
 },
 pick(root){
-  const pk=plOf(G.pk),mine=myId()===G.pk;
+  const pk=plOf(G.pk),mine=myId()===G.pk,tO=teamOn(),tL=teamLocal(),meP=plOf(myId());
   const timer=h("div",{class:"tbar","data-timer":"bar"},h("i"));
   const holder=h("div");
-  const spin=h("button",{class:"btn ghost",type:"button",onclick:()=>pickCat(autoCat(G.pk))},"Spin for me");
+  const spin=h("button",{class:"btn ghost",type:"button",onclick:()=>pickCat(autoCat(G.pk))},"🎲 Rastgele çevir");
   const sub=h("p",{class:"muted",style:"margin:0;max-width:46ch"});
-  root.append(
-    h("div",{class:"qhead"},h("span",{class:"eyebrow"},`Round ${G.r}${G.set.m==="sprint"?" of "+G.set.n:""}`),h("div",{class:"timer","data-timer":"num"})),
+  const title=mine?(mode==="local"?(tL?`${pk.n}, kategori seçin`:`${pk.n}, kategori seç`):"Seçim senin"):`${pk?pk.n:"Biri"} seçiyor`;
+  add(root,
+    h("div",{class:"qhead"},h("span",{class:"eyebrow"},`Tur ${G.r}${G.set.m==="sprint"?" / "+G.set.n:""}`),h("div",{class:"timer","data-timer":"num"})),
     G.left?timer:null,
     h("div",{class:"center"},
-      mode==="local"?h("div",{class:"pass"},`Pass the device to ${pk?pk.n:"the next player"}`):null,
-      h("h2",{class:"display pick-h"},mine?(mode==="local"?`${pk.n}, pick a category`:"Your pick"):`${pk?pk.n:"Someone"} is choosing`),
+      mode==="local"?h("div",{class:"pass"},tL?`Telefonu şu takıma verin: ${pk?pk.n:""}`:`Telefonu şu kişiye ver: ${pk?pk.n:""}`):null,
+      h("h2",{class:"display pick-h"},title),
+      tO&&pk?h("span",{class:"tpill",style:`--tc:${TEAMS[pk.t].c}`},`${TEAMS[pk.t].n} takımı için`):null,
       sub,holder,mine?spin:null),
     playerStrip());
-  holder.innerHTML=wheelSVG({live:mine,w:pk&&pk.w});
+  holder.innerHTML=wheelSVG({live:mine,w:wOf(pk)});
   if(mine)holder.querySelectorAll(".slice").forEach(s=>{const c=+s.dataset.cat;s.addEventListener("click",()=>pickCat(c));s.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();pickCat(c)}})});
   return()=>{
-    sub.textContent=mine?(ui.picked?"Spinning…":"Get it right and the whole slice is yours. Everyone else plays for half."):"Everyone answers this one. Right answers earn half a slice.";
-    spin.disabled=ui.picked;
+    let t;
+    if(mine&&ui.picked)t="Çark dönüyor…";
+    else if(mine)t=tO?"Takımının en az yarısı doğru bilirse dilimin tamamı takımına yazılır.":tL?"Doğru bilirseniz dilimin tamamı sizin.":mode==="local"?"Doğru bilirsen dilimin tamamı senin.":"Doğru bilirsen dilimin tamamı senin. Diğerleri yarımı için oynar.";
+    else if(tO&&meP&&pk)t=meP.t===pk.t?"Takım arkadaşın seçiyor. Yarınız doğru bilirse tam dilim!":"Rakip takım seçiyor. Yarınız doğru bilirse yarım dilim kaparsınız.";
+    else t="Bu soruyu herkes cevaplar. Doğru cevap yarım dilim kazandırır.";
+    sub.textContent=t;spin.disabled=ui.picked;
   };
 },
 cat(root){
-  const c=G.cat,holder=h("div");
-  root.append(
-    h("div",{class:"qhead"},h("span",{class:"eyebrow"},`Round ${G.r}`)),
-    h("div",{class:"center"},holder,h("div",{class:"catpill",style:`--cat:var(--c${c})`,id:"catpill"},CATS[c].n)),
+  const c=G.cat,holder=h("div"),C=CATS[G.set.k[c]];
+  add(root,
+    h("div",{class:"qhead"},h("span",{class:"eyebrow"},`Tur ${G.r}`)),
+    h("div",{class:"center"},holder,h("div",{class:"catpill",style:`--cat:var(--c${c})`,id:"catpill"},catLabel(C))),
     playerStrip());
   holder.innerHTML=wheelSVG({});
   const rot=holder.querySelector(".rot"),target=-(c*60+30)-1080;
   requestAnimationFrame(()=>requestAnimationFrame(()=>{rot.style.transform=`rotate(${target}deg)`}));
 },
 q(root){
-  const q=QS[G.qid],c=G.cat,ord=optOrder(),gone=ffGone();
+  const q=QS[G.qid],c=G.cat,ord=optOrder(),gone=ffGone(),C=CATS[G.set.k[c]];
   root.style.setProperty("--cat",`var(--c${c})`);
   const btns=ord.map((o,idx)=>h("button",{class:"opt",type:"button","data-o":o,onclick:()=>answer(o)},h("span",{class:"l"},"ABCD"[idx]),h("span",{class:"t"},q[3+o])));
-  const ffB=h("button",{class:"pwb",type:"button",onclick:()=>{ui.ff=true;render()}},h("b",{},"50:50"),"Remove two");
-  const dbB=h("button",{class:"pwb",type:"button",onclick:()=>{ui.dbl=!ui.dbl;render()}},h("b",{},"×2"),"Double or nothing");
+  const ffB=h("button",{class:"pwb",type:"button",onclick:()=>{ui.ff=true;render()}},h("b",{},"50:50"),"İki şık sil");
+  const dbB=h("button",{class:"pwb",type:"button",onclick:()=>{ui.dbl=!ui.dbl;render()}},h("b",{},"×2"),"Ya hep ya hiç");
   const status=h("div",{class:"status",role:"status"});const stripBox=h("div");
   const me_=plOf(myId());
-  root.append(
-    h("div",{class:"qhead"},h("span",{class:"catpill"},CATS[c].n),h("span",{class:"eyebrow"},`Round ${G.r}`+(mode==="local"&&plOf(G.pk)?` · ${plOf(G.pk).n}`:"")),h("div",{class:"timer","data-timer":"num"})),
+  add(root,
+    h("div",{class:"qhead"},h("span",{class:"catpill"},catLabel(C)),h("span",{class:"eyebrow"},`Tur ${G.r}`+(mode==="local"&&plOf(G.pk)?` · ${plOf(G.pk).n}`:"")),h("div",{class:"timer","data-timer":"num"})),
     h("div",{class:"tbar","data-timer":"bar"},h("i")),
     h("h2",{class:"qtext"},q[2]),
     h("div",{class:"opts"},btns),
@@ -988,78 +1319,99 @@ q(root){
     for(const b of btns){const o=+b.dataset.o;b.disabled=!p||locked;b.classList.toggle("gone",ui.ff&&gone.includes(o));b.classList.toggle("chosen",locked&&ui.ans.c===o)}
     if(p){ffB.disabled=locked||ui.ff||!!(p.p&1);ffB.setAttribute("aria-pressed",String(ui.ff));
       dbB.disabled=locked||!!(p.p&2);dbB.setAttribute("aria-pressed",String(ui.dbl));
-      if(p.p&1&&!ui.ff)ffB.title="Already used";if(p.p&2)dbB.title="Already used"}
+      if(p.p&1&&!ui.ff)ffB.title="Zaten kullanıldı";if(p.p&2)dbB.title="Zaten kullanıldı"}
     const n=G.pl.filter(x=>{const a=IO.ans(x.i);return a&&a.r===G.r}).length;
     status.replaceChildren();
-    if(!p)status.append("You're watching this round.");
-    else if(locked)status.append(h("b",{},"Locked in."),mode==="online"?` Waiting for others · ${n}/${IO.active().size} answered`:"");
-    else if(ui.dbl)status.append(h("b",{},"Double or nothing is on."));
+    if(!p)status.append("Bu turu izliyorsun.");
+    else if(locked)status.append(h("b",{},"Kilitlendi."),mode==="online"?` Diğerleri bekleniyor · ${n}/${IO.active().size} cevapladı`:"");
+    else if(ui.dbl)status.append(h("b",{},"Ya hep ya hiç açık."));
     stripBox.replaceChildren(playerStrip({answered:mode==="online"}));
   };
 },
 reveal(root){
-  const q=QS[G.qid],c=G.cat,ord=optOrder(),mine=myId();
+  const q=QS[G.qid],c=G.cat,ord=optOrder(),mine=myId(),tO=teamOn(),tL=teamLocal(),C=CATS[G.set.k[c]];
   root.style.setProperty("--cat",`var(--c${c})`);
   const mp=plOf(mine);
   const opts=ord.map((o,idx)=>{let cls="opt";if(o===0)cls+=" correct";else if(mp&&mp.k===o)cls+=" wrong";else cls+=" dim";
     const who=G.pl.filter(p=>p.k===o);
     return h("div",{class:cls},h("span",{class:"l"},"ABCD"[idx]),h("span",{class:"t"},q[3+o]),who.length&&mode==="online"?h("span",{class:"who"},who.map(disc)):null)});
   let head;
-  if(mp&&mp.k===0)head=`Right! +${mp.d}`;else if(mp&&mp.k>0)head=mp.d<0?`Wrong. ${mp.d} for doubling`:"Not this time";else if(mp)head="Time's up";else head="Answer";
-  const rows=G.pl.slice().sort((a,b)=>(b.d-a.d)||(b.s-a.s)).map(p=>{
-    const note=p.k===0?(p.gw===2?`Full ${CATS[c].n} slice`:p.gw===1?"Half slice":"Already had this slice"):p.k>0?"Wrong answer":"No answer";
-    return h("div",{class:"res"},disc(p),h("span",{class:"nm"},p.n,p.i===G.fx?h("span",{class:"badge"},"Fastest"):null,p.x&&p.k>=0?h("span",{class:"badge"},"×2"):null),
-      h("span",{class:"d "+(p.d>0?"pos":p.d<0?"neg":"")},p.d>0?`+${p.d}`:p.d<0?String(p.d):"0"),
+  if(mp&&mp.k===0)head=`${pickOne(tL?["Doğru!","Bildiniz!","Kralsınız!","Efsane!","Aura +1000"]:["Doğru!","Bildin!","Kralsın!","Efsane!","Aura +1000"])} +${fmt(mp.d)}`;
+  else if(mp&&mp.k>0)head=mp.d<0?`Yanlış. ×2 cezası: ${sign(mp.d)}`:pickOne(["Olmadı be","Yanlış!","Bu sefer olmadı","Aura −500","Yok artık"]);
+  else if(mp)head="Süre doldu";else head="Cevap";
+  // tek cihazda turu yalnızca sırası gelen oynar
+  const rows=(mode==="local"?[plOf(G.pk)].filter(Boolean):G.pl.slice().sort((a,b)=>(b.d-a.d)||(b.s-a.s))).map(p=>{
+    const note=tO?(p.k===0?"Doğru":p.k>0?"Yanlış":"Cevap yok")
+      :p.k===0?(p.gw===2?`Tam ${C.n} dilimi`:p.gw===1?"Yarım dilim":"Bu dilim zaten vardı"):p.k>0?"Yanlış cevap":"Cevap yok";
+    return h("div",{class:"res"},disc(p),h("span",{class:"nm"},p.n,tO?teamDot(p.t):null,p.i===G.fx&&mode==="online"?h("span",{class:"badge"},"En hızlı"):null,p.x&&p.k>=0?h("span",{class:"badge"},"×2"):null),
+      h("span",{class:"d "+(p.d>0?"pos":p.d<0?"neg":"")},sign(p.d)),
       h("span",{class:"note"},note))});
   const foot=h("div",{class:"row"});
-  root.append(
-    h("div",{class:"qhead"},h("span",{class:"catpill"},CATS[c].n),h("span",{class:"eyebrow"},`Round ${G.r}`),h("div",{class:"timer","data-timer":"num"})),
+  add(root,
+    h("div",{class:"qhead"},h("span",{class:"catpill"},catLabel(C)),h("span",{class:"eyebrow"},`Tur ${G.r}`),h("div",{class:"timer","data-timer":"num"})),
     h("h2",{class:"display",style:`font-size:clamp(26px,6vw,40px);color:${mp&&mp.k===0?"var(--good)":"var(--paper)"}`},head),
     h("p",{class:"qtext",style:"font-size:clamp(18px,3.6vw,22px);color:var(--muted)"},q[2]),
     h("div",{class:"opts"},opts),
+    tO?teamCards({reveal:true}):null,
     h("div",{class:"results"},rows),
-    foot,playerStrip());
+    foot,playerStrip({noTeams:true}));
   if(mode==="local"){
-    const nextP=(()=>{const n=G.pl.length;return G.pl[(G.pi+1)%n]})();
-    foot.append(h("button",{class:"btn big",type:"button",onclick:nextRound},`Next · ${nextP?nextP.n+"'s turn":"continue"}`));
-  }else foot.append(h("span",{class:"muted"},"Next round starts in a moment…"));
+    const nextP=G.pl[(G.pi+1)%G.pl.length];
+    foot.append(h("button",{class:"btn big",type:"button",onclick:nextRound},`Devam · Sıra: ${nextP?nextP.n:"sonraki"}`));
+  }else foot.append(h("span",{class:"muted"},"Sonraki tur birazdan…"));
 },
 over(root){
-  const ranked=(G.win||[]).map(plOf).filter(Boolean);const w=ranked[0];
-  const cnt=x=>[...x.w].filter(c=>c==="2").length;
-  root.append(
-    h("div",{class:"center",style:"padding-block:10px"},
-      w?pieEl(w.w,120):null,
-      h("div",{class:"eyebrow"},G.set.m==="classic"?(cnt(w||{w:""})===6?"All six slices":"Most slices"):"Highest score"),
-      h("h2",{class:"display",style:"font-size:clamp(34px,8vw,60px)"},w?`${w.n} wins!`:"Game over")),
-    h("div",{class:"podium"},ranked.map((p,i)=>h("div",{class:"rank"+(i===0?" first":"")},
-      h("span",{class:"n"},String(i+1)),disc(p),h("span",{style:"font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"},p.n),pieEl(p.w,28),h("span",{class:"sc"},p.s.toLocaleString("en-US"))))),
+  const ranked=(G.win||[]).map(plOf).filter(Boolean),tO=teamOn(),cl=G.set.m==="classic";
+  const cnt=x=>[...(x||"")].filter(c=>c==="2").length;
+  const rankRow=(i,first,dot,name,w,score,extra)=>h("div",{class:"rank"+(first?" first":"")},
+    h("span",{class:"n"},String(i+1)),dot,h("span",{style:"font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"},name,extra||null),w!=null?pieEl(w,28):h("span"),h("span",{class:"sc"},fmt(score)));
+  let hero,eyebrow,title,list;
+  if(tO){
+    const tw=G.tw,T=tw>=0?G.tm[tw]:null;
+    hero=pieEl(T?T.w:"000000",120);
+    eyebrow=cl?(T&&cnt(T.w)===6?"Altı dilimin hepsi":"En çok dilim"):"En yüksek puan";
+    title=G.tie?"Berabere!":`${TEAMS[tw].n} kazandı!`;
+    const order=tw===1?[1,0]:[0,1];
+    list=[h("div",{class:"podium"},order.map((ti,i)=>rankRow(i,!G.tie&&i===0,h("div",{class:"disc",style:`background:${TEAMS[ti].c}`},TEAMS[ti].n[0]),TEAMS[ti].n,G.tm[ti].w,G.tm[ti].s))),
+      h("div",{class:"eyebrow",style:"margin-top:6px"},"Oyuncular"),
+      h("div",{class:"podium"},ranked.map((p,i)=>rankRow(i,false,disc(p),p.n,null,p.s,[teamDot(p.t),i===0&&p.s>0?h("span",{class:"badge"},"MVP"):null])))];
+  }else{
+    const w=ranked[0];
+    hero=w?pieEl(w.w,120):null;
+    eyebrow=cl?(cnt(w&&w.w)===6?"Altı dilimin hepsi":"En çok dilim"):"En yüksek puan";
+    title=G.tie?"Berabere!":w?`${w.n} kazandı!`:"Oyun bitti";
+    list=[h("div",{class:"podium"},ranked.map((p,i)=>rankRow(i,!G.tie&&i===0,disc(p),p.n,p.w,p.s)))];
+  }
+  add(root,
+    h("div",{class:"center",style:"padding-block:10px"},hero,h("div",{class:"eyebrow"},eyebrow),
+      h("h2",{class:"display",style:"font-size:clamp(34px,8vw,60px)"},title)),
+    ...list,
     h("div",{class:"row",style:"justify-content:center"},
       (isHost||mode==="local")?[
-        h("button",{class:"btn big",type:"button",onclick:startGame},"Rematch"),
-        mode==="local"?h("button",{class:"btn ghost",type:"button",onclick:()=>{stopLoop();G=null;mode="localsetup";render()}},"Change players")
-          :h("button",{class:"btn ghost",type:"button",onclick:toLobby},"Back to lobby")]
-      :h("span",{class:"muted"},"Waiting for the host to start a rematch…")));
+        h("button",{class:"btn big",type:"button",onclick:startGame},"Rövanş"),
+        mode==="local"?h("button",{class:"btn ghost",type:"button",onclick:()=>{stopLoop();G=null;mode="localsetup";render()}},"Oyuncuları değiştir")
+          :h("button",{class:"btn ghost",type:"button",onclick:toLobby},"Lobiye dön")]
+      :h("span",{class:"muted"},"Ev sahibinin rövanşı başlatması bekleniyor…")));
 }
 };
 
-// timer loop
+// zamanlayıcı
 function frame(){
   if(G&&(G.ph==="q"||G.ph==="pick"||G.ph==="reveal")&&G.left){
     const rem=Math.max(0,ui.phaseStart+G.left-Date.now()),p=rem/G.left;
     document.querySelectorAll('[data-timer="bar"]').forEach(b=>{b.style.setProperty("--p",p.toFixed(3));b.classList.toggle("low",G.ph==="q"&&rem<5000)});
-    document.querySelectorAll('[data-timer="num"]').forEach(n=>{n.textContent=G.ph==="reveal"?"":Math.ceil(rem/1000)+"s"});
+    document.querySelectorAll('[data-timer="num"]').forEach(n=>{n.textContent=G.ph==="reveal"?"":Math.ceil(rem/1000)+" sn"});
   }else document.querySelectorAll('[data-timer="num"]').forEach(n=>{n.textContent=""});
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
-// keyboard: A–D or 1–4 to answer
+// klavye: A–D ya da 1–4 ile cevap
 document.addEventListener("keydown",e=>{
   if(!G||G.ph!=="q"||ui.ans||e.target.closest("input"))return;
-  const k=e.key.toUpperCase();let idx="ABCD".indexOf(k);if(idx<0)idx="1234".indexOf(k);if(idx<0)return;
+  const k=e.key.toLocaleUpperCase("en");let idx="ABCD".indexOf(k);if(idx<0)idx="1234".indexOf(k);if(idx<0)return;
   const o=optOrder()[idx];if(ui.ff&&ffGone().includes(o))return;answer(o);
 });
-// refresh waiting text / leave button
+// bekleme metnini tazele
 setInterval(()=>{if(cur.key==="waiting"&&cur.upd)cur.upd()},1000);
 render();
 (async()=>{
