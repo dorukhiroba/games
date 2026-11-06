@@ -2,7 +2,8 @@
  * KNet: free peer-to-peer online play for the games on GitHub Pages.
  *
  * It mirrors the small "room" API the games already use on claude.ai
- * (join / peers / presence / onPeers / onConnection / connected / leave),
+ * (join / peers / presence / onPeers / onConnection / connected / leave,
+ * plus emit / on for one-off messages),
  * but runs on Trystero (WebRTC, discovered through public Nostr relays),
  * so no account, login or server is needed.
  *
@@ -33,6 +34,8 @@
 
     const tr = joinRoom({ appId: APP_ID }, name);
     const presAction = tr.makeAction('pres');
+    const msgAction = tr.makeAction('msg');
+    const topicSubs = new Map(); // topic -> Set of callbacks
 
     const me = { peer: selfId, kind: 'viewer', sameTab: true, presence: {} };
     const peers = new Map([[selfId, me]]);
@@ -44,8 +47,8 @@
     let timer = null;
 
     const changed = (ch) => {
-      list = null;
-      const full = { joined: [], left: [], updated: [], ...ch };
+      list = [...peers.values()];
+      const full = { joined: [], left: [], updated: [], ...ch, peers: list };
       for (const sub of peerSubs) call(sub.cb, full);
     };
 
@@ -81,6 +84,20 @@
       changed(isNew ? { joined: [p] } : { updated: [p] });
     };
 
+    // One-off messages. Like the real room API, senders also get their own
+    // message back, marked isMe/sameTab.
+    const deliver = (topic, data, peerId) => {
+      const subs = topicSubs.get(topic);
+      if (!subs) return;
+      const isMe = peerId === selfId;
+      const m = { topic, data, peer: peerId, isMe, sameTab: isMe, kind: 'viewer' };
+      for (const cb of [...subs]) call(cb, m);
+    };
+    msgAction.onMessage = (p, { peerId }) => {
+      if (closed || peerId === selfId || !p || typeof p.t !== 'string') return;
+      deliver(p.t, p.d, peerId);
+    };
+
     const api = {
       name,
 
@@ -99,6 +116,20 @@
         const wait = SEND_INTERVAL_MS - (performance.now() - lastSent);
         if (!timer) { if (wait <= 0) flush(); else timer = setTimeout(flush, wait); }
         return Promise.resolve();
+      },
+
+      emit(topic, data) {
+        if (closed) return Promise.reject(fail('closed', 'This room was left'));
+        if (typeof topic !== 'string' || !topic) return Promise.reject(fail('invalid_argument', 'topic must be a string'));
+        msgAction.send({ t: topic, d: data }).catch(() => {});
+        setTimeout(() => { if (!closed) deliver(topic, data, selfId); }, 0);
+        return Promise.resolve();
+      },
+
+      on(topic, cb) {
+        if (!topicSubs.has(topic)) topicSubs.set(topic, new Set());
+        topicSubs.get(topic).add(cb);
+        return () => { const s = topicSubs.get(topic); if (s) s.delete(cb); };
       },
 
       onPeers(cb, onError) {
@@ -127,6 +158,7 @@
         for (const sub of connSubs) call(sub.cb, false);
         peerSubs.clear();
         connSubs.clear();
+        topicSubs.clear();
         try { tr.leave(); } catch (e) {}
         return Promise.resolve();
       },
