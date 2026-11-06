@@ -55,6 +55,11 @@ body{margin:0;background:var(--sky-bottom);color:var(--ink);font-family:var(--fo
 .variants::-webkit-scrollbar{display:none}
 .variants .chip{flex:none;height:32px;padding:0 12px}
 .variants .chip[aria-pressed="true"]{background:var(--honey-soft);box-shadow:inset 0 0 0 2px var(--honey)}
+.brushbar{display:flex;align-items:center;gap:10px;padding:6px 14px;border-radius:16px;font-size:12.5px;font-weight:800;color:var(--ink-soft)}
+.brushbar input{width:150px;accent-color:var(--honey);cursor:pointer}
+.brushbar .dotprev{width:26px;height:26px;display:grid;place-items:center;flex:none}
+.brushbar .dotprev i{display:block;border-radius:50%;background:var(--ink-soft);opacity:.55}
+#brushVal{min-width:34px;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
 #toast{position:fixed;left:50%;top:calc(84px + env(safe-area-inset-top,0px));transform:translateX(-50%);pointer-events:none;background:var(--ink);color:#f7fbf5;font-weight:800;font-size:13px;padding:8px 14px;border-radius:12px;box-shadow:var(--shadow);white-space:nowrap}
 @media (max-width:620px){
   .brand h1{font-size:22px}
@@ -94,6 +99,12 @@ body{margin:0;background:var(--sky-bottom);color:var(--ink);font-family:var(--fo
   <div class="bottom">
     <div class="hint"><span id="hint"></span><small id="ctrlHint"></small></div>
     <div class="card variants" id="variants" role="group" aria-label="Wall style" hidden></div>
+    <label class="card brushbar" id="brushbar" hidden>
+      <span>Brush size</span>
+      <span class="dotprev" aria-hidden="true"><i id="brushDot"></i></span>
+      <input id="brush" type="range" min="40" max="300" step="5" value="100" aria-label="Brush size">
+      <span id="brushVal">1×</span>
+    </label>
     <nav class="card dock" id="dock" aria-label="Building tools"></nav>
   </div>
 </div>
@@ -130,6 +141,9 @@ const SHUTTERS = ['#5579a3','#6c9a58','#9e5d7c','#4f8f8a','#c9773e','#8a6a52'];
 const CASTLE = ['#b9b4ab','#a9a49b','#c5c0b7','#9f9b93','#b3ada3'];
 const HEDGE = ['#5f9a4a','#6aa84f','#58904a','#72b058'];
 const WATER_R = .6, DIRT_R = .55;
+const BRUSH_MIN = .4, BRUSH_MAX = 3, BRUSH_TOOLS = ['path','dirt','water','flowers','erase'];
+let brush = 1; // size multiplier for the painting tools
+try{ const b=parseFloat(localStorage.getItem('pocket-glade-v1-brush')); if(b>=BRUSH_MIN && b<=BRUSH_MAX) brush=b; }catch(e){}
 const WALL_KINDS = [{id:'stone',label:'Stone wall'},{id:'castle',label:'Castle wall'},{id:'fence',label:'Wooden fence'},{id:'picket',label:'Picket fence'},{id:'hedge',label:'Hedge'}];
 
 /* ---------- renderer / scene ---------- */
@@ -194,7 +208,7 @@ groundTex.anisotropy = renderer.capabilities.getMaxAnisotropy ? Math.min(8, rend
 let groundDirty = true;
 function w2c(x,z){ return [(x/R+1)/2*S, (z/R+1)/2*S]; }
 function stamp(x,z){
-  const [px,py]=w2c(x,z), rr=PATH_R/(2*R)*S;
+  const [px,py]=w2c(x,z), rr=PATH_R*brush/(2*R)*S;
   pCtx.fillStyle='#d4b68a'; pCtx.beginPath(); pCtx.arc(px,py,rr,0,6.283); pCtx.fill();
   if(Math.random()<.75){ const a=Math.random()*6.283, d=Math.random()*rr*.7, pr=rr*(.16+Math.random()*.14);
     bCtx.fillStyle=PEB[rint(PEB.length)]; bCtx.beginPath(); bCtx.ellipse(px+Math.cos(a)*d, py+Math.sin(a)*d, pr, pr*.72, Math.random()*3, 0, 6.283); bCtx.fill(); }
@@ -204,7 +218,7 @@ function strokeWith(fn,a,b,step){ const d=Math.hypot(b.x-a.x,b.z-a.z), n=Math.ma
 function strokePath(a,b){ strokeWith(stamp,a,b,.12); }
 // tilled soil: brown earth with darker clods and a few light grains
 function stampDirt(x,z){
-  const [px,py]=w2c(x,z), rr=DIRT_R/(2*R)*S;
+  const [px,py]=w2c(x,z), rr=DIRT_R*brush/(2*R)*S;
   dCtx.fillStyle='#9b7653'; dCtx.beginPath(); dCtx.arc(px,py,rr,0,6.283); dCtx.fill();
   for(let i=0;i<4;i++){ const a=Math.random()*6.283, d=Math.random()*rr*.8, pr=rr*(.07+Math.random()*.1);
     dCtx.fillStyle=Math.random()<.65?'#7c5a3d':'#b48d63'; dCtx.beginPath(); dCtx.ellipse(px+Math.cos(a)*d, py+Math.sin(a)*d, pr, pr*.7, Math.random()*3, 0, 6.283); dCtx.fill(); }
@@ -213,9 +227,9 @@ function stampDirt(x,z){
 // water mask (white); trees, flowers and lanterns in the way are washed out
 function stampWater(x,z){
   if(inHouse(x,z,.12)) return false;
-  const [px,py]=w2c(x,z), rr=WATER_R/(2*R)*S;
+  const [px,py]=w2c(x,z), rr=WATER_R*brush/(2*R)*S;
   wCtx.fillStyle='#fff'; wCtx.beginPath(); wCtx.arc(px,py,rr,0,6.283); wCtx.fill();
-  for(const it of items.slice()) if((it.t==='tree'||it.t==='fl'||it.t==='lamp') && Math.hypot(it.x-x,it.z-z)<WATER_R*.85) removeItem(it);
+  for(const it of items.slice()) if((it.t==='tree'||it.t==='fl'||it.t==='lamp') && Math.hypot(it.x-x,it.z-z)<WATER_R*brush*.85) removeItem(it);
   groundDirty=true; return true;
 }
 function paintAlpha(ctx,x,z){ const [px,py]=w2c(x,z); return ctx.getImageData(clamp(px|0,0,S-1),clamp(py|0,0,S-1),1,1).data[3]; }
@@ -657,18 +671,19 @@ function plantTree(x,z){ if(inHouse(x,z,.15) || isWater(x,z)) return false; cons
 function plantFlower(x,z){ if(inHouse(x,z) || Math.hypot(x,z)>R-.25 || isWater(x,z)) return false; addItem({t:'fl',x,z,c:rint(PETALS.length),seed:newSeed()}); sfx.flower(); return true; }
 function placeLamp(x,z){ if(inHouse(x,z,.1) || isWater(x,z)) return false; addItem({t:'lamp',x,z}); sfx.lamp(); return true; }
 function eraseAround(p){
+  const ER=ERASE_R*brush;
   let did=false;
   for(const it of items.slice()){
-    if((it.t==='tree'||it.t==='lamp'||it.t==='fl') && Math.hypot(it.x-p.x,it.z-p.z)<ERASE_R+(it.t==='tree'?.15:0)){ removeItem(it); did=true; }
+    if((it.t==='tree'||it.t==='lamp'||it.t==='fl') && Math.hypot(it.x-p.x,it.z-p.z)<ER+(it.t==='tree'?.15:0)){ removeItem(it); did=true; }
     else if(it.t==='wall'){
-      const dense=resample(chaikin(it.pts),.15); const keep=dense.map(q=>Math.hypot(q[0]-p.x,q[1]-p.z)>ERASE_R);
+      const dense=resample(chaikin(it.pts),.15); const keep=dense.map(q=>Math.hypot(q[0]-p.x,q[1]-p.z)>ER);
       if(keep.every(Boolean)) continue;
       removeItem(it); did=true; let run=[];
       const flush=()=>{ if(run.length>=3) addItem({t:'wall',kind:it.kind,pts:run,seed:it.seed+run.length*31},false); run=[]; };
       dense.forEach((q,i)=>{ if(keep[i]) run.push(q); else flush(); }); flush();
     }
   }
-  erasePaint(p.x,p.z,ERASE_R);
+  erasePaint(p.x,p.z,ER);
   return did;
 }
 
@@ -702,6 +717,7 @@ function loadState(st){
 
 /* ---------- sample village ---------- */
 function seedVillage(){
+  const userBrush=brush; brush=1;
   items=[]; for(const k in PAINT) PAINT[k][1].clearRect(0,0,S,S);
   const paths=[
     [[.62,.3],[1.6,-.5],[3,-1.4],[4.6,-1.5],[6.1,-.6],[8,.4],[10.4,.9]],
@@ -733,7 +749,7 @@ function seedVillage(){
     if(near(x,z,pathPts,.6)||inHouse(x,z,.3)||nearWater(x,z,.5)) continue; const c=rint(PETALS.length);
     for(let k=0;k<3;k++){ addItem({t:'fl',x:x+(Math.random()-.5)*.6,z:z+(Math.random()-.5)*.6,c,seed:newSeed()},false); fl++; } }
   [[2.6,-1.95],[-2.9,.55],[6.5,-1.35],[.05,4.8]].forEach(([x,z])=>addItem({t:'lamp',x,z},false));
-  groundDirty=true; rebuildAll();
+  brush=userBrush; groundDirty=true; rebuildAll();
 }
 
 /* ---------- sound ---------- */
@@ -803,9 +819,16 @@ WALL_KINDS.forEach(w=>{ const b=document.createElement('button'); b.type='button
 $('#ctrlHint').textContent = coarse ? 'Two fingers to turn and zoom' : 'Right-drag to turn · scroll to zoom · R to rotate a cottage · Ctrl+Z to undo';
 function setTool(id){ tool=id; for(const b of dock.children) b.setAttribute('aria-pressed', String(b.dataset.tool===id));
   variants.hidden = id!=='wall'; for(const b of variants.children) b.setAttribute('aria-pressed', String(b.dataset.kind===wallKind));
+  $('#brushbar').hidden = !BRUSH_TOOLS.includes(id);
   $('#hint').textContent = id==='wall' ? 'Drag to draw a winding '+WALL_KINDS.find(w=>w.id===wallKind).label.toLowerCase()+'.' : TOOLS.find(t=>t.id===id).hint;
   hideCursor(); canvas.style.cursor = id==='look'?'grab':'crosshair'; }
 
+const brushInput=$('#brush');
+const brushLabel=()=>(Math.round(brush*10)/10)+'×';
+function setBrush(v){ brush=clamp(Math.round(v*100)/100,BRUSH_MIN,BRUSH_MAX); brushInput.value=Math.round(brush*100); $('#brushVal').textContent=brushLabel();
+  const d=Math.round(6+brush*6.5); const dot=$('#brushDot'); dot.style.width=dot.style.height=d+'px';
+  try{ localStorage.setItem(KEY+'-brush',String(brush)); }catch(e){} if(lastHit) showCursor(lastHit); }
+brushInput.addEventListener('input',e=>setBrush(e.target.value/100));
 let toastT=0; const toastEl=$('#toast');
 function toast(msg){ toastEl.textContent=msg; toastEl.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>toastEl.hidden=true,2400); }
 $('#undo').addEventListener('click',undo);
@@ -875,7 +898,7 @@ function pick(x,y){
   const p=ray.ray.intersectPlane(plane,new THREE.Vector3());
   return {p: p && Math.hypot(p.x,p.z)<R-.15 ? p : null, raw:p, house};
 }
-let hoverHouse=null;
+let hoverHouse=null, lastHit=null;
 function pickHouse(x,y){ const rect=canvas.getBoundingClientRect(); ndc.set(((x-rect.left)/rect.width)*2-1, -((y-rect.top)/rect.height)*2+1); ray.setFromCamera(ndc,camera);
   const hs=[]; for(const it of items) if(it.t==='house'){ const o=objs.get(it.id); if(o) hs.push(o); }
   const hits=ray.intersectObjects(hs,true); return hits.length ? hits[0].object.userData.item||null : null; }
@@ -891,7 +914,7 @@ function showCursor(hit){
   }
   if(tool==='rotate'){ if(hit.house){ const o=objs.get(hit.house.id); if(o){ const hh=BASE+hit.house.floors*FH; ghost.position.set(o.position.x,hh/2,o.position.z); ghost.scale.set(HW+.08,hh+.02,HW+.08); ghost.visible=true; } } return; }
   if(tool==='erase' && hit.house){ const o=objs.get(hit.house.id); if(o){ const hh=BASE+hit.house.floors*FH; ghost.position.set(o.position.x,hh-FH/2,o.position.z); ghost.scale.set(HW+.08,FH+.02,HW+.08); ghost.visible=true; } return; }
-  if(!hit.p) return; const r=TOOLS.find(t=>t.id===tool).r; ring.position.x=hit.p.x; ring.position.z=hit.p.z; ring.scale.setScalar(r); ring.visible=true;
+  if(!hit.p) return; const r=TOOLS.find(t=>t.id===tool).r*(BRUSH_TOOLS.includes(tool)?brush:1); ring.position.x=hit.p.x; ring.position.z=hit.p.z; ring.scale.setScalar(r); ring.visible=true;
 }
 
 /* ---------- strokes ---------- */
@@ -945,8 +968,8 @@ function applyTool(hit,first){
     }
     case 'flowers': {
       if(!p) return; if(st.last){ st.acc+=Math.hypot(st.last.x-p.x,st.last.z-p.z); } st.last=p.clone();
-      if(!first && st.acc<.26) return; st.acc=0;
-      const n=first?3:1; for(let i=0;i<n;i++){ if(plantFlower(p.x+(Math.random()-.5)*.55,p.z+(Math.random()-.5)*.55)) st.changed=true; } return;
+      if(!first && st.acc<.26*brush) return; st.acc=0;
+      const n=Math.round((first?3:1)*brush*brush)||1, sp=.55*brush; for(let i=0;i<n;i++){ if(plantFlower(p.x+(Math.random()-.5)*sp,p.z+(Math.random()-.5)*sp)) st.changed=true; } return;
     }
     case 'lamp': {
       if(!p) return; if(st.last && Math.hypot(st.last.x-p.x,st.last.z-p.z)<2.2) return;
@@ -975,7 +998,7 @@ canvas.addEventListener('pointerdown',e=>{
 });
 canvas.addEventListener('pointermove',e=>{
   const pt=pointers.get(e.pointerId);
-  if(!pt){ if(e.pointerType==='mouse'){ const h=pick(e.clientX,e.clientY); showCursor(h); hoverHouse=h.house||pickHouse(e.clientX,e.clientY); } return; }
+  if(!pt){ if(e.pointerType==='mouse'){ const h=pick(e.clientX,e.clientY); lastHit=h; showCursor(h); hoverHouse=h.house||pickHouse(e.clientX,e.clientY); } return; }
   pt.x=e.clientX; pt.y=e.clientY;
   if(mode==='pinch'){ if(pointers.size<2) return; const s=pinchState(); camG.theta-=(s.cx-pinch.cx)*.007; camG.phi=clamp(camG.phi-(s.cy-pinch.cy)*.005,PHI_MIN,PHI_MAX); camG.dist=clamp(camG.dist*pinch.d/s.d,DMIN,DMAX); pinch=s; return; }
   const dx=e.clientX-lx, dy=e.clientY-ly; lx=e.clientX; ly=e.clientY;
@@ -998,6 +1021,7 @@ window.addEventListener('keydown',e=>{
   const k=e.key.toLowerCase();
   if(k==='q') camG.theta+=.45; else if(k==='e') camG.theta-=.45;
   else if(k==='r' && !stroke && hoverHouse && items.includes(hoverHouse)){ pushUndo([]); rotateHouse(hoverHouse); }
+  else if(e.key==='['||e.key===']'){ setBrush(brush*(e.key===']'?1.2:1/1.2)); if(!BRUSH_TOOLS.includes(tool)) toast('Brush size '+brushLabel()); }
 });
 
 /* ---------- loop ---------- */
@@ -1037,7 +1061,7 @@ function frame(now){
 
 /* ---------- boot ---------- */
 function start(data){
-  resize(); setTool('cottage');
+  resize(); setBrush(brush); setTool('cottage');
   let st=data && data.state;
   if(!st){ try{ const raw=localStorage.getItem(KEY); if(raw) st=JSON.parse(raw); }catch(e){} }
   if(st && Array.isArray(st.items)){ loadState(st); } else { setTime(.4); seedVillage(); }
