@@ -37,7 +37,8 @@
     const msgAction = tr.makeAction('msg');
     const topicSubs = new Map(); // topic -> Set of callbacks
 
-    const me = { peer: selfId, kind: 'viewer', sameTab: true, presence: {} };
+    // updatedAt: when a presence last changed, on this tab's clock (the real room API has it too).
+    const me = { peer: selfId, kind: 'viewer', sameTab: true, presence: {}, updatedAt: Date.now() };
     const peers = new Map([[selfId, me]]);
     const peerSubs = new Set();
     const connSubs = new Set();
@@ -81,6 +82,7 @@
       const isNew = !p;
       if (isNew) { p = { peer: peerId, kind: 'viewer', sameTab: false, presence: {} }; peers.set(peerId, p); }
       p.presence = data && typeof data === 'object' ? data : {};
+      p.updatedAt = Date.now();
       changed(isNew ? { joined: [p] } : { updated: [p] });
     };
 
@@ -112,6 +114,7 @@
         const next = { ...me.presence };
         for (const k in patch) { if (patch[k] === null) delete next[k]; else next[k] = patch[k]; }
         me.presence = next;
+        me.updatedAt = Date.now();
         list = null;
         const wait = SEND_INTERVAL_MS - (performance.now() - lastSent);
         if (!timer) { if (wait <= 0) flush(); else timer = setTimeout(flush, wait); }
