@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Order Up!</title>
+<meta name="description" content="A 3D co-op incremental restaurant game for up to 10 friends, right in the browser.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍔</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+<script src="../quit.js"></script>
+</head>
+<body>
+<div id="game"></div>
+
+<!-- Start menu -->
+<section id="menu" class="screen">
+  <div class="card menu-card">
+    <div class="logo">
+      <span class="logo-plate">🍔</span>
+      <h1>Order Up!</h1>
+      <p class="tag">Cook, serve and grow a restaurant with up to 10 friends.</p>
+    </div>
+
+    <label class="field">
+      <span>Your chef name</span>
+      <input id="nameInput" maxlength="16" autocomplete="off" placeholder="Chef">
+    </label>
+    <div class="field">
+      <span>Apron colour</span>
+      <div id="swatches" class="swatches"></div>
+    </div>
+
+    <div class="menu-actions">
+      <div class="block">
+        <button id="hostBtn" class="btn big primary">Open my restaurant</button>
+        <p id="saveSummary" class="muted small"></p>
+      </div>
+      <div class="or"><span>or help a friend</span></div>
+      <div class="block join-row">
+        <input id="codeInput" maxlength="5" autocomplete="off" placeholder="ROOM CODE" spellcheck="false">
+        <button id="joinBtn" class="btn big">Join</button>
+      </div>
+      <p id="menuStatus" class="status small"></p>
+    </div>
+    <div class="menu-foot"><button id="resetBtn" class="link small">Reset my restaurant</button><span id="quitSlot"></span></div>
+  </div>
+</section>
+
+<!-- In-game HUD -->
+<section id="hud" class="hidden">
+  <div class="topbar">
+    <div class="chip money-chip">
+      <span id="money">$0</span>
+      <small id="rate">$0/min</small>
+    </div>
+    <div class="chip stars-chip" title="Franchise stars boost all income"><span id="stars">★ 0</span></div>
+    <div class="chip room-chip">
+      <span class="dot" id="netDot"></span>
+      <span class="room-label">Room</span> <b id="roomCode">·····</b>
+      <button id="inviteBtn" class="mini">Invite</button>
+      <span id="netText" class="muted small"></span>
+    </div>
+    <div id="playerList" class="players"></div>
+  </div>
+
+  <div id="hint" class="hint"></div>
+
+  <button id="panelToggle" class="btn primary panel-toggle">⬆ Upgrades</button>
+  <aside id="panel" class="card panel">
+    <header>
+      <nav class="tabs">
+        <button data-tab="menu" class="active">Menu</button>
+        <button data-tab="place">Restaurant</button>
+        <button data-tab="staff">Staff</button>
+        <button data-tab="franchise">Franchise</button>
+      </nav>
+      <button id="panelClose" class="mini close" aria-label="Close upgrades">✕</button>
+    </header>
+    <div id="upgrades" class="upgrades"></div>
+  </aside>
+
+  <div class="help small">WASD / arrows to move · <b>E</b> or <b>Space</b> to use · click anything to walk there · scroll to zoom</div>
+  <button id="actBtn" class="act-btn" aria-label="Use">E</button>
+  <div id="toasts" class="toasts"></div>
+</section>
+
+<!-- Modal -->
+<div id="modal" class="screen hidden">
+  <div class="card modal-card">
+    <div id="modalBody"></div>
+    <div id="modalActions" class="modal-actions"></div>
+  </div>
+</div>
+
+<script src="lib/three.min.js"></script>
+<script src="lib/peerjs.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/sim.js"></script>
+<script src="js/world.js"></script>
+<script src="js/net.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
