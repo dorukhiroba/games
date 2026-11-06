@@ -1,0 +1,1072 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Altı Dilim</title>
+<script src="../net.js"></script>
+<script src="../quit.js"></script>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Onest:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one centred play column; a six-slice İznik-tile wheel is the hero and every player's token. */
+:root{
+  --ink:#0C1330; --ink-2:#131C44; --ink-3:#1C285A; --ink-4:#25336E; --line:#33438A;
+  --paper:#F5EFE2; --muted:#A3ACD3; --good:#86D894; --bad:#FF8270;
+  --c0:#27B3BE; --c1:#E46A9A; --c2:#EDB143; --c3:#E8644C; --c4:#72BA66; --c5:#5A8DF0;
+  --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --f-body:"Onest",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r:16px;
+  color-scheme:dark;
+}
+html,body{background:var(--ink);color:var(--paper)}
+body{
+  font-family:var(--f-body);font-size:16px;line-height:1.45;min-height:100%;
+  background-color:var(--ink);
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(245,239,226,.045) 0 1.5px, transparent 2.5px),
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(90,141,240,.18), transparent 70%);
+  background-size:26px 26px, 100% 100%;
+  background-attachment:fixed;
+}
+*{box-sizing:border-box}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+button:disabled{cursor:default}
+:focus-visible{outline:2px solid var(--paper);outline-offset:2px}
+.app{max-width:780px;margin:0 auto;padding-block:14px 48px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:18px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:700;font-size:17px;letter-spacing:.01em;background:none;border:0;padding:0}
+.top-r{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip{font-family:var(--f-display);font-size:12px;font-weight:700;letter-spacing:.14em;padding:7px 12px;border-radius:999px;background:var(--ink-3);border:1px solid var(--line)}
+.ibtn{background:var(--ink-3);border:1px solid var(--line);border-radius:999px;padding:7px 12px;font-size:13px;font-weight:600;color:var(--muted)}
+.ibtn:hover{color:var(--paper)}
+h1,h2,h3{text-wrap:balance;margin:0}
+.display{font-family:var(--f-display);font-weight:800;letter-spacing:-.01em;line-height:1.02}
+.eyebrow{font-family:var(--f-display);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+.card{background:var(--ink-2);border:1px solid var(--line);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{font-family:var(--f-display);font-weight:700;font-size:13px;letter-spacing:.04em;border-radius:999px;padding:13px 20px;border:2px solid var(--paper);background:var(--paper);color:var(--ink);transition:transform .12s, background .12s}
+.btn:hover:not(:disabled){transform:translateY(-1px)}
+.btn:disabled{opacity:.45}
+.btn.ghost{background:transparent;color:var(--paper);border-color:var(--line)}
+.btn.ghost:hover:not(:disabled){border-color:var(--paper)}
+.btn.big{font-size:15px;padding:16px 26px}
+.field{background:var(--ink);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:16px;min-width:0;width:100%}
+.field:focus{border-color:var(--paper);outline:none}
+.code-in{font-family:var(--f-display);letter-spacing:.3em;text-transform:uppercase;max-width:160px;text-align:center}
+.seg{display:inline-flex;background:var(--ink);border:1px solid var(--line);border-radius:999px;padding:3px;flex-wrap:wrap}
+.seg button{background:none;border:0;border-radius:999px;padding:8px 14px;font-size:14px;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--paper);color:var(--ink)}
+.seg button:disabled{opacity:.9}
+.setting{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.setting .lbl{font-weight:600}
+.setting .sub{font-size:13px;color:var(--muted)}
+.sw{display:flex;gap:6px;flex-wrap:wrap}
+.sw button{width:28px;height:28px;border-radius:50%;border:2px solid transparent;padding:0}
+.sw button[aria-pressed="true"]{border-color:var(--paper);box-shadow:0 0 0 2px var(--ink) inset}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center;padding-block:10px 4px}
+.hero h1{font-size:clamp(44px,11vw,84px)}
+.hero p{margin:10px 0 0;max-width:44ch;color:var(--muted);font-size:17px}
+.hero .wheelwrap{width:clamp(110px,26vw,190px)}
+.spin-slow{animation:slow 60s linear infinite;transform-origin:50% 50%}
+@keyframes slow{to{transform:rotate(360deg)}}
+.cats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.cat-tag{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;min-width:0}
+.cat-tag i{width:12px;height:12px;border-radius:3px;flex:none}
+.games{display:flex;flex-direction:column;gap:8px}
+.game-row{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--ink);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+.game-row b{font-family:var(--f-display);letter-spacing:.16em;font-size:14px}
+.rules{margin:0;padding-left:18px;color:var(--muted);display:flex;flex-direction:column;gap:6px;font-size:15px}
+.rules b{color:var(--paper)}
+
+/* lobby */
+.code-big{font-family:var(--f-display);font-weight:800;font-size:clamp(44px,13vw,72px);letter-spacing:.18em;line-height:1}
+.plist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.pslot{display:flex;align-items:center;gap:10px;background:var(--ink);border:1px solid var(--line);border-radius:14px;padding:9px 11px;min-width:0}
+.pslot.empty{border-style:dashed;color:var(--muted);opacity:.6;font-size:14px}
+.pslot .nm{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.tag{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-left:auto;flex:none}
+.disc{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:13px;color:var(--ink);flex:none}
+
+/* play */
+.stage{display:flex;flex-direction:column;gap:16px}
+.qhead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.catpill{display:inline-flex;align-items:center;gap:8px;font-family:var(--f-display);font-weight:700;font-size:12px;letter-spacing:.12em;text-transform:uppercase;padding:8px 13px;border-radius:999px;background:var(--cat);color:var(--ink)}
+.timer{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:700;font-variant-numeric:tabular-nums;font-size:18px;min-width:120px;justify-content:flex-end}
+.tbar{height:6px;border-radius:6px;background:var(--ink-3);overflow:hidden}
+.tbar i{display:block;height:100%;background:var(--cat,var(--paper));width:calc(var(--p,1)*100%);transition:width .2s linear}
+.tbar.low i{background:var(--bad)}
+.qtext{font-size:clamp(22px,4.6vw,30px);font-weight:700;line-height:1.25;margin:0}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.opt{position:relative;display:flex;align-items:center;gap:12px;text-align:left;min-height:68px;background:var(--ink-3);border:2px solid var(--ink-4);border-radius:var(--r);padding:12px 14px;font-size:17px;font-weight:600;transition:border-color .12s, background .12s, transform .12s;min-width:0}
+.opt .l{font-family:var(--f-display);font-weight:800;font-size:13px;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--ink);color:var(--muted);flex:none}
+.opt .t{min-width:0;overflow-wrap:anywhere}
+.opt:hover:not(:disabled){border-color:var(--cat);transform:translateY(-1px)}
+.opt.chosen{border-color:var(--paper);background:var(--ink-4)}
+.opt.chosen .l{background:var(--paper);color:var(--ink)}
+.opt.gone{opacity:.18;pointer-events:none}
+.opt.correct{background:var(--cat);border-color:var(--cat);color:var(--ink)}
+.opt.correct .l{background:var(--ink);color:var(--paper)}
+.opt.wrong{border-color:var(--bad)}
+.opt.dim{opacity:.55}
+.opt .who{display:flex;gap:3px;margin-left:auto;flex-wrap:wrap;justify-content:flex-end}
+.opt .who .disc{width:22px;height:22px;font-size:10px;box-shadow:0 0 0 2px var(--ink-3)}
+.opt:disabled{cursor:default}
+.pw{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pwb{display:inline-flex;align-items:center;gap:8px;background:transparent;border:1.5px dashed var(--line);border-radius:999px;padding:8px 14px;font-weight:600;font-size:14px;color:var(--paper)}
+.pwb b{font-family:var(--f-display);font-size:12px}
+.pwb[aria-pressed="true"]{border-style:solid;border-color:var(--c2);background:rgba(237,177,67,.14)}
+.pwb:disabled{opacity:.35}
+.status{font-size:15px;color:var(--muted);min-height:22px}
+.status b{color:var(--paper)}
+
+.strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
+.pc{display:flex;align-items:center;gap:9px;background:var(--ink-2);border:1px solid var(--line);border-radius:14px;padding:8px 10px;min-width:0;position:relative}
+.pc .nm{font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.pc .sc{font-family:var(--f-display);font-weight:700;font-size:12px;font-variant-numeric:tabular-nums;color:var(--muted)}
+.pc .mid{display:flex;flex-direction:column;min-width:0;flex:1}
+.pc.turn{border-color:var(--paper)}
+.pc.away{opacity:.4}
+.pc.done::after{content:"✓";position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:var(--good);color:var(--ink);font-size:12px;font-weight:800;display:grid;place-items:center}
+.pc.me .nm::after{content:" (you)";color:var(--muted);font-weight:500}
+
+/* wheel */
+.wheel{display:block;width:min(100%,380px);margin:0 auto;overflow:visible}
+.wheel .slice{cursor:default;transition:filter .15s, opacity .15s}
+.wheel.live .slice{cursor:pointer}
+.wheel.live .slice:hover{filter:brightness(1.15)}
+.wheel .lab{font-family:var(--f-display);font-weight:800;font-size:8.6px;letter-spacing:.06em;fill:var(--ink);pointer-events:none}
+.wheel .rot{transform-origin:100px 100px;transform-box:view-box;transition:transform 1.7s cubic-bezier(.17,.84,.24,1)}
+.wheel .need{font-size:6px;fill:var(--ink);opacity:.7}
+.center{text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.pick-h{font-size:clamp(24px,5.5vw,36px)}
+
+.results{display:flex;flex-direction:column;gap:6px}
+.res{display:grid;grid-template-columns:30px minmax(0,1fr) auto auto;gap:10px;align-items:center;background:var(--ink-2);border:1px solid var(--line);border-radius:14px;padding:8px 12px}
+.res .nm{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.res .d{font-family:var(--f-display);font-weight:700;font-variant-numeric:tabular-nums;font-size:14px}
+.res .d.pos{color:var(--good)} .res .d.neg{color:var(--bad)}
+.res .note{font-size:12px;color:var(--muted)}
+.badge{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:6px;padding:2px 6px;background:var(--ink-4);color:var(--paper);margin-left:6px}
+
+.podium{display:flex;flex-direction:column;gap:8px}
+.rank{display:grid;grid-template-columns:34px 30px minmax(0,1fr) auto auto;gap:10px;align-items:center;background:var(--ink-2);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+.rank .n{font-family:var(--f-display);font-weight:800;color:var(--muted)}
+.rank.first{border-color:var(--c2);background:linear-gradient(90deg,rgba(237,177,67,.16),var(--ink-2) 70%)}
+.rank .sc{font-family:var(--f-display);font-weight:700;font-variant-numeric:tabular-nums}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--paper);color:var(--ink);font-weight:600;padding:12px 18px;border-radius:12px;z-index:20;max-width:calc(100% - 32px);box-shadow:0 8px 30px rgba(0,0,0,.35)}
+.local-list{display:flex;flex-direction:column;gap:8px}
+.local-row{display:flex;gap:8px;align-items:center}
+.local-row .disc{width:34px;height:34px}
+.xbtn{background:none;border:1px solid var(--line);border-radius:10px;width:40px;height:44px;color:var(--muted);flex:none;font-size:18px}
+.pass{font-size:15px;color:var(--muted)}
+
+@media (max-width:560px){
+  .opts{grid-template-columns:1fr}
+  .plist{grid-template-columns:1fr}
+  .hero{grid-template-columns:1fr}
+  .hero .wheelwrap{order:-1;width:120px}
+  .cats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .strip{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .res{grid-template-columns:30px minmax(0,1fr) auto}
+  .res .note{grid-column:2/4}
+}
+@media (prefers-reduced-motion:reduce){
+  .spin-slow{animation:none}
+  .wheel .rot{transition:none}
+  *{transition-duration:0s!important}
+}
+</style>
+
+<div class="app">
+  <header class="top">
+    <button class="brand" id="brand" type="button" aria-label="Altı Dilim home"><span id="logo"></span><span>Altı Dilim</span></button>
+    <div class="top-r" id="topR"></div>
+  </header>
+  <main id="main" class="stage"></main>
+</div>
+
+<script>
+// [category, region, question, correct, wrong1, wrong2, wrong3]
+// category: 0 Geography, 1 Screen & Song, 2 History, 3 Arts & Letters, 4 Science & Nature, 5 Sport & Table
+// region: "t" = Türkiye, "g" = global
+const QS = [
+// ── 0 GEOGRAPHY ─────────────────────────────
+[0,"t","Which is the largest lake in Türkiye?","Lake Van","Tuz Gölü","Lake Beyşehir","Lake Eğirdir"],
+[0,"t","What is Türkiye's highest mountain?","Mount Ararat (Ağrı Dağı)","Mount Erciyes","Mount Süphan","Uludağ"],
+[0,"t","Which strait connects the Sea of Marmara with the Aegean Sea?","The Dardanelles (Çanakkale)","The Bosphorus","The Strait of Kerch","The Strait of Otranto"],
+[0,"t","Göreme and its fairy chimneys are in which province?","Nevşehir","Konya","Kayseri","Aksaray"],
+[0,"t","Which is Türkiye's largest province by area?","Konya","Sivas","Erzurum","Ankara"],
+[0,"t","The Kızılırmak, the longest river entirely within Türkiye, flows into which sea?","Black Sea","Mediterranean Sea","Aegean Sea","Sea of Marmara"],
+[0,"t","Pamukkale's white travertine terraces are in which province?","Denizli","Muğla","Aydın","Antalya"],
+[0,"t","How many countries share a land border with Türkiye?","8","6","7","9"],
+[0,"t","Which of these cities is in the European part of Türkiye?","Edirne","Bursa","Bilecik","Balıkesir"],
+[0,"t","Mount Nemrut, with its giant stone heads, is in which province?","Adıyaman","Malatya","Şanlıurfa","Diyarbakır"],
+[0,"t","Which is Türkiye's most populous geographical region?","Marmara","Central Anatolia","Aegean","Black Sea"],
+[0,"t","Tuz Gölü (Salt Lake) is Türkiye's ___ largest lake.","Second","Largest","Third","Fifth"],
+[0,"t","Which river forms much of the border between Türkiye and Greece?","Meriç (Evros)","Tunca","Ergene","Struma"],
+[0,"t","The mountain lake Uzungöl is in which province?","Trabzon","Rize","Artvin","Giresun"],
+[0,"t","Türkiye's easternmost point lies in which province?","Iğdır","Van","Hakkari","Kars"],
+[0,"t","Which city is the heart of Türkiye's tea growing?","Rize","Trabzon","Artvin","Ordu"],
+[0,"t","The Ölüdeniz lagoon is next to which town?","Fethiye","Kaş","Marmaris","Bodrum"],
+[0,"t","What is Türkiye's largest island?","Gökçeada","Bozcaada","Marmara Island","Büyükada"],
+[0,"t","Which two seas does the Bosphorus connect?","Black Sea and Sea of Marmara","Aegean and Marmara","Black Sea and Aegean","Mediterranean and Aegean"],
+[0,"t","Mount Erciyes, a ski resort and extinct volcano, towers over which city?","Kayseri","Sivas","Niğde","Nevşehir"],
+[0,"t","The Sümela Monastery clings to a cliff in which province?","Trabzon","Gümüşhane","Rize","Bayburt"],
+// global
+[0,"g","What is the capital of Australia?","Canberra","Sydney","Melbourne","Perth"],
+[0,"g","What is the longest river in Africa?","Nile","Congo","Niger","Zambezi"],
+[0,"g","Counting overseas territories, which country spans the most time zones?","France","Russia","United Kingdom","China"],
+[0,"g","What is the largest hot desert in the world?","Sahara","Arabian Desert","Gobi","Kalahari"],
+[0,"g","Mount Kilimanjaro is in which country?","Tanzania","Kenya","Uganda","Ethiopia"],
+[0,"g","Which country has the most natural lakes?","Canada","Finland","Russia","Sweden"],
+[0,"g","What is the capital of Kazakhstan?","Astana","Almaty","Bishkek","Tashkent"],
+[0,"g","Which of these capitals sits on the Danube?","Budapest","Prague","Warsaw","Bucharest"],
+[0,"g","What is the smallest country in the world by area?","Vatican City","Monaco","San Marino","Liechtenstein"],
+[0,"g","Angkor Wat is in which country?","Cambodia","Thailand","Laos","Vietnam"],
+[0,"g","Lake Titicaca lies on the border of Peru and which country?","Bolivia","Chile","Ecuador","Argentina"],
+[0,"g","What is the capital of New Zealand?","Wellington","Auckland","Christchurch","Queenstown"],
+[0,"g","Which is Africa's most populous country?","Nigeria","Ethiopia","Egypt","DR Congo"],
+[0,"g","The Atacama Desert lies mostly in which country?","Chile","Peru","Argentina","Bolivia"],
+[0,"g","Which sea has no coastline at all?","Sargasso Sea","Caspian Sea","Dead Sea","Coral Sea"],
+[0,"g","Which of these capitals is the furthest north?","Reykjavík","Helsinki","Oslo","Tallinn"],
+[0,"g","What is the largest island in the world?","Greenland","New Guinea","Borneo","Madagascar"],
+[0,"g","Which river flows through Baghdad?","Tigris","Euphrates","Jordan","Karun"],
+[0,"g","Mount Fuji is on which Japanese island?","Honshu","Hokkaido","Kyushu","Shikoku"],
+[0,"g","Which country has the longest coastline?","Canada","Norway","Indonesia","Russia"],
+[0,"g","What is the capital of Morocco?","Rabat","Casablanca","Marrakesh","Fez"],
+[0,"g","Which of these South American countries is landlocked?","Paraguay","Uruguay","Ecuador","Colombia"],
+[0,"g","The Danube empties into which sea?","Black Sea","Adriatic Sea","Baltic Sea","Aegean Sea"],
+[0,"g","Angel Falls, the world's highest uninterrupted waterfall, is in which country?","Venezuela","Brazil","Colombia","Guyana"],
+[0,"g","Which country is said to have the most islands?","Sweden","Norway","Indonesia","Philippines"],
+[0,"g","What is the capital of Vietnam?","Hanoi","Ho Chi Minh City","Da Nang","Huế"],
+[0,"g","The Strait of Gibraltar separates Spain from which country?","Morocco","Algeria","Tunisia","Portugal"],
+[0,"g","Lake Baikal, the world's deepest lake, is in which country?","Russia","Mongolia","Kazakhstan","China"],
+[0,"g","Which country's coast touches both the Atlantic and the Indian Ocean?","South Africa","Namibia","Mozambique","Angola"],
+[0,"g","The Mekong River reaches the sea in which country?","Vietnam","Cambodia","Thailand","Myanmar"],
+[0,"g","Which Scandinavian country is famous for its fjord-lined west coast?","Norway","Denmark","Sweden","Finland"],
+
+// ── 1 SCREEN & SONG ─────────────────────────
+[1,"t","Which Turkish director won the Palme d'Or in 2014 for ‘Winter Sleep’ (Kış Uykusu)?","Nuri Bilge Ceylan","Fatih Akın","Semih Kaplanoğlu","Zeki Demirkubuz"],
+[1,"t","Yılmaz Güney shared the 1982 Palme d'Or for which film?","Yol","Sürü","Umut","Duvar"],
+[1,"t","Which singer is known as Türkiye's ‘Megastar’?","Tarkan","Mustafa Sandal","Kenan Doğulu","Teoman"],
+[1,"t","Which nickname belongs to Sezen Aksu?","Minik Serçe","Diva","Süperstar","Megastar"],
+[1,"t","Who won the Eurovision Song Contest for Türkiye in 2003?","Sertab Erener","Hadise","maNga","Kenan Doğulu"],
+[1,"t","Which Turkish series about Sultan Süleyman became a hit across 40+ countries?","Muhteşem Yüzyıl","Diriliş: Ertuğrul","Kurtlar Vadisi","Payitaht"],
+[1,"t","In ‘Hababam Sınıfı’, Kemal Sunal played which character?","İnek Şaban","Damat Ferit","Güdük Necmi","Tulum Hayri"],
+[1,"t","Which Cem Yılmaz film is set on an alien planet of the same name?","G.O.R.A.","A.R.O.G","Vizontele","Yahşi Batı"],
+[1,"t","What was Barış Manço's famous TV show for children called?","7'den 77'ye","Çarkıfelek","Susam Sokağı","Bir Kahkaha"],
+[1,"t","maNga came second at Eurovision 2010 with which song?","We Could Be the Same","Cevapsız Sorular","Dursun Zaman","Bir Kadın Çizeceksin"],
+[1,"t","Who wrote and sang ‘Gülpembe’?","Barış Manço","Cem Karaca","Erkin Koray","Fikret Kızılok"],
+[1,"t","In the shadow-puppet play, Karagöz's partner is…","Hacivat","Nasreddin","Keloğlan","Pişekar"],
+[1,"t","The police series ‘Behzat Ç.’ is set in which city?","Ankara","Istanbul","İzmir","Bursa"],
+[1,"t","Fatih Akın's ‘Head-On’ (Duvara Karşı) won the top prize at which festival?","Berlin","Cannes","Venice","Sundance"],
+[1,"t","Müslüm Gürses is a legend of which genre?","Arabesk","Anatolian rock","Pop","Turkish jazz"],
+[1,"t","Who sang ‘Şımarık’, the song with the famous kissing sound?","Tarkan","Mustafa Sandal","Serdar Ortaç","Hande Yener"],
+[1,"t","Which singer was called ‘Sanat Güneşi’ (Sun of Art)?","Zeki Müren","Müzeyyen Senar","Bülent Ersoy","Ajda Pekkan"],
+[1,"t","What is Ajda Pekkan's famous nickname?","Süperstar","Megastar","Diva","Prenses"],
+[1,"t","Who is the frontman of the rock band Duman?","Kaan Tangöze","Teoman","Hayko Cepkin","Cem Adrian"],
+[1,"t","Who is the main character of ‘Kurtlar Vadisi’?","Polat Alemdar","Ezel Bayraktar","Behzat Ç.","Yaman Koper"],
+[1,"t","In the film ‘Vizontele’, what arrives in a small Hakkari town?","Television","Cinema","Electricity","The railway"],
+[1,"t","Cem Karaca is a key figure of which genre?","Anatolian rock","Arabesk","Turkish pop","Classical Turkish music"],
+[1,"t","Which Turkish film director made ‘Once Upon a Time in Anatolia’?","Nuri Bilge Ceylan","Ferzan Özpetek","Reha Erdem","Yeşim Ustaoğlu"],
+// global
+[1,"g","Which Studio Ghibli film won the Academy Award for Best Animated Feature?","Spirited Away","Princess Mononoke","My Neighbor Totoro","Howl's Moving Castle"],
+[1,"g","ABBA won Eurovision 1974 with which song?","Waterloo","Dancing Queen","Mamma Mia","SOS"],
+[1,"g","Which South Korean film won the Palme d'Or in 2019?","Parasite","Burning","Oldboy","Minari"],
+[1,"g","Which band released ‘Bohemian Rhapsody’?","Queen","The Beatles","Pink Floyd","Led Zeppelin"],
+[1,"g","Which company created Super Mario?","Nintendo","Sega","Sony","Capcom"],
+[1,"g","Tetris was created in which country?","Soviet Union","Japan","Finland","Hungary"],
+[1,"g","Angry Birds was made by a studio from which country?","Finland","Sweden","Estonia","Denmark"],
+[1,"g","Minecraft was originally created by a developer from…","Sweden","Norway","Denmark","Finland"],
+[1,"g","The series ‘Money Heist’ (La Casa de Papel) is from which country?","Spain","Mexico","Argentina","Italy"],
+[1,"g","What is the Hindi-language film industry based in Mumbai called?","Bollywood","Tollywood","Kollywood","Mollywood"],
+[1,"g","The electronic duo Daft Punk came from which country?","France","Belgium","Germany","Netherlands"],
+[1,"g","Which James Bond actor was Scottish?","Sean Connery","Roger Moore","Daniel Craig","Pierce Brosnan"],
+[1,"g","The time-travel series ‘Dark’ comes from which country?","Germany","Austria","Denmark","Switzerland"],
+[1,"g","In ‘Squid Game’, the prize money is counted in which currency?","Won","Yen","Yuan","Dollars"],
+[1,"g","Which French film follows a shy waitress in Montmartre?","Amélie","La Haine","The Intouchables","Léon"],
+[1,"g","Hayao Miyazaki co-founded which animation studio?","Studio Ghibli","Toei Animation","Madhouse","Sunrise"],
+[1,"g","Shakira comes from which country?","Colombia","Mexico","Spain","Argentina"],
+[1,"g","Nemo won Eurovision 2024 representing which country?","Switzerland","Croatia","Italy","Ukraine"],
+[1,"g","Which Swedish band recorded ‘The Final Countdown’?","Europe","Roxette","ABBA","Ace of Base"],
+[1,"g","‘The Witcher’ video games come from a studio in which country?","Poland","Czechia","Ukraine","Lithuania"],
+[1,"g","The band Rammstein sings mostly in which language?","German","Dutch","Swedish","English"],
+[1,"g","Tintin, the boy reporter, was created in which country?","Belgium","France","Switzerland","Netherlands"],
+[1,"g","Who directed both ‘Parasite’ and ‘Snowpiercer’?","Bong Joon-ho","Park Chan-wook","Kim Ki-duk","Lee Chang-dong"],
+[1,"g","Which Irish band recorded ‘With or Without You’?","U2","The Cranberries","Coldplay","Oasis"],
+[1,"g","Who played Mr. Bean?","Rowan Atkinson","Hugh Laurie","Stephen Fry","John Cleese"],
+[1,"g","Which K-pop group's fans are known as ARMY?","BTS","Blackpink","EXO","Twice"],
+[1,"g","The Eurovision Song Contest started in which decade?","1950s","1960s","1940s","1970s"],
+
+// ── 2 HISTORY ───────────────────────────────
+[2,"t","In which year was the Republic of Türkiye proclaimed?","1923","1920","1919","1938"],
+[2,"t","In which year did the Ottomans conquer Constantinople?","1453","1071","1299","1517"],
+[2,"t","In which year was the Battle of Manzikert (Malazgirt)?","1071","1176","1243","1402"],
+[2,"t","Which sultan conquered Constantinople?","Mehmed II","Süleyman I","Selim I","Murad II"],
+[2,"t","Mustafa Kemal landed in Samsun to start the national struggle on…","19 May 1919","23 April 1920","30 August 1922","29 October 1923"],
+[2,"t","The Grand National Assembly first met in Ankara on…","23 April 1920","19 May 1919","29 October 1923","3 March 1924"],
+[2,"t","Which 1923 treaty internationally recognised modern Türkiye's borders?","Treaty of Lausanne","Treaty of Sèvres","Armistice of Mudanya","Treaty of Karlowitz"],
+[2,"t","Roughly how old are the oldest structures at Göbeklitepe?","About 11,000 years","About 5,000 years","About 3,000 years","About 2,000 years"],
+[2,"t","The ancient city of Troy is in which modern province?","Çanakkale","İzmir","Balıkesir","Edirne"],
+[2,"t","In which year did women in Türkiye win the right to vote in national elections?","1934","1923","1946","1950"],
+[2,"t","Which Ottoman sultan is known in the West as ‘the Magnificent’?","Süleyman I","Mehmed II","Selim I","Ahmed I"],
+[2,"t","Who founded the Ottoman state around 1299?","Osman I","Orhan","Ertuğrul","Murad I"],
+[2,"t","Hattusa was the capital of which ancient people?","The Hittites","The Phrygians","The Lydians","The Urartians"],
+[2,"t","The world's first coins are credited to which Anatolian kingdom?","Lydia","Phrygia","Caria","Lycia"],
+[2,"t","King Midas ruled which Anatolian kingdom?","Phrygia","Lydia","Urartu","Pontus"],
+[2,"t","The ruins of Ephesus are next to which modern town?","Selçuk","Bergama","Didim","Fethiye"],
+[2,"t","In which year did Türkiye switch from Arabic to Latin letters?","1928","1923","1934","1946"],
+[2,"t","Which battle was the decisive victory of the Great Offensive in August 1922?","Dumlupınar","Sakarya","İnönü","Kut"],
+[2,"t","Mustafa Kemal was given the title ‘Gazi’ after which battle?","Sakarya","Dumlupınar","Çanakkale","İnönü"],
+[2,"t","The Hagia Sophia we see today was built under which Byzantine emperor?","Justinian I","Constantine I","Theodosius II","Basil II"],
+[2,"t","In which year did Türkiye join NATO?","1952","1949","1955","1960"],
+[2,"t","Çatalhöyük, one of the earliest known towns, is in which province?","Konya","Çorum","Şanlıurfa","Kayseri"],
+[2,"t","The Ottoman Tanzimat reform era began in which year?","1839","1808","1876","1908"],
+[2,"t","Which Wonder of the Ancient World stood in today's Bodrum?","The Mausoleum","The Colossus","The Lighthouse","The Temple of Artemis"],
+[2,"t","The Temple of Artemis, an Ancient Wonder, stood at which city?","Ephesus","Pergamon","Miletus","Halicarnassus"],
+[2,"t","The second Ottoman siege of which city failed in 1683?","Vienna","Budapest","Belgrade","Prague"],
+// global
+[2,"g","Which civilisation built Machu Picchu?","The Inca","The Aztecs","The Maya","The Olmecs"],
+[2,"g","In which year did the Berlin Wall fall?","1989","1987","1991","1985"],
+[2,"g","Who was the first emperor of a unified China?","Qin Shi Huang","Kublai Khan","Liu Bang","Wu Zetian"],
+[2,"g","The French Revolution began in which year?","1789","1776","1815","1848"],
+[2,"g","Great Zimbabwe was built by the ancestors of which people?","The Shona","The Zulu","The Maasai","The Berbers"],
+[2,"g","Which city was buried by Mount Vesuvius in 79 CE?","Pompeii","Ostia","Carthage","Syracuse"],
+[2,"g","Nelson Mandela became South Africa's president in which year?","1994","1990","1989","1999"],
+[2,"g","Who was the first person in space?","Yuri Gagarin","Valentina Tereshkova","Alexei Leonov","Gherman Titov"],
+[2,"g","The Rosetta Stone was the key to reading what?","Egyptian hieroglyphs","Cuneiform","Linear B","Mayan glyphs"],
+[2,"g","Marco Polo came from which city?","Venice","Genoa","Florence","Pisa"],
+[2,"g","Which general led Carthage's army and elephants across the Alps?","Hannibal","Hamilcar","Scipio","Hasdrubal"],
+[2,"g","The Meiji Restoration happened in which country?","Japan","China","Korea","Siam"],
+[2,"g","In which year did the First World War begin?","1914","1912","1916","1918"],
+[2,"g","The Taj Mahal was built by an emperor of which dynasty?","Mughal","Maurya","Gupta","Chola"],
+[2,"g","The Battle of Waterloo took place in present-day…","Belgium","France","Netherlands","Germany"],
+[2,"g","Which Soviet leader introduced glasnost and perestroika?","Mikhail Gorbachev","Leonid Brezhnev","Nikita Khrushchev","Yuri Andropov"],
+[2,"g","Which Egyptian queen was allied with Mark Antony?","Cleopatra VII","Nefertiti","Hatshepsut","Nefertari"],
+[2,"g","Euro banknotes and coins entered circulation in which year?","2002","1999","1995","2004"],
+[2,"g","Persepolis was the ceremonial capital of which empire?","Achaemenid","Sasanian","Parthian","Seleucid"],
+[2,"g","Who was Alexander the Great's tutor?","Aristotle","Plato","Socrates","Pythagoras"],
+[2,"g","Genghis Khan founded which empire?","Mongol","Timurid","Seljuk","Khwarazmian"],
+[2,"g","Which country was the first to give women the vote nationally, in 1893?","New Zealand","Finland","Norway","Australia"],
+[2,"g","The Hundred Years' War was fought between England and…","France","Spain","Scotland","Burgundy"],
+[2,"g","Which ancient city-state was famous for its strict military upbringing?","Sparta","Athens","Corinth","Thebes"],
+[2,"g","Tenochtitlan, today's Mexico City, was the capital of which empire?","Aztec","Inca","Maya","Toltec"],
+
+// ── 3 ARTS & LETTERS ────────────────────────
+[3,"t","Which Turkish author won the Nobel Prize in Literature in 2006?","Orhan Pamuk","Yaşar Kemal","Elif Şafak","Nazım Hikmet"],
+[3,"t","Yaşar Kemal's novel about a bandit of the Taurus Mountains is…","İnce Memed","Kuyucaklı Yusuf","Tutunamayanlar","Çalıkuşu"],
+[3,"t","Who wrote ‘Saatleri Ayarlama Enstitüsü’ (The Time Regulation Institute)?","Ahmet Hamdi Tanpınar","Oğuz Atay","Sabahattin Ali","Peyami Safa"],
+[3,"t","Which novel is Oğuz Atay's best-known work?","Tutunamayanlar","Kürk Mantolu Madonna","Huzur","Masumiyet Müzesi"],
+[3,"t","Who wrote ‘Kürk Mantolu Madonna’ (Madonna in a Fur Coat)?","Sabahattin Ali","Reşat Nuri Güntekin","Halide Edib Adıvar","Orhan Kemal"],
+[3,"t","Who wrote ‘Memleketimden İnsan Manzaraları’?","Nazım Hikmet","Orhan Veli Kanık","Cemal Süreya","Attilâ İlhan"],
+[3,"t","Mimar Sinan's ‘masterpiece’, the Selimiye Mosque, is in which city?","Edirne","Istanbul","Bursa","Konya"],
+[3,"t","Mimar Sinan called which mosque his ‘apprentice work’?","Şehzade Mosque","Süleymaniye Mosque","Selimiye Mosque","Rüstem Paşa Mosque"],
+[3,"t","Rumi (Mevlânâ) is buried in which city?","Konya","Bursa","Kayseri","Sivas"],
+[3,"t","Who wrote the lyrics of the İstiklal Marşı, the national anthem?","Mehmet Akif Ersoy","Ziya Gökalp","Namık Kemal","Tevfik Fikret"],
+[3,"t","Who painted ‘The Tortoise Trainer’ (Kaplumbağa Terbiyecisi)?","Osman Hamdi Bey","Şeker Ahmed Paşa","Hoca Ali Rıza","İbrahim Çallı"],
+[3,"t","Ebru is the traditional Turkish art of…","Paper marbling","Calligraphy","Tile painting","Miniature painting"],
+[3,"t","The town of İznik is historically famous for its…","Ceramic tiles","Carpets","Glassware","Copperwork"],
+[3,"t","The Book of Dede Korkut is a collection of…","Oghuz Turkish epic tales","Rumi's poems","Ottoman travel notes","Court recipes"],
+[3,"t","Evliya Çelebi is famous for which work?","Seyahatname (Book of Travels)","Divan-ı Kebir","Mesnevi","Nutuk"],
+[3,"t","Yunus Emre was a…","Sufi folk poet","Palace architect","Miniature painter","Court composer"],
+[3,"t","Who wrote the poem ‘İstanbul'u Dinliyorum’?","Orhan Veli Kanık","Nazım Hikmet","Can Yücel","Ahmet Haşim"],
+[3,"t","Elif Şafak's ‘The Forty Rules of Love’ centres on Rumi and…","Shams of Tabriz","Yunus Emre","Hafez","Hacı Bektaş"],
+[3,"t","Which architects designed Anıtkabir?","Emin Onat & Orhan Arda","Sedad Hakkı Eldem","Clemens Holzmeister","Vedat Tek"],
+[3,"t","Âşık Veysel is famous for playing which instrument?","Bağlama (saz)","Oud","Kanun","Ney"],
+[3,"t","Which novel by Orhan Pamuk is set around a museum of a lost love?","The Museum of Innocence","Snow","My Name Is Red","The White Castle"],
+[3,"t","The whirling ceremony (sema) is associated with which order?","The Mevlevi","The Bektashi","The Naqshbandi","The Qadiri"],
+// global
+[3,"g","Who painted ‘The Starry Night’?","Vincent van Gogh","Claude Monet","Paul Gauguin","Paul Cézanne"],
+[3,"g","Which Spanish artist co-founded Cubism?","Pablo Picasso","Salvador Dalí","Joan Miró","Francisco Goya"],
+[3,"g","Who wrote ‘One Hundred Years of Solitude’?","Gabriel García Márquez","Jorge Luis Borges","Pablo Neruda","Mario Vargas Llosa"],
+[3,"g","Who wrote ‘Crime and Punishment’?","Fyodor Dostoevsky","Leo Tolstoy","Anton Chekhov","Nikolai Gogol"],
+[3,"g","The Mona Lisa hangs in which museum?","The Louvre","The Uffizi","The Prado","The Hermitage"],
+[3,"g","Who wrote ‘Don Quixote’?","Miguel de Cervantes","Lope de Vega","Federico García Lorca","Calderón"],
+[3,"g","Who composed ‘The Four Seasons’?","Antonio Vivaldi","J. S. Bach","G. F. Handel","Arcangelo Corelli"],
+[3,"g","Who made the woodblock print ‘The Great Wave off Kanagawa’?","Hokusai","Hiroshige","Utamaro","Sesshū"],
+[3,"g","Who wrote ‘The Little Prince’?","Antoine de Saint-Exupéry","Jules Verne","Victor Hugo","Albert Camus"],
+[3,"g","Frida Kahlo was from which country?","Mexico","Spain","Cuba","Argentina"],
+[3,"g","Which Prague-born writer wrote ‘The Metamorphosis’?","Franz Kafka","Milan Kundera","Rainer Maria Rilke","Hermann Hesse"],
+[3,"g","Gaudí's unfinished basilica in Barcelona is called…","Sagrada Família","Casa Batlló","Park Güell","Casa Milà"],
+[3,"g","Who wrote ‘War and Peace’?","Leo Tolstoy","Fyodor Dostoevsky","Alexander Pushkin","Ivan Turgenev"],
+[3,"g","Who painted ‘The Scream’?","Edvard Munch","Gustav Klimt","Egon Schiele","Wassily Kandinsky"],
+[3,"g","Who composed the opera ‘La Traviata’?","Giuseppe Verdi","Giacomo Puccini","Gioachino Rossini","Georges Bizet"],
+[3,"g","Who wrote ‘The Alchemist’?","Paulo Coelho","Jorge Amado","Isabel Allende","José Saramago"],
+[3,"g","Who designed the Sydney Opera House?","Jørn Utzon","Le Corbusier","Alvar Aalto","Renzo Piano"],
+[3,"g","Who painted ‘The Kiss’ using gold leaf?","Gustav Klimt","Egon Schiele","Alphonse Mucha","Henri Matisse"],
+[3,"g","The Persian epic ‘Shahnameh’ was written by…","Ferdowsi","Hafez","Rumi","Omar Khayyam"],
+[3,"g","Which author created the detective Hercule Poirot?","Agatha Christie","Arthur Conan Doyle","Georges Simenon","Dorothy L. Sayers"],
+[3,"g","Who wrote ‘Les Misérables’?","Victor Hugo","Émile Zola","Alexandre Dumas","Gustave Flaubert"],
+[3,"g","Which Polish-born composer wrote many piano nocturnes?","Frédéric Chopin","Franz Liszt","Ignacy Paderewski","Antonín Dvořák"],
+[3,"g","Le Corbusier was born in which country?","Switzerland","France","Belgium","Germany"],
+[3,"g","Who wrote ‘Things Fall Apart’?","Chinua Achebe","Wole Soyinka","Ngũgĩ wa Thiong'o","Chimamanda Ngozi Adichie"],
+[3,"g","The Bauhaus school was founded in 1919 in which city?","Weimar","Dessau","Berlin","Munich"],
+[3,"g","Who painted ‘Girl with a Pearl Earring’?","Johannes Vermeer","Rembrandt","Peter Paul Rubens","Jan van Eyck"],
+[3,"g","Which Japanese author wrote ‘Norwegian Wood’?","Haruki Murakami","Yukio Mishima","Yasunari Kawabata","Kazuo Ishiguro"],
+[3,"g","Who wrote ‘The Divine Comedy’?","Dante Alighieri","Petrarch","Boccaccio","Virgil"],
+[3,"g","The architect Zaha Hadid was born in which city?","Baghdad","Beirut","Cairo","Tehran"],
+
+// ── 4 SCIENCE & NATURE ──────────────────────
+[4,"t","The Van cat is famous for often having…","Eyes of two different colours","No tail","Curled ears","A spotted coat"],
+[4,"t","Which scientist co-founded BioNTech and co-developed its COVID-19 vaccine?","Uğur Şahin","Aziz Sancar","Cahit Arf","Gazi Yaşargil"],
+[4,"t","Aziz Sancar won the 2015 Nobel Prize in Chemistry for work on…","DNA repair","Protein folding","CRISPR","Graphene"],
+[4,"t","Cahit Arf, who appears on the 10 lira note, was a…","Mathematician","Physicist","Chemist","Astronomer"],
+[4,"t","The Kangal is a Turkish breed of…","Dog","Horse","Cat","Sheep"],
+[4,"t","What kind of mountain is Mount Ararat?","Stratovolcano","Fold mountain","Block mountain","Coral atoll"],
+[4,"t","The North Anatolian Fault is mainly what type of fault?","Strike-slip","Normal","Reverse","Subduction zone"],
+[4,"t","Legend says Hezarfen Ahmed Çelebi glided with wings across…","The Bosphorus","The Dardanelles","Lake Van","The Golden Horn only"],
+[4,"t","Gazi Yaşargil is celebrated as a pioneer of…","Microneurosurgery","Heart transplants","Vaccines","Robotics"],
+[4,"t","Al-Jazari, who worked for the Artuqids in Anatolia, is famous for…","Mechanical automata","Star maps","Medical encyclopedias","Gunpowder"],
+[4,"t","Lake Salda, compared by NASA scientists to a crater on Mars, is in which province?","Burdur","Isparta","Denizli","Afyonkarahisar"],
+[4,"t","Türkiye holds most of the world's known reserves of which element?","Boron","Lithium","Cobalt","Tin"],
+[4,"t","Roughly what share of the world's hazelnuts does Türkiye grow?","About two-thirds","About 10%","About a quarter","About 95%"],
+[4,"t","At the surface, the Bosphorus current mainly flows…","From the Black Sea to the Marmara","From the Marmara to the Black Sea","East to west only at night","It has no current"],
+[4,"t","Who became the first Turkish astronaut, flying to the ISS in January 2024?","Alper Gezeravcı","Tuva Cihangir Atasever","Aziz Sancar","Cahit Arf"],
+[4,"t","Which fibre comes from the Angora goat?","Mohair","Cashmere","Angora","Alpaca"],
+[4,"t","Which flower, later central to the Dutch ‘mania’, was prized by the Ottomans?","Tulip","Rose","Carnation","Hyacinth"],
+[4,"t","Which salty lake gives the Anatolian flamingo one of its main breeding grounds?","Tuz Gölü","Lake Van","Lake Sapanca","Lake Abant"],
+// global
+[4,"g","Which planet has the most known moons?","Saturn","Jupiter","Uranus","Neptune"],
+[4,"g","What is the chemical symbol for gold?","Au","Ag","Gd","Go"],
+[4,"g","Marie Curie was born in which city?","Warsaw","Paris","Kraków","Vienna"],
+[4,"g","What is the hardest natural material?","Diamond","Quartz","Corundum","Titanium"],
+[4,"g","Which organ produces insulin?","Pancreas","Liver","Kidney","Spleen"],
+[4,"g","What is the largest living bird?","Ostrich","Emu","Albatross","Cassowary"],
+[4,"g","CERN's Large Hadron Collider crosses the border of Switzerland and…","France","Germany","Italy","Austria"],
+[4,"g","Which gas makes up about 78% of Earth's air?","Nitrogen","Oxygen","Argon","Carbon dioxide"],
+[4,"g","Roughly how fast does light travel in a vacuum?","300,000 km/s","30,000 km/s","3,000,000 km/s","150,000 km/s"],
+[4,"g","Who discovered penicillin?","Alexander Fleming","Louis Pasteur","Robert Koch","Joseph Lister"],
+[4,"g","Who published the periodic table in 1869?","Dmitri Mendeleev","Antoine Lavoisier","John Dalton","Niels Bohr"],
+[4,"g","Which blood type is the universal red-cell donor?","O negative","AB positive","A negative","B positive"],
+[4,"g","The Great Barrier Reef lies off the coast of which country?","Australia","Indonesia","Philippines","Papua New Guinea"],
+[4,"g","How many bones are in an adult human body?","206","201","212","198"],
+[4,"g","Which planet has the Great Red Spot?","Jupiter","Mars","Saturn","Neptune"],
+[4,"g","What is the pH of pure water at 25°C?","7","0","5","14"],
+[4,"g","Who discovered the electron?","J. J. Thomson","Ernest Rutherford","Niels Bohr","Michael Faraday"],
+[4,"g","Which mammal lays eggs?","Platypus","Pangolin","Armadillo","Wombat"],
+[4,"g","Which element has atomic number 1?","Hydrogen","Helium","Lithium","Oxygen"],
+[4,"g","Which Danish astronomer's data helped Kepler find his laws?","Tycho Brahe","Nicolaus Copernicus","Galileo Galilei","Ole Rømer"],
+[4,"g","Which vitamin does your skin make in sunlight?","Vitamin D","Vitamin C","Vitamin A","Vitamin B12"],
+[4,"g","Dolly the sheep, the first cloned mammal, was born in…","Scotland","England","Sweden","New Zealand"],
+[4,"g","The Higgs boson was confirmed at CERN in which year?","2012","2008","2015","2004"],
+[4,"g","What do bees collect from flowers to make honey?","Nectar","Pollen","Sap","Dew"],
+[4,"g","Which is the nearest star to Earth after the Sun?","Proxima Centauri","Sirius","Betelgeuse","Vega"],
+[4,"g","A light-year is a unit of…","Distance","Time","Brightness","Speed"],
+[4,"g","Which is the largest ocean?","Pacific","Atlantic","Indian","Southern"],
+[4,"g","Which part of a plant cell carries out photosynthesis?","Chloroplast","Mitochondrion","Nucleus","Vacuole"],
+[4,"g","Galileo discovered the four largest moons of which planet?","Jupiter","Saturn","Mars","Uranus"],
+
+// ── 5 SPORT & TABLE ─────────────────────────
+[5,"t","Galatasaray won which European trophy in 2000?","UEFA Cup","Champions League","Cup Winners' Cup","Conference League"],
+[5,"t","Where did Türkiye finish at the 2002 FIFA World Cup?","Third","Fourth","Quarter-finals","Second"],
+[5,"t","Naim Süleymanoğlu, the ‘Pocket Hercules’, was a champion in…","Weightlifting","Wrestling","Boxing","Judo"],
+[5,"t","Kırkpınar is a centuries-old tournament of…","Oil wrestling","Archery","Camel wrestling","Cirit"],
+[5,"t","The Kırkpınar tournament is held in which province?","Edirne","Kırklareli","Tekirdağ","Bursa"],
+[5,"t","Cirit is a traditional sport played…","On horseback with blunt javelins","With a bow on foot","On ice","In water"],
+[5,"t","Hidayet Türkoğlu played which sport professionally?","Basketball","Volleyball","Football","Handball"],
+[5,"t","What is the Turkish women's national volleyball team nicknamed?","Filenin Sultanları","12 Dev Adam","Altın Kızlar","Ay-Yıldızlılar"],
+[5,"t","‘12 Dev Adam’ is the nickname of Türkiye's national team in…","Basketball","Volleyball","Football","Handball"],
+[5,"t","Which club is nicknamed ‘Kara Kartallar’ (Black Eagles)?","Beşiktaş","Trabzonspor","Bursaspor","Fenerbahçe"],
+[5,"t","Fenerbahçe's home stadium is in which Istanbul district?","Kadıköy","Beşiktaş","Sarıyer","Başakşehir"],
+[5,"t","Hakan Şükür's record World Cup goal in 2002 came after about…","11 seconds","25 seconds","45 seconds","5 seconds"],
+[5,"t","İskender kebap comes from which city?","Bursa","Adana","Gaziantep","Konya"],
+[5,"t","Which dessert of shredded kadayıf and cheese is a Hatay speciality?","Künefe","Baklava","Kazandibi","Sütlaç"],
+[5,"t","Gaziantep is famous for which nut?","Pistachio","Hazelnut","Walnut","Almond"],
+[5,"t","In tavla (backgammon), how many checkers does each player start with?","15","12","16","10"],
+[5,"t","How many tiles are in a standard okey set?","106","104","108","96"],
+[5,"t","Türkiye's first Olympic gold medal, in 1936, came in which sport?","Wrestling","Weightlifting","Athletics","Boxing"],
+[5,"t","Arda Güler joined which club in 2023?","Real Madrid","Barcelona","Bayern Munich","AC Milan"],
+[5,"t","Which anise-flavoured spirit is Türkiye's traditional drink?","Rakı","Boza","Şalgam","Ayran"],
+[5,"t","Simit is traditionally coated with…","Sesame seeds","Poppy seeds","Sunflower seeds","Black cumin"],
+[5,"t","What is the small pot used to make Turkish coffee called?","Cezve","Çaydanlık","Demlik","Güğüm"],
+[5,"t","Ayran is made from yogurt, water and…","Salt","Sugar","Mint","Lemon"],
+[5,"t","Which Turkish city became a UNESCO City of Gastronomy in 2015?","Gaziantep","İzmir","Trabzon","Ankara"],
+[5,"t","Mantı from Kayseri are famous for being…","Tiny","Fried","Sweet","Square sheets"],
+// global
+[5,"g","Which country has won the most FIFA World Cups?","Brazil","Germany","Italy","Argentina"],
+[5,"g","The Tour de France is a race in which sport?","Cycling","Motor racing","Sailing","Running"],
+[5,"g","Wimbledon is played on which surface?","Grass","Clay","Hard court","Carpet"],
+[5,"g","Judo was developed in which country?","Japan","China","Korea","Brazil"],
+[5,"g","Cricket's Ashes series is contested by England and…","Australia","India","New Zealand","South Africa"],
+[5,"g","Usain Bolt represents which country?","Jamaica","Trinidad and Tobago","Bahamas","Barbados"],
+[5,"g","Which city hosted the 2024 Summer Olympics?","Paris","London","Tokyo","Madrid"],
+[5,"g","Paella comes from which Spanish region?","Valencia","Andalusia","Catalonia","Galicia"],
+[5,"g","Pizza Margherita is traditionally from which city?","Naples","Rome","Milan","Florence"],
+[5,"g","In chess, which piece moves only diagonally?","Bishop","Rook","Knight","Queen"],
+[5,"g","Which country won the 2022 FIFA World Cup?","Argentina","France","Croatia","Morocco"],
+[5,"g","Taekwondo originated in which country?","Korea","Japan","China","Thailand"],
+[5,"g","How many players does each volleyball team have on court?","6","5","7","9"],
+[5,"g","The Dakar Rally originally finished in which country?","Senegal","Morocco","Mali","Mauritania"],
+[5,"g","Which driver shares the record of seven F1 titles with Michael Schumacher?","Lewis Hamilton","Sebastian Vettel","Ayrton Senna","Alain Prost"],
+[5,"g","In which event would you see a ‘Fosbury Flop’?","High jump","Pole vault","Long jump","Diving"],
+[5,"g","Which country hosted the first modern Olympics in 1896?","Greece","France","United Kingdom","Sweden"],
+[5,"g","Traditional feta cheese is made mainly from which milk?","Sheep's milk","Cow's milk","Buffalo milk","Camel milk"],
+[5,"g","Which Brazilian is known as ‘the King of Football’?","Pelé","Ronaldo","Zico","Garrincha"],
+[5,"g","A ‘birdie’ in golf means how many strokes under par?","One","Two","Three","None"],
+[5,"g","Goulash is a national dish of which country?","Hungary","Poland","Czechia","Romania"],
+[5,"g","What is the highest score possible with three darts?","180","150","170","200"],
+[5,"g","The Six Nations Championship is played in which sport?","Rugby union","Football","Cricket","Field hockey"],
+[5,"g","Kimchi is a staple of which cuisine?","Korean","Japanese","Chinese","Thai"],
+[5,"g","Lionel Messi began his professional career at which club?","Barcelona","Newell's Old Boys","PSG","River Plate"],
+[5,"g","The croissant's ancestor, the kipferl, comes from which country?","Austria","France","Switzerland","Hungary"],
+[5,"g","Sumo is the national sport of which country?","Japan","Mongolia","Korea","China"],
+];
+
+
+// ───────── basics ─────────
+const CATS=[
+  {n:"Geography",s:"GEO"},{n:"Screen & Song",s:"SCREEN"},{n:"History",s:"HISTORY"},
+  {n:"Arts & Letters",s:"ARTS"},{n:"Science & Nature",s:"SCIENCE"},{n:"Sport & Table",s:"SPORT"}];
+const PCOL=["#F2C14E","#5BC0EB","#FF8A65","#9BD15A","#C792FF","#FF9F1C","#4ECDC4","#FF7AA8","#C9CEE6","#7AE582"];
+const MAXP=10;
+const byCat=[[],[],[],[],[],[]];
+QS.forEach((q,i)=>byCat[q[0]].push(i));
+const store={get(k,d){try{const v=localStorage.getItem("dilim:"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem("dilim:"+k,JSON.stringify(v))}catch(e){}}};
+const $=s=>document.querySelector(s);
+function h(t,a,...kids){const e=document.createElement(t);a=a||{};
+  for(const k in a){const v=a[k];if(v==null||v===false)continue;
+    if(k==="class")e.className=v;else if(k==="style")e.style.cssText=v;
+    else if(k.startsWith("on"))e.addEventListener(k.slice(2),v);
+    else if(k==="html")e.innerHTML=v;else e.setAttribute(k,v===true?"":v);}
+  for(const c of kids.flat()){if(c==null||c===false)continue;e.append(c.nodeType?c:document.createTextNode(String(c)));}
+  return e;}
+function rng(seed){let a=seed>>>0;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function shuffled(arr,r){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const clean=s=>String(s||"").replace(/[\u0000-\u001f\u007f-\u009f​-‏‪-‮⁠-⁯]/g,"").trim().slice(0,16);
+const initial=n=>(clean(n)[0]||"?").toLocaleUpperCase("tr");
+const pcol=i=>PCOL[((i|0)%PCOL.length+PCOL.length)%PCOL.length];
+function disc(p){return h("div",{class:"disc",style:`background:${pcol(p.c)}`,"aria-hidden":"true"},initial(p.n))}
+let toastT;function toast(msg){document.querySelectorAll(".toast").forEach(e=>e.remove());const t=h("div",{class:"toast",role:"status"},msg);document.body.append(t);clearTimeout(toastT);toastT=setTimeout(()=>t.remove(),3200)}
+
+// ───────── sound ─────────
+let actx=null,muted=store.get("muted",false);
+document.addEventListener("pointerdown",()=>{try{if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)();if(actx.state==="suspended")actx.resume()}catch(e){}},{capture:true});
+function beep(seq){if(muted||!actx)return;try{const t0=actx.currentTime;for(const[f,d,st]of seq){const o=actx.createOscillator(),g=actx.createGain();o.type="triangle";o.frequency.value=f;g.gain.setValueAtTime(.0001,t0+st);g.gain.exponentialRampToValueAtTime(.16,t0+st+.012);g.gain.exponentialRampToValueAtTime(.0001,t0+st+d);o.connect(g).connect(actx.destination);o.start(t0+st);o.stop(t0+st+d+.03)}}catch(e){}}
+const SND={ok:[[660,.12,0],[990,.22,.1]],no:[[240,.22,0],[180,.3,.14]],go:[[520,.07,0],[780,.09,.07]],tick:[[880,.05,0]],win:[[523,.15,0],[659,.15,.12],[784,.15,.24],[1047,.4,.36]],pick:[[440,.06,0]]};
+
+// ───────── svg pieces ─────────
+const RAD=Math.PI/180;
+function pt(r,deg){return[(100+r*Math.sin(deg*RAD)).toFixed(2),(100-r*Math.cos(deg*RAD)).toFixed(2)]}
+function slicePath(r0,r1,a0,a1){const[x0,y0]=pt(r1,a0),[x1,y1]=pt(r1,a1),[x2,y2]=pt(r0,a1),[x3,y3]=pt(r0,a0);
+  return `M${x3},${y3} L${x0},${y0} A${r1},${r1} 0 0 1 ${x1},${y1} L${x2},${y2} A${r0},${r0} 0 0 0 ${x3},${y3} Z`}
+// small token: w = "000000" with 0 empty, 1 half, 2 full
+function pie(w,size){w=w||"222222";let s=`<svg viewBox="0 0 200 200" width="${size}" height="${size}" aria-hidden="true" style="flex:none"><circle cx="100" cy="100" r="98" fill="var(--ink)" stroke="var(--line)" stroke-width="4"/>`;
+  for(let i=0;i<6;i++){const a0=i*60+3,a1=i*60+57,v=w[i];
+    if(v==="2")s+=`<path d="${slicePath(14,88,a0,a1)}" fill="var(--c${i})"/>`;
+    else if(v==="1")s+=`<path d="${slicePath(14,88,a0,a1)}" fill="var(--c${i})" opacity=".22"/><path d="${slicePath(14,52,a0,a1)}" fill="var(--c${i})"/>`;
+    else s+=`<path d="${slicePath(14,88,a0,a1)}" fill="var(--c${i})" opacity=".13"/>`;}
+  return s+"</svg>"}
+function pieEl(w,size){const d=h("span",{style:"display:inline-flex"});d.innerHTML=pie(w,size);return d}
+function wheelSVG(opts){ // opts: live, w (wedges of picker), rot
+  let s=`<svg class="wheel${opts.live?" live":""}" viewBox="-6 -14 212 220" role="${opts.live?"group":"img"}" aria-label="Category wheel">`;
+  s+=`<g class="rot" style="transform:rotate(${opts.rot||0}deg)">`;
+  for(let i=0;i<6;i++){const a0=i*60+1.2,a1=i*60+58.8,v=(opts.w||"")[i];
+    const ca=i*60+30,tr=ca<180?ca-90:ca+90;const[lx,ly]=pt(58,ca);
+    s+=`<g class="slice" data-cat="${i}"${opts.live?` tabindex="0" role="button" aria-label="${CATS[i].n}"`:""}><path d="${slicePath(26,96,a0,a1)}" fill="var(--c${i})"/>`;
+    s+=`<text class="lab" x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" transform="rotate(${tr} ${lx} ${ly})">${CATS[i].s}</text>`;
+    if(opts.w){const[nx,ny]=pt(88,ca);const t=v==="2"?"HAVE":v==="1"?"HALF":"";if(t)s+=`<text class="lab need" x="${nx}" y="${ny}" text-anchor="middle" dominant-baseline="middle" transform="rotate(${tr} ${nx} ${ny})">${t}</text>`}
+    s+=`</g>`;}
+  s+=`</g><circle cx="100" cy="100" r="22" fill="var(--ink)" stroke="var(--paper)" stroke-width="2.5"/>`;
+  s+=`<path d="M100,-10 L91,6 L109,6 Z" fill="var(--paper)"/>`;
+  return s+"</svg>"}
+
+// ───────── state ─────────
+let me={name:store.get("name",""),col:store.get("col",Math.floor(Math.random()*PCOL.length))};
+let mode="home";           // home | localsetup | online | local
+let room;                  // undefined = connecting, null = unavailable
+let game=null,unsubPeers=null;
+let G=null,isHost=false,myPeer=null,peers=[],peerMap=new Map(),myPres={};
+let code="",hostGoneAt=0,joinedAt=0,lastAnn="";
+let hostDeadline=0,allDoneAt=0,loop=null;
+let localAns={},localPick=null;
+const ui={phaseKey:"",phaseStart:0,ans:null,ff:false,dbl:false,picked:false,leaveArm:0,quitArm:0};
+let settings=Object.assign({m:"classic",n:12,x:"mix",t:20},store.get("set",{}));
+let localPlayers=store.get("lp",null)||[{n:"",c:0},{n:"",c:1}];
+
+// ───────── IO adapters ─────────
+const IO={
+  ans(id){if(mode==="local")return localAns[id];if(id===myPeer)return myPres.a;const p=peerMap.get(id);return p&&p.presence&&p.presence.a},
+  pick(id){if(mode==="local")return localPick;if(id===myPeer)return myPres.k;const p=peerMap.get(id);return p&&p.presence&&p.presence.k},
+  active(){if(mode==="local")return new Set(G.pl.map(p=>p.i));const s=new Set();for(const p of peers)if(p.kind==="viewer"&&typeof p.presence.n==="string")s.add(p.peer);return s}
+};
+const myId=()=>mode==="local"?(G&&G.pk):myPeer;
+const plOf=id=>G&&G.pl.find(p=>p.i===id);
+
+// ───────── host engine ─────────
+function newG(){return{v:0,ph:"lobby",set:Object.assign({},settings),seed:0,r:0,pi:0,pk:null,cat:-1,qid:-1,left:0,pl:[],u:[],fx:null,win:null,code}}
+function setPhase(ph,left){G.ph=ph;G.left=left;hostDeadline=Date.now()+left;allDoneAt=0}
+function commit(){G.v=(G.v||0)+1;if(mode==="online"){setMyPres({g:G});announce()}render()}
+function freshPl(p){p.s=0;p.w="000000";p.p=0;p.k=-1;p.d=0;p.gw=0;return p}
+function syncPlayers(){
+  if(!G||mode!=="online")return;
+  let changed=false;const act=IO.active();
+  if(G.ph==="lobby"){const before=G.pl.length;G.pl=G.pl.filter(p=>act.has(p.i));if(G.pl.length!==before)changed=true}
+  for(const p of peers){
+    if(p.kind!=="viewer"||typeof p.presence.n!=="string")continue;
+    const ex=plOf(p.peer),n=clean(p.presence.n)||"Player",c=(p.presence.c|0)%PCOL.length;
+    if(ex){if(ex.n!==n||ex.c!==c){ex.n=n;ex.c=c;changed=true}}
+    else if(G.pl.length<MAXP&&G.ph!=="over"){G.pl.push(freshPl({i:p.peer,n,c}));changed=true}
+  }
+  if(changed)commit();
+}
+function startGame(){
+  if(!G)return;
+  if(mode==="online"){const act=IO.active();G.pl=G.pl.filter(p=>act.has(p.i))}
+  if(!G.pl.length)return;
+  G.pl.forEach(freshPl);G.seed=(Math.random()*2**31)|0;G.u=[];G.r=1;G.win=null;G.fx=null;
+  G.pi=0;G.pk=G.pl[0].i;localAns={};localPick=null;
+  setPhase("pick",mode==="online"?12000:0);commit();
+}
+function autoCat(id){const p=plOf(id);const need=[0,1,2,3,4,5].filter(i=>!p||p.w[i]!=="2");const pool=need.length?need:[0,1,2,3,4,5];return pool[Math.floor(Math.random()*pool.length)]}
+function pickQ(c){
+  const x=G.set.x,used=new Set(G.u),reg=i=>x==="mix"||(x==="t"?QS[i][1]==="t":QS[i][1]==="g");
+  let pool=byCat[c].filter(i=>reg(i)&&!used.has(i));
+  if(!pool.length)pool=byCat[c].filter(i=>!used.has(i));
+  if(!pool.length)pool=byCat[c].slice();
+  // in Mixed, lean toward a Türkiye question about 45% of the time
+  if(x==="mix"){const t=pool.filter(i=>QS[i][1]==="t"),g=pool.filter(i=>QS[i][1]==="g");if(t.length&&g.length)pool=Math.random()<.45?t:g}
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+function chooseCat(c){G.cat=c;G.qid=pickQ(c);G.u.push(G.qid);if(G.u.length>60)G.u=G.u.slice(-60);setPhase("cat",2100);commit()}
+function toQuestion(){setPhase("q",G.set.t*1000);commit()}
+function scoreRound(){
+  const T=G.set.t*1000;let fastest=null,fms=1e9;
+  for(const p of G.pl){
+    const a=IO.ans(p.i);p.k=-1;p.d=0;p.gw=0;
+    if(!a||a.r!==G.r||typeof a.c!=="number")continue;
+    const pw=(a.p|0)&3,ff=(pw&1)&&!(p.p&1),dbl=(pw&2)&&!(p.p&2);
+    p.p|=(ff?1:0)|(dbl?2:0);
+    p.k=a.c|0;p.x=dbl?1:0;
+    const ms=Math.max(0,Math.min(T,+a.ms||T));
+    if(p.k===0){
+      let pts=500+Math.round(500*(1-ms/T));if(dbl)pts*=2;
+      p.s+=pts;p.d=pts;
+      const w=+p.w[G.cat],nw=p.i===G.pk?2:Math.min(2,w+1);
+      if(nw>w){p.w=p.w.slice(0,G.cat)+nw+p.w.slice(G.cat+1);p.gw=nw-w}
+      if(ms<fms){fms=ms;fastest=p.i}
+    }else if(dbl){const loss=Math.min(300,p.s);p.s-=loss;p.d=-loss}
+  }
+  G.fx=fastest;setPhase("reveal",mode==="online"?7500:0);commit();
+}
+function nextRound(){
+  const full=p=>p.w==="222222";
+  if(G.set.m==="classic"){if(G.pl.some(full)||G.r>=40)return finish()}
+  else if(G.r>=G.set.n)return finish();
+  const act=IO.active(),n=G.pl.length;
+  for(let k=1;k<=n;k++){const j=(G.pi+k)%n;if(mode==="local"||act.has(G.pl[j].i)){G.pi=j;G.pk=G.pl[j].i;break}}
+  G.r++;localAns={};localPick=null;
+  setPhase("pick",mode==="online"?12000:0);commit();
+}
+function finish(){
+  const cnt=w=>[...w].filter(c=>c==="2").length;
+  const r=G.pl.slice().sort((a,b)=>G.set.m==="classic"?(cnt(b.w)-cnt(a.w))||(b.s-a.s):(b.s-a.s)||(cnt(b.w)-cnt(a.w)));
+  G.win=r.map(p=>p.i);setPhase("over",0);commit();
+}
+function toLobby(){G.ph="lobby";G.left=0;G.win=null;if(mode==="online")G.pl=G.pl.filter(p=>IO.active().has(p.i));G.pl.forEach(freshPl);commit()}
+function hostTick(){
+  if(!G||!(isHost||mode==="local"))return;
+  const now=Date.now();
+  if(mode==="online")syncPlayers();
+  const act=IO.active();
+  if(G.ph==="pick"){
+    const k=IO.pick(G.pk);
+    if(k&&k.r===G.r&&k.cat>=0&&k.cat<6)return chooseCat(k.cat|0);
+    if(mode==="online"&&(!act.has(G.pk)||now>hostDeadline))return chooseCat(autoCat(G.pk));
+  }else if(G.ph==="cat"){if(now>=hostDeadline)toQuestion()}
+  else if(G.ph==="q"){
+    const need=mode==="local"?[G.pk]:G.pl.map(p=>p.i).filter(i=>act.has(i));
+    const all=need.every(i=>{const a=IO.ans(i);return a&&a.r===G.r});
+    if(all&&!allDoneAt)allDoneAt=now+800;
+    if(now>hostDeadline+600||(allDoneAt&&now>=allDoneAt))scoreRound();
+  }else if(G.ph==="reveal"){if(mode==="online"&&now>=hostDeadline)nextRound()}
+}
+function startLoop(){if(!loop)loop=setInterval(hostTick,200)}
+function stopLoop(){clearInterval(loop);loop=null}
+
+// ───────── online plumbing ─────────
+function setMyPres(patch){Object.assign(myPres,patch);if(game)game.presence(patch).catch(()=>{})}
+function announce(){
+  if(!room||!isHost||mode!=="online"||!G)return;
+  const info={code:G.code,n:clean(me.name)||"Host",c:G.pl.length,st:G.ph==="lobby"?"open":"playing"};
+  const s=JSON.stringify(info);if(s!==lastAnn){lastAnn=s;room.presence({host:info}).catch(()=>{})}
+}
+function onGamePeers(ch){
+  peers=ch.peers;peerMap=new Map(peers.map(p=>[p.peer,p]));
+  const mine=peers.find(p=>p.sameTab);if(mine)myPeer=mine.peer;
+  if(!isHost){
+    let best=null;
+    for(const p of peers){const g=p.presence&&p.presence.g;if(g&&typeof g==="object"&&Array.isArray(g.pl)&&(!best||g.v>best.v||(g.v===best.v&&p.peer<best.peer)))best=g}
+    if(best){G=best;hostGoneAt=0}
+  }else syncPlayers();
+  render();
+}
+function migrateCheck(){
+  if(mode!=="online"||isHost||!G)return;
+  const hostThere=peers.some(p=>!p.sameTab&&p.presence&&p.presence.g);
+  if(hostThere){hostGoneAt=0;return}
+  const now=Date.now();if(!hostGoneAt){hostGoneAt=now;return}
+  if(now-hostGoneAt<3500)return;
+  const act=IO.active();const cands=G.pl.map(p=>p.i).filter(i=>act.has(i)).sort();
+  if(cands[0]&&cands[0]===myPeer){
+    isHost=true;G=JSON.parse(JSON.stringify(G));
+    setPhase(G.ph,G.ph==="pick"?12000:G.ph==="q"?G.set.t*1000:G.ph==="cat"?1500:G.ph==="reveal"?6000:0);
+    startLoop();commit();toast("The host left. You're hosting now.");
+  }
+}
+setInterval(migrateCheck,700);
+
+async function enterGame(c,asHost){
+  if(!room)return;
+  me.name=clean(me.name);if(!me.name){toast("Type your name first.");const f=$("#nm");f&&f.focus();return}
+  store.set("name",me.name);
+  code=c.toUpperCase();mode="online";isHost=asHost;G=null;myPeer=null;peers=[];peerMap=new Map();myPres={};hostGoneAt=0;joinedAt=Date.now();
+  render();
+  try{game=await room.join("dilim-"+code.toLowerCase())}
+  catch(e){game=null;mode="home";render();toast(e&&e.code==="limit_reached"?"Too many rooms open right now. Try again in a moment.":"Couldn't open that room. Try again.");return}
+  myPres={n:me.name,c:me.col};
+  if(asHost){G=newG();myPres.g=G;startLoop()}
+  game.presence(myPres).catch(()=>{});
+  unsubPeers=game.onPeers(onGamePeers,()=>{toast("Lost the connection to the room.");leave(true)});
+  if(asHost)announce();
+  render();
+}
+function leave(silent){
+  try{unsubPeers&&unsubPeers()}catch(e){}
+  if(game)game.leave().catch(()=>{});
+  if(room&&isHost)room.presence({host:null}).catch(()=>{});
+  game=null;unsubPeers=null;stopLoop();isHost=false;G=null;mode="home";lastAnn="";localAns={};localPick=null;
+  render();
+}
+
+
+// ───────── local play ─────────
+function startLocal(){
+  const list=localPlayers.map((p,i)=>({n:clean(p.n)||`Player ${i+1}`,c:p.c|0}));
+  if(list.length<1)return;
+  store.set("lp",localPlayers);
+  mode="local";isHost=false;code="";G=newG();G.local=true;
+  G.pl=list.map((p,i)=>freshPl({i:"L"+i,n:p.n,c:p.c}));
+  startLoop();startGame();
+}
+
+// ───────── player actions ─────────
+function pickCat(c){
+  if(!G||G.ph!=="pick"||ui.picked)return;
+  if(myId()!==G.pk)return;
+  ui.picked=true;beep(SND.pick);
+  if(mode==="local")localPick={r:G.r,cat:c};else setMyPres({k:{r:G.r,cat:c}});
+  render();hostTick();
+}
+function answer(orig){
+  if(!G||G.ph!=="q"||ui.ans)return;
+  const id=myId(),p=plOf(id);if(!p)return;
+  const a={r:G.r,c:orig,ms:Date.now()-ui.phaseStart,p:(ui.ff?1:0)|(ui.dbl?2:0)};
+  ui.ans=a;beep(SND.tick);
+  if(mode==="local")localAns[id]=a;else setMyPres({a});
+  render();
+}
+function optOrder(){return shuffled([0,1,2,3],rng((G.seed^Math.imul(G.qid+7,2654435761))>>>0))}
+function ffGone(){const r=rng((G.seed+G.qid*31+5)>>>0);return shuffled([1,2,3],r).slice(0,2)}
+
+// ───────── rendering ─────────
+const main=$("#main");
+let cur={key:null,upd:null};
+function screenKey(){
+  if(mode==="home")return"home";
+  if(mode==="localsetup")return"localsetup";
+  if(!G)return"waiting";
+  if(G.ph==="lobby")return"lobby";
+  return G.ph+":"+G.r+(G.ph==="over"?":"+G.v:"");
+}
+function render(){
+  if(G){const pk=G.ph+":"+G.r+":"+G.qid;
+    if(pk!==ui.phaseKey){const prev=ui.phaseKey;ui.phaseKey=pk;ui.phaseStart=Date.now();
+      if(G.ph==="q"){ui.ans=null;ui.ff=false;ui.dbl=false;if(prev)beep(SND.go)}
+      if(G.ph==="pick")ui.picked=false;
+      if(G.ph==="reveal"){const p=plOf(myId());if(p&&p.k>=0)beep(p.k===0?SND.ok:SND.no)}
+      if(G.ph==="over")beep(SND.win);
+    }}
+  renderTop();
+  const key=screenKey();
+  if(key!==cur.key||cur.rebuild){cur.key=key;cur.rebuild=false;main.replaceChildren();const b=BUILD[key.split(":")[0]];cur.upd=b?b(main)||null:null}
+  if(cur.upd)cur.upd();
+}
+function renderTop(){
+  $("#logo").replaceChildren(pieEl("222222",28));
+  const r=$("#topR");r.replaceChildren();
+  if(mode==="online"&&code)r.append(h("span",{class:"chip",title:"Room code"},code));
+  if(mode==="local")r.append(h("span",{class:"chip"},"ONE DEVICE"));
+  r.append(h("button",{class:"ibtn",type:"button","aria-pressed":String(!muted),onclick:()=>{muted=!muted;store.set("muted",muted);renderTop()}},muted?"Sound off":"Sound on"));
+  if(mode==="online"||mode==="local"||mode==="localsetup"){
+    const armed=Date.now()-ui.leaveArm<3000;
+    r.append(h("button",{class:"ibtn",type:"button",style:armed?"color:var(--bad);border-color:var(--bad)":"",onclick:()=>{
+      if(mode==="localsetup"){mode="home";render();return}
+      if(Date.now()-ui.leaveArm<3000){ui.leaveArm=0;leave()}else{ui.leaveArm=Date.now();renderTop();setTimeout(renderTop,3100)}
+    }},armed?"Tap again to leave":"Leave"));
+  }
+  // Back to the arcade launcher. Mid-game it needs a second tap, like Leave.
+  if(window.KQuit&&KQuit.onSite){
+    const qa=Date.now()-ui.quitArm<3000;
+    r.append(h("button",{class:"ibtn",type:"button",style:qa?"color:var(--bad);border-color:var(--bad)":"",onclick:()=>{
+      if(mode==="home"||qa){KQuit.go();return}
+      ui.quitArm=Date.now();renderTop();setTimeout(renderTop,3100);
+    }},qa?"Tap again to quit":KQuit.LABEL));
+  }
+}
+$("#brand").onclick=()=>{if(mode==="home")return;if(mode==="localsetup"){mode="home";render()}};
+
+function playerStrip(opts){
+  opts=opts||{};const wrap=h("div",{class:"strip"});if(!G)return wrap;
+  const act=IO.active(),mine=myId();
+  for(const p of G.pl){
+    let cls="pc";if(p.i===G.pk&&G.ph!=="lobby")cls+=" turn";if(mode==="online"&&!act.has(p.i))cls+=" away";
+    if(mode==="online"&&p.i===mine)cls+=" me";
+    if(opts.answered){const a=IO.ans(p.i);if(a&&a.r===G.r)cls+=" done"}
+    wrap.append(h("div",{class:cls},disc(p),h("div",{class:"mid"},h("span",{class:"nm"},p.n),h("span",{class:"sc"},p.s.toLocaleString("en-US")+" pts")),pieEl(p.w,30)));
+  }
+  return wrap;
+}
+function settingsBlock(editable,onChange){
+  const s=G?G.set:settings;const box=h("div",{class:"card"});
+  const seg=(key,items)=>{const el=h("div",{class:"seg",role:"group"});
+    for(const[val,label]of items)el.append(h("button",{type:"button","aria-pressed":String(s[key]===val),disabled:!editable,onclick:()=>{settings[key]=val;store.set("set",settings);onChange&&onChange()}},label));return el};
+  box.append(
+    h("div",{class:"setting"},h("div",{},h("div",{class:"lbl"},"Mode"),h("div",{class:"sub"},s.m==="classic"?"First to fill all six wedges wins":`${s.n} rounds, most points wins`)),seg("m",[["classic","Classic"],["sprint","Sprint"]])),
+    h("div",{class:"setting"},h("div",{},h("div",{class:"lbl"},"Questions"),h("div",{class:"sub"},s.x==="mix"?"Global questions with a Türkiye streak":s.x==="t"?"Mostly about Türkiye":"Worldwide, no US focus")),seg("x",[["mix","Mixed"],["g","Global"],["t","Türkiye"]])),
+    h("div",{class:"setting"},h("div",{},h("div",{class:"lbl"},"Answer time")),seg("t",[[15,"15s"],[20,"20s"],[30,"30s"]]))
+  );
+  return box;
+}
+
+const BUILD={
+home(root){
+  const nameIn=h("input",{id:"nm",class:"field",maxlength:"16",placeholder:"Your name",autocomplete:"off",value:me.name,"aria-label":"Your name"});
+  nameIn.addEventListener("input",()=>{me.name=nameIn.value;store.set("name",clean(me.name))});
+  const sw=h("div",{class:"sw",role:"group","aria-label":"Your colour"});
+  const drawSw=()=>{sw.replaceChildren(...PCOL.map((c,i)=>h("button",{type:"button",style:`background:${c}`,"aria-label":`Colour ${i+1}`,"aria-pressed":String(me.col===i),onclick:()=>{me.col=i;store.set("col",i);drawSw()}})))};drawSw();
+  const codeIn=h("input",{id:"code",class:"field code-in",maxlength:"4",placeholder:"CODE",autocomplete:"off","aria-label":"Room code"});
+  codeIn.addEventListener("input",()=>{codeIn.value=codeIn.value.toUpperCase().replace(/[^A-Z]/g,"")});
+  const joinBtn=h("button",{class:"btn ghost",type:"button",onclick:()=>{const c=codeIn.value.trim();if(c.length!==4){toast("Room codes are 4 letters.");codeIn.focus();return}enterGame(c,false)}},"Join");
+  codeIn.addEventListener("keydown",e=>{if(e.key==="Enter")joinBtn.click()});
+  const hostBtn=h("button",{class:"btn big",type:"button",onclick:()=>{const L="ABCDEFGHJKLMNPRSTUVYZ";let c="";for(let i=0;i<4;i++)c+=L[Math.floor(Math.random()*L.length)];enterGame(c,true)}},"Host a room");
+  const games=h("div",{class:"games"});const onlineNote=h("p",{class:"muted",style:"margin:0;font-size:14px"});
+  const tCount=QS.filter(q=>q[1]==="t").length;
+  root.append(
+    h("section",{class:"hero"},
+      h("div",{},h("div",{class:"eyebrow"},"Six-wedge trivia · up to 10 players"),h("h1",{class:"display"},"Altı Dilim"),
+        h("p",{},`Spin the wheel, answer fast, fill your six slices. ${QS.length} questions from around the world, ${tCount} of them about Türkiye.`)),
+      h("div",{class:"wheelwrap",html:wheelSVG({}).replace('class="rot"','class="rot spin-slow"')})),
+    h("div",{class:"card"},
+      h("div",{class:"eyebrow"},"You"),
+      h("div",{class:"row",style:"flex-wrap:nowrap"},nameIn),sw),
+    h("div",{class:"card"},
+      h("div",{class:"eyebrow"},"Play online, everyone on their own phone"),
+      h("div",{class:"row"},hostBtn,h("span",{class:"muted"},"or"),codeIn,joinBtn),
+      onlineNote,games),
+    h("div",{class:"card"},
+      h("div",{class:"eyebrow"},"Play on one device"),
+      h("p",{class:"muted",style:"margin:0"},"Pass the phone or laptop around. Players take turns, classic board-game style."),
+      h("div",{class:"row"},h("button",{class:"btn ghost",type:"button",onclick:()=>{mode="localsetup";render()}},"Set up players"))),
+    h("div",{class:"card"},
+      h("div",{class:"eyebrow"},"How it works"),
+      h("ul",{class:"rules"},
+        h("li",{},h("b",{},"Each round one player spins. "),"They pick one of six categories. Everyone answers the same question at once."),
+        h("li",{},h("b",{},"Slices. "),"Answer right and you earn half a slice of that colour, or the whole slice if it was your pick. Two halves make a slice."),
+        h("li",{},h("b",{},"Points. "),"500 for a right answer, plus up to 500 for speed."),
+        h("li",{},h("b",{},"Once per game: "),"50:50 removes two wrong answers. Double or nothing doubles your points, or costs you 300 if you're wrong.")),
+      h("div",{class:"cats"},CATS.map((c,i)=>h("div",{class:"cat-tag"},h("i",{style:`background:var(--c${i})`}),c.n))))
+  );
+  return()=>{
+    hostBtn.disabled=!room;joinBtn.disabled=!room;
+    games.replaceChildren();
+    if(room===undefined){onlineNote.textContent="Connecting…";return}
+    if(!room){onlineNote.textContent="Couldn’t start online play. Check your connection and reload. You can still play on one device below.";return}
+    const list=[];for(const p of room.peers()){const x=p.presence&&p.presence.host;if(!p.sameTab&&x&&/^[A-Z]{4}$/.test(x.code))list.push(x)}
+    onlineNote.textContent=list.length?"Open rooms right now:":"Host a room and share the 4-letter code. Open rooms also show up here for anyone with this page open.";
+    for(const x of list.slice(0,8))games.append(h("div",{class:"game-row"},
+      h("div",{style:"min-width:0"},h("b",{},x.code)," ",h("span",{class:"muted"},`${clean(x.n)} · ${x.c|0}/10 · ${x.st==="open"?"in lobby":"playing"}`)),
+      h("button",{class:"btn ghost",type:"button",disabled:(x.c|0)>=MAXP,onclick:()=>enterGame(x.code,false)},(x.c|0)>=MAXP?"Full":"Join")));
+  };
+},
+localsetup(root){
+  const list=h("div",{class:"local-list"});
+  const draw=()=>{list.replaceChildren();localPlayers.forEach((p,i)=>{
+    const inp=h("input",{id:"lp"+i,class:"field",maxlength:"16",placeholder:`Player ${i+1}`,value:p.n,autocomplete:"off","aria-label":`Player ${i+1} name`});
+    inp.addEventListener("input",()=>{p.n=inp.value;store.set("lp",localPlayers)});
+    const d=h("button",{class:"disc",type:"button",style:`background:${pcol(p.c)};width:44px;height:44px;border:0`,"aria-label":"Change colour",onclick:()=>{p.c=(p.c+1)%PCOL.length;store.set("lp",localPlayers);draw()}},String(i+1));
+    list.append(h("div",{class:"local-row"},d,inp,localPlayers.length>1?h("button",{class:"xbtn",type:"button","aria-label":"Remove player",onclick:()=>{localPlayers.splice(i,1);draw()}},"×"):null));
+  });addBtn.disabled=localPlayers.length>=MAXP};
+  const addBtn=h("button",{class:"btn ghost",type:"button",onclick:()=>{const used=new Set(localPlayers.map(p=>p.c));let c=0;while(used.has(c)&&c<9)c++;localPlayers.push({n:"",c});draw();const f=$("#lp"+(localPlayers.length-1));f&&f.focus()}},"Add player");
+  const setBox=h("div");const drawSet=()=>setBox.replaceChildren(settingsBlock(true,drawSet));
+  draw();drawSet();
+  root.append(
+    h("div",{},h("div",{class:"eyebrow"},"One device"),h("h2",{class:"display",style:"font-size:clamp(28px,6vw,40px);margin-top:6px"},"Who's playing?")),
+    h("div",{class:"card"},list,h("div",{class:"row"},addBtn,h("span",{class:"muted",style:"font-size:14px"},"Tap a number to change colour. Up to 10."))),
+    setBox,
+    h("div",{class:"row"},h("button",{class:"btn big",type:"button",onclick:startLocal},"Start game"))
+  );
+},
+waiting(root){
+  const msg=h("p",{class:"muted"},"Connecting to the room…");
+  root.append(h("div",{class:"card center",style:"padding-block:40px"},h("div",{class:"eyebrow"},"Room"),h("div",{class:"code-big"},code),msg));
+  return()=>{if(game&&Date.now()-joinedAt>6000)msg.textContent=`Nobody is hosting ${code} yet. Check the code with your host, or leave and host your own.`;};
+},
+lobby(root){
+  const plist=h("div",{class:"plist"}),setBox=h("div"),actions=h("div",{class:"row"}),head=h("p",{class:"muted",style:"margin:0"});
+  root.append(
+    h("div",{class:"card center",style:"padding-block:26px"},
+      h("div",{class:"eyebrow"},"Room code"),h("div",{class:"code-big"},code),head),
+    h("div",{class:"card"},h("div",{class:"row",style:"justify-content:space-between"},h("div",{class:"eyebrow"},"Players"),h("span",{class:"eyebrow",id:"pcount"})),plist),
+    setBox,actions);
+  return()=>{
+    const host=isHost;
+    head.textContent=host?"Send friends this page’s link and tell them the code. They join from the home screen.":"You're in. The host will start the game.";
+    plist.replaceChildren();const act=IO.active();
+    for(const p of G.pl)plist.append(h("div",{class:"pslot"},disc(p),h("span",{class:"nm"},p.n),p.i===myPeer?h("span",{class:"tag"},"You"):null));
+    for(let i=G.pl.length;i<Math.min(MAXP,Math.max(G.pl.length+1,4));i++)plist.append(h("div",{class:"pslot empty"},"Waiting for a player…"));
+    $("#pcount").textContent=`${G.pl.length} / ${MAXP}`;
+    if(!plOf(myPeer)&&G.pl.length>=MAXP&&myPeer)head.textContent="This room is full. You can watch.";
+    setBox.replaceChildren(settingsBlock(host,()=>{G.set=Object.assign({},settings);commit()}));
+    actions.replaceChildren(host?h("button",{class:"btn big",type:"button",onclick:startGame},G.pl.length<2?"Start solo":`Start game · ${G.pl.length} players`):h("span",{class:"muted"},"Waiting for the host to start…"));
+    void act;
+  };
+},
+pick(root){
+  const pk=plOf(G.pk),mine=myId()===G.pk;
+  const timer=h("div",{class:"tbar","data-timer":"bar"},h("i"));
+  const holder=h("div");
+  const spin=h("button",{class:"btn ghost",type:"button",onclick:()=>pickCat(autoCat(G.pk))},"Spin for me");
+  const sub=h("p",{class:"muted",style:"margin:0;max-width:46ch"});
+  root.append(
+    h("div",{class:"qhead"},h("span",{class:"eyebrow"},`Round ${G.r}${G.set.m==="sprint"?" of "+G.set.n:""}`),h("div",{class:"timer","data-timer":"num"})),
+    G.left?timer:null,
+    h("div",{class:"center"},
+      mode==="local"?h("div",{class:"pass"},`Pass the device to ${pk?pk.n:"the next player"}`):null,
+      h("h2",{class:"display pick-h"},mine?(mode==="local"?`${pk.n}, pick a category`:"Your pick"):`${pk?pk.n:"Someone"} is choosing`),
+      sub,holder,mine?spin:null),
+    playerStrip());
+  holder.innerHTML=wheelSVG({live:mine,w:pk&&pk.w});
+  if(mine)holder.querySelectorAll(".slice").forEach(s=>{const c=+s.dataset.cat;s.addEventListener("click",()=>pickCat(c));s.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();pickCat(c)}})});
+  return()=>{
+    sub.textContent=mine?(ui.picked?"Spinning…":"Get it right and the whole slice is yours. Everyone else plays for half."):"Everyone answers this one. Right answers earn half a slice.";
+    spin.disabled=ui.picked;
+  };
+},
+cat(root){
+  const c=G.cat,holder=h("div");
+  root.append(
+    h("div",{class:"qhead"},h("span",{class:"eyebrow"},`Round ${G.r}`)),
+    h("div",{class:"center"},holder,h("div",{class:"catpill",style:`--cat:var(--c${c})`,id:"catpill"},CATS[c].n)),
+    playerStrip());
+  holder.innerHTML=wheelSVG({});
+  const rot=holder.querySelector(".rot"),target=-(c*60+30)-1080;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{rot.style.transform=`rotate(${target}deg)`}));
+},
+q(root){
+  const q=QS[G.qid],c=G.cat,ord=optOrder(),gone=ffGone();
+  root.style.setProperty("--cat",`var(--c${c})`);
+  const btns=ord.map((o,idx)=>h("button",{class:"opt",type:"button","data-o":o,onclick:()=>answer(o)},h("span",{class:"l"},"ABCD"[idx]),h("span",{class:"t"},q[3+o])));
+  const ffB=h("button",{class:"pwb",type:"button",onclick:()=>{ui.ff=true;render()}},h("b",{},"50:50"),"Remove two");
+  const dbB=h("button",{class:"pwb",type:"button",onclick:()=>{ui.dbl=!ui.dbl;render()}},h("b",{},"×2"),"Double or nothing");
+  const status=h("div",{class:"status",role:"status"});const stripBox=h("div");
+  const me_=plOf(myId());
+  root.append(
+    h("div",{class:"qhead"},h("span",{class:"catpill"},CATS[c].n),h("span",{class:"eyebrow"},`Round ${G.r}`+(mode==="local"&&plOf(G.pk)?` · ${plOf(G.pk).n}`:"")),h("div",{class:"timer","data-timer":"num"})),
+    h("div",{class:"tbar","data-timer":"bar"},h("i")),
+    h("h2",{class:"qtext"},q[2]),
+    h("div",{class:"opts"},btns),
+    me_?h("div",{class:"pw"},ffB,dbB):null,
+    status,stripBox);
+  return()=>{
+    const p=plOf(myId());const locked=!!ui.ans;
+    for(const b of btns){const o=+b.dataset.o;b.disabled=!p||locked;b.classList.toggle("gone",ui.ff&&gone.includes(o));b.classList.toggle("chosen",locked&&ui.ans.c===o)}
+    if(p){ffB.disabled=locked||ui.ff||!!(p.p&1);ffB.setAttribute("aria-pressed",String(ui.ff));
+      dbB.disabled=locked||!!(p.p&2);dbB.setAttribute("aria-pressed",String(ui.dbl));
+      if(p.p&1&&!ui.ff)ffB.title="Already used";if(p.p&2)dbB.title="Already used"}
+    const n=G.pl.filter(x=>{const a=IO.ans(x.i);return a&&a.r===G.r}).length;
+    status.replaceChildren();
+    if(!p)status.append("You're watching this round.");
+    else if(locked)status.append(h("b",{},"Locked in."),mode==="online"?` Waiting for others · ${n}/${IO.active().size} answered`:"");
+    else if(ui.dbl)status.append(h("b",{},"Double or nothing is on."));
+    stripBox.replaceChildren(playerStrip({answered:mode==="online"}));
+  };
+},
+reveal(root){
+  const q=QS[G.qid],c=G.cat,ord=optOrder(),mine=myId();
+  root.style.setProperty("--cat",`var(--c${c})`);
+  const mp=plOf(mine);
+  const opts=ord.map((o,idx)=>{let cls="opt";if(o===0)cls+=" correct";else if(mp&&mp.k===o)cls+=" wrong";else cls+=" dim";
+    const who=G.pl.filter(p=>p.k===o);
+    return h("div",{class:cls},h("span",{class:"l"},"ABCD"[idx]),h("span",{class:"t"},q[3+o]),who.length&&mode==="online"?h("span",{class:"who"},who.map(disc)):null)});
+  let head;
+  if(mp&&mp.k===0)head=`Right! +${mp.d}`;else if(mp&&mp.k>0)head=mp.d<0?`Wrong. ${mp.d} for doubling`:"Not this time";else if(mp)head="Time's up";else head="Answer";
+  const rows=G.pl.slice().sort((a,b)=>(b.d-a.d)||(b.s-a.s)).map(p=>{
+    const note=p.k===0?(p.gw===2?`Full ${CATS[c].n} slice`:p.gw===1?"Half slice":"Already had this slice"):p.k>0?"Wrong answer":"No answer";
+    return h("div",{class:"res"},disc(p),h("span",{class:"nm"},p.n,p.i===G.fx?h("span",{class:"badge"},"Fastest"):null,p.x&&p.k>=0?h("span",{class:"badge"},"×2"):null),
+      h("span",{class:"d "+(p.d>0?"pos":p.d<0?"neg":"")},p.d>0?`+${p.d}`:p.d<0?String(p.d):"0"),
+      h("span",{class:"note"},note))});
+  const foot=h("div",{class:"row"});
+  root.append(
+    h("div",{class:"qhead"},h("span",{class:"catpill"},CATS[c].n),h("span",{class:"eyebrow"},`Round ${G.r}`),h("div",{class:"timer","data-timer":"num"})),
+    h("h2",{class:"display",style:`font-size:clamp(26px,6vw,40px);color:${mp&&mp.k===0?"var(--good)":"var(--paper)"}`},head),
+    h("p",{class:"qtext",style:"font-size:clamp(18px,3.6vw,22px);color:var(--muted)"},q[2]),
+    h("div",{class:"opts"},opts),
+    h("div",{class:"results"},rows),
+    foot,playerStrip());
+  if(mode==="local"){
+    const nextP=(()=>{const n=G.pl.length;return G.pl[(G.pi+1)%n]})();
+    foot.append(h("button",{class:"btn big",type:"button",onclick:nextRound},`Next · ${nextP?nextP.n+"'s turn":"continue"}`));
+  }else foot.append(h("span",{class:"muted"},"Next round starts in a moment…"));
+},
+over(root){
+  const ranked=(G.win||[]).map(plOf).filter(Boolean);const w=ranked[0];
+  const cnt=x=>[...x.w].filter(c=>c==="2").length;
+  root.append(
+    h("div",{class:"center",style:"padding-block:10px"},
+      w?pieEl(w.w,120):null,
+      h("div",{class:"eyebrow"},G.set.m==="classic"?(cnt(w||{w:""})===6?"All six slices":"Most slices"):"Highest score"),
+      h("h2",{class:"display",style:"font-size:clamp(34px,8vw,60px)"},w?`${w.n} wins!`:"Game over")),
+    h("div",{class:"podium"},ranked.map((p,i)=>h("div",{class:"rank"+(i===0?" first":"")},
+      h("span",{class:"n"},String(i+1)),disc(p),h("span",{style:"font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"},p.n),pieEl(p.w,28),h("span",{class:"sc"},p.s.toLocaleString("en-US"))))),
+    h("div",{class:"row",style:"justify-content:center"},
+      (isHost||mode==="local")?[
+        h("button",{class:"btn big",type:"button",onclick:startGame},"Rematch"),
+        mode==="local"?h("button",{class:"btn ghost",type:"button",onclick:()=>{stopLoop();G=null;mode="localsetup";render()}},"Change players")
+          :h("button",{class:"btn ghost",type:"button",onclick:toLobby},"Back to lobby")]
+      :h("span",{class:"muted"},"Waiting for the host to start a rematch…")));
+}
+};
+
+// timer loop
+function frame(){
+  if(G&&(G.ph==="q"||G.ph==="pick"||G.ph==="reveal")&&G.left){
+    const rem=Math.max(0,ui.phaseStart+G.left-Date.now()),p=rem/G.left;
+    document.querySelectorAll('[data-timer="bar"]').forEach(b=>{b.style.setProperty("--p",p.toFixed(3));b.classList.toggle("low",G.ph==="q"&&rem<5000)});
+    document.querySelectorAll('[data-timer="num"]').forEach(n=>{n.textContent=G.ph==="reveal"?"":Math.ceil(rem/1000)+"s"});
+  }else document.querySelectorAll('[data-timer="num"]').forEach(n=>{n.textContent=""});
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+// keyboard: A–D or 1–4 to answer
+document.addEventListener("keydown",e=>{
+  if(!G||G.ph!=="q"||ui.ans||e.target.closest("input"))return;
+  const k=e.key.toUpperCase();let idx="ABCD".indexOf(k);if(idx<0)idx="1234".indexOf(k);if(idx<0)return;
+  const o=optOrder()[idx];if(ui.ff&&ffGone().includes(o))return;answer(o);
+});
+// refresh waiting text / leave button
+setInterval(()=>{if(cur.key==="waiting"&&cur.upd)cur.upd()},1000);
+render();
+(async()=>{
+  try{room=window.claude&&window.claude.use?await window.claude.use("room"):window.KNet?await window.KNet.use("room"):null}catch(e){room=null}
+  if(room){room.onPeers(()=>{if(mode==="home")render()},()=>{room=null;if(mode==="home")render()})}
+  if(mode==="home")render();
+})();
+</script>
+
+</body></html>

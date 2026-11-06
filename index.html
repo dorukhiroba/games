@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Kral Oyun Arcade</title>
-<meta name="description" content="16 free browser games: solo puzzles, 2-player couch battles and online arenas for up to 10 friends. 16 ücretsiz tarayıcı oyunu.">
+<meta name="description" content="18 free browser games: solo puzzles, 2-player couch battles and online arenas for up to 10 friends. 18 ücretsiz tarayıcı oyunu.">
 <meta name="theme-color" content="#0f0c1d">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Kral Oyun Arcade">
-<meta property="og:title" content="Kral Oyun Arcade · 16 free browser games">
+<meta property="og:title" content="Kral Oyun Arcade · 18 free browser games">
 <meta property="og:description" content="Puzzles, couch battles and online arenas for up to 10 friends. No downloads, no logins.">
 <meta property="og:url" content="https://dorukhiroba.github.io/games/">
 <meta property="og:image" content="https://dorukhiroba.github.io/games/og.jpg">
@@ -388,6 +388,8 @@
       desc: { en: "Free-for-all or Duos: team up in pairs, no friendly fire.", tr: "Herkes herkese karşı ya da ikili takımlar. Dost ateşi yok." } },
     { slug: "doodle-duel",   cat: "online", name: "Doodle Duel",   badge: "new", tags: ["Drawing", "Party", "Also local"], dev: "tkm",
       desc: { en: "One player sketches a secret word, everyone else races to guess it first.", tr: "Bir oyuncu gizli kelimeyi çizer, diğerleri ilk tahmin eden olmak için yarışır." } },
+    { slug: "6-dilim",       cat: "online", name: "Altı Dilim",    badge: "new", tags: ["Trivia", "Party", "Also local"], dev: "tkm",
+      desc: { en: "Spin the wheel, answer fast and fill all six slices. 303 questions, 135 about Türkiye.", tr: "Çarkı çevir, hızlı cevapla, altı dilimi doldur. 303 soru, 135'i Türkiye hakkında." } },
     { slug: "saltpit-arena", cat: "online", name: "Saltpit Arena", badge: "up10", tags: ["3D", "Shooter"], dev: "tkm",
       desc: { en: "FFA, TDM, CTF, Domination and S&D. Seven weapons, gold camos, killstreaks up to a nuke.", tr: "FFA, TDM, CTF, Domination ve S&D. Yedi silah, altın kamuflajlar, nükleere kadar seri ödüller." } },
 
@@ -396,6 +398,8 @@
     { slug: "epoch-clash", cat: "duo", name: "Epoch Clash", badge: "2p", tags: ["Strategy", "vs CPU"], dev: "tk",
       desc: { en: "Train troops, hold the lane and evolve through five ages.", tr: "Asker yetiştir, hattı tut ve beş çağ boyunca gelişerek kazan." } },
 
+    { slug: "pocket-glade",     cat: "solo", name: "Pocket Glade",     badge: "new", tags: ["Builder", "3D"], dev: "tkm",
+      desc: { en: "Build a cosy island village of cottages, paths, trees and lanterns.", tr: "Kulübeler, patikalar, ağaçlar ve fenerlerle şirin bir ada köyü kur." } },
     { slug: "demir-tac-arena",  cat: "solo", name: "Demir Taç Arena",  badge: "new", tags: ["RPG", "Online 1v1", "Turkish"], dev: "tkm",
       desc: { en: "Create your gladiator, win tournaments and take the crown. Online duels with a friend too.", tr: "Gladyatörünü yarat, turnuvaları kazan, tacı al. Arkadaşınla online düello da var." } },
     { slug: "nugget-rush",      cat: "solo", name: "Nugget Rush",      badge: "new", tags: ["Arcade"], dev: "tkm",
@@ -417,7 +421,7 @@
     { slug: "wordfield",        cat: "solo", name: "Wordfield",        tags: ["Word"], dev: "tm",
       desc: { en: "Find hidden words across, down and diagonally.", tr: "Gizli kelimeleri yatay, dikey ve çapraz bul." } },
   ];
-  const FEATURED = "doodle-duel";
+  const FEATURED = "6-dilim";
 
   const CATS = [
     { id: "online", color: "var(--online)", live: true },
@@ -440,7 +444,7 @@
       search: "Search games…", all: "All", surprise: "Surprise me",
       empty: "No games match. Try another word or tag.",
       dev_t: "Works with touch", dev_k: "Keyboard controls", dev_m: "Mouse or click",
-      footer: "<b>16 games</b> · works on phone and desktop · online games connect you straight to your friends",
+      footer: "<b>18 games</b> · works on phone and desktop · online games connect you straight to your friends",
       cats: "Game categories",
     },
     tr: {
@@ -457,7 +461,7 @@
       search: "Oyun ara…", all: "Tümü", surprise: "Rastgele oyun",
       empty: "Eşleşen oyun yok. Başka bir kelime ya da etiket dene.",
       dev_t: "Dokunmatikle oynanır", dev_k: "Klavyeyle oynanır", dev_m: "Fare ya da tıklamayla oynanır",
-      footer: "<b>16 oyun</b> · telefonda ve bilgisayarda çalışır · online oyunlar seni doğrudan arkadaşlarına bağlar",
+      footer: "<b>18 oyun</b> · telefonda ve bilgisayarda çalışır · online oyunlar seni doğrudan arkadaşlarına bağlar",
       cats: "Oyun kategorileri",
     },
   };
@@ -465,10 +469,10 @@
     "Bomber": "Bombacı", "Also local": "Yerel de var", "Duos": "İkili", "3D": "3D", "Arena": "Arena", "Shooter": "Nişancı",
     "Football": "Futbol", "Turkish": "Türkçe", "Strategy": "Strateji", "vs CPU": "Bilgisayara karşı", "RPG": "RPG",
     "Online 1v1": "Online 1v1", "Arcade": "Arcade", "Stacking": "Dizme", "Merge": "Birleştirme", "Physics": "Fizik",
-    "Puzzle": "Bulmaca", "Word": "Kelime", "Drawing": "Çizim", "Party": "Parti",
+    "Puzzle": "Bulmaca", "Word": "Kelime", "Drawing": "Çizim", "Party": "Parti", "Trivia": "Bilgi yarışması", "Builder": "İnşa",
   };
   // Tags shown as filters, most useful first.
-  const FILTER_TAGS = ["Puzzle", "Word", "Drawing", "Arcade", "3D", "Arena", "Shooter", "Strategy", "RPG", "Physics", "Turkish"];
+  const FILTER_TAGS = ["Puzzle", "Word", "Trivia", "Drawing", "Builder", "Arcade", "3D", "Arena", "Shooter", "Strategy", "RPG", "Physics", "Turkish"];
 
   const ICON = {
     online: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z"/></svg>',
