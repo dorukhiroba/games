@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reel Rumble – Makara Kapışması</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rye&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="../quit.js" data-lang="tr"></script>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="game" width="1280" height="720"></canvas>
+  <div id="lobby" class="hidden">
+    <div class="card">
+      <h2>Çevrimiçi Ortak Oyun</h2>
+      <p class="sub">İki oyuncu, iki bilgisayar. Biri oda kurar, diğeri oda koduyla katılır.</p>
+      <div class="row"><button id="btnHost">Oda Kur</button></div>
+      <div class="code" id="hostCode"></div>
+      <div class="sep">— ya da —</div>
+      <div class="row"><input id="joinCode" maxlength="6" placeholder="ODA KODU" autocomplete="off" spellcheck="false"><button id="btnJoin">Katıl</button></div>
+      <p id="netStatus"></p>
+      <button id="btnBack" class="ghost">Geri</button>
+    </div>
+  </div>
+  <div id="toast" class="hidden"></div>
+</div>
+<script src="lib/peerjs.min.js"></script>
+<script src="js/core.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/art.js"></script>
+<script src="js/bg.js"></script>
+<script src="js/player.js"></script>
+<script src="js/fight.js"></script>
+<script src="js/boss_corn.js"></script>
+<script src="js/boss_gramo.js"></script>
+<script src="js/boss_boiler.js"></script>
+<script src="js/boss_proj.js"></script>
+<script src="js/plane.js"></script>
+<script src="js/boss_cloud.js"></script>
+<script src="js/boss_paper.js"></script>
+<script src="js/run.js"></script>
+<script src="js/ui_menus.js"></script>
+<script src="js/ui_map.js"></script>
+<script src="js/ui_fight.js"></script>
+<script src="js/extras.js"></script>
+<script src="js/net.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
