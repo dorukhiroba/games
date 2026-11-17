@@ -20,7 +20,38 @@ UI.list = function(c,items,sel,x,y,o){
 };
 function measure(c,s,size){ c.save(); c.font=size+"px 'Rye', Georgia, serif"; const w=c.measureText(s).width; c.restore(); return w; }
 UI.measure=measure;
-UI.hint = function(c,s,y){ Art.text(c,s,W/2,y||H-26,16,{bold:true,color:'#fff3d6',stroke:OL,sw:4}); };
+UI.hint = function(c,s,y){ UI.rich(c,In.device==='pad'?UI.padify(s):s,W/2,y||H-26,16,{color:'#fff3d6',stroke:OL,sw:4}); };
+/* gamepad prompts: tokens like {A} {RT} {START} {DPAD}, or {@jump} for whatever button that action is mapped to */
+const BTN=['A','B','X','Y','LB','RB','LT','RT','SELECT','START','LS','RS','UP','DOWN','LEFT','RIGHT'];
+UI.btnName=i=>BTN[i]||('#'+i);
+UI.actTok=act=>{ const l=In.padMap()[act]; return l&&l.length?l.map(i=>'{'+UI.btnName(i)+'}').join(' / '):'—'; };
+UI.padify=s=>String(s).replace(/Yön tuşları/g,'{DPAD}').replace(/Z ?\/ ?Enter/g,'{A}').replace(/Esc \/ Z/g,'{B}').replace(/\bZ:/g,'{A}:')
+  .replace(/Esc:/g,'{B}:').replace(/Tab\/E:/g,'{Y}:').replace(/Tab:/g,'{Y}:').replace(/↑↓:|←→:/g,'{DPAD}:').replace(/\s*•\s*F: tam ekran/,'');
+const glyphW=n=>/^(LB|RB|LT|RT)$/.test(n)?1.6:/^(START|SELECT|DPAD)$/.test(n)?1.3:1.15;
+UI.glyph = function(c,name,x,y,s){
+  const ps=In.padStyle==='ps', OLc=Art.OL;
+  const face={A:ps?['✕','#5a8ee8']:['A','#3fae49'],B:ps?['○','#e0485a']:['B','#d8343a'],X:ps?['□','#d878c8']:['X','#2f6fd6'],Y:ps?['△','#3fbf8a']:['Y','#e2b23a']};
+  c.save(); c.translate(x,y);
+  if(face[name]){ Art.circ(c,0,0,s*0.5,face[name][1],2.5); Art.text(c,face[name][0],0,1,s*0.62,{bold:true,color:'#fff'}); }
+  else if(/^(LB|RB|LT|RT)$/.test(name)){ const lab=ps?{LB:'L1',RB:'R1',LT:'L2',RT:'R2'}[name]:name, w=s*1.5; Art.rrect(c,-w/2,-s*0.4,w,s*0.8,s*(name[1]==='T'?0.18:0.36),'#3a3a44',2.5); Art.text(c,lab,0,1,s*0.5,{bold:true,color:'#fff'}); }
+  else if(name==='START'||name==='SELECT'){ const w=s*1.2; Art.rrect(c,-w/2,-s*0.34,w,s*0.68,s*0.34,'#3a3a44',2.5); Art.text(c,name==='START'?'☰':'⧉',0,1,s*0.55,{bold:true,color:'#fff'}); }
+  else if(/^(DPAD|UP|DOWN|LEFT|RIGHT)$/.test(name)){ const a=s*0.19,b=s*0.52; c.beginPath(); c.rect(-a,-b,a*2,b*2); c.rect(-b,-a,b*2,a*2); c.fillStyle='#3a3a44'; c.fill(); c.lineWidth=2; c.strokeStyle=OLc; c.stroke();
+    const hi={UP:[0,-b*0.6],DOWN:[0,b*0.6],LEFT:[-b*0.6,0],RIGHT:[b*0.6,0]}[name]; if(hi){ Art.circ(c,hi[0],hi[1],a*0.8,'#ffd23a',0); } }
+  else if(name==='LS'||name==='RS'){ Art.circ(c,0,0,s*0.48,'#3a3a44',2.5); Art.circ(c,0,0,s*0.27,'#5a5a66',0); Art.text(c,name[0],0,1,s*0.42,{bold:true,color:'#fff'}); }
+  else Art.text(c,name,0,1,s*0.45,{bold:true,color:'#fff',stroke:OLc,sw:3});
+  c.restore();
+};
+UI.rich = function(c,s,x,y,size,o){
+  o=o||{}; const bold=o.bold!==false;
+  const parts=String(s).split(/(\{@?[A-Za-z]+\})/).filter(Boolean).flatMap(p=>{ const m=p.match(/^\{(@?)([A-Za-z]+)\}$/); if(!m) return [{t:p}];
+    if(m[1]) return UI.actTok(m[2]).split(/(\{[A-Z]+\})/).filter(Boolean).map(q=>{ const k=q.match(/^\{([A-Z]+)\}$/); return k?{g:k[1]}:{t:q}; });
+    return [{g:m[2].toUpperCase()}]; });
+  const gs=size*1.3;
+  c.save(); c.font=(bold?'700 ':'')+size+"px 'Courier Prime','Courier New',monospace";
+  const ws=parts.map(p=>p.g?gs*glyphW(p.g)+4:c.measureText(p.t).width); c.restore();
+  const total=ws.reduce((a,b)=>a+b,0); let cx=o.align==='left'?x:o.align==='right'?x-total:x-total/2;
+  parts.forEach((p,i)=>{ if(p.g) UI.glyph(c,p.g,cx+ws[i]/2,y,gs); else Art.text(c,p.t,cx,y,size,{align:'left',bold,color:o.color||'#fff3d6',stroke:o.stroke,sw:o.sw}); cx+=ws[i]; });
+};
 UI.toast = function(msg,ms){ const el=document.getElementById('toast'); if(!el) return; el.textContent=msg; el.classList.remove('hidden'); clearTimeout(UI._tt); UI._tt=setTimeout(()=>el.classList.add('hidden'),ms||3000); };
 UI.stage = function(c,t){ c.fillStyle='#2a1418'; c.fillRect(0,0,W,H); const g=c.createRadialGradient(W/2,H*0.45,40,W/2,H*0.45,560); g.addColorStop(0,'rgba(255,230,180,0.55)'); g.addColorStop(1,'rgba(0,0,0,0)'); c.fillStyle=g; c.fillRect(0,0,W,H);
   c.fillStyle='#6a3a1e'; c.fillRect(0,H-90,W,90); c.strokeStyle='rgba(0,0,0,0.4)'; c.lineWidth=2; for(let x=0;x<W;x+=60){ c.beginPath(); c.moveTo(x,H-90); c.lineTo(x-20,H); c.stroke(); } c.beginPath(); c.moveTo(0,H-90); c.lineTo(W,H-90); c.lineWidth=5; c.strokeStyle=OL; c.stroke(); };
@@ -87,40 +118,91 @@ RR.Scenes.story = {
 
 /* ---------- settings ---------- */
 RR.Scenes.settings = {
-  enter(a){ this.back=(a&&a.back)||'menu'; this.sel=0; this.confirm=false; this.t=0; },
-  rows(){ const s=RR.Save.d.set, onoff=v=>v?'Açık':'Kapalı';
-    return [['Müzik',Math.round(s.music*10)],['Efektler',Math.round(s.sfx*10)],['Film efekti',onoff(s.filter)],['Ekran sarsıntısı',onoff(s.shake)],['Boss can barı',onoff(s.bossbar)],['Çarpışma kutuları',onoff(s.hitbox)],['Sunucu sesi',onoff(s.voice)],['Tam ekran',document.fullscreenElement?'Açık':'Kapalı'],['Kaydı sıfırla',this.confirm?'EMİN MİSİN?':''],['Geri','']]; },
-  update(dt){ this.t+=dt; const s=RR.Save.d.set, n=this.rows().length; const prev=this.sel; this.sel=UI.nav(this.sel,n); if(prev!==this.sel) this.confirm=false;
-    const d=(In.m('right')?1:0)-(In.m('left')?1:0), ok=In.m('ok');
+  enter(a){ if(a&&a.back) this.back=a.back; this.back=this.back||'menu'; this.sel=a&&a.keepSel?this.sel||0:0; this.confirm=false; this.t=0; },
+  rows(){
+    const s=RR.Save.d.set, onoff=v=>v?'Açık':'Kapalı', me=this;
+    return [
+      {n:'Müzik',bar:Math.round(s.music*10),adj:d=>{ s.music=U.clamp(Math.round(s.music*10+d)/10,0,1); A.applyVol(); A.sfx('move'); }},
+      {n:'Efektler',bar:Math.round(s.sfx*10),adj:d=>{ s.sfx=U.clamp(Math.round(s.sfx*10+d)/10,0,1); A.applyVol(); A.sfx('coin'); }},
+      {n:'Film efekti',v:onoff(s.filter),tog:()=>{ s.filter=!s.filter; }},
+      {n:'Ekran sarsıntısı',v:onoff(s.shake),tog:()=>{ s.shake=!s.shake; }},
+      {n:'Boss can barı',v:onoff(s.bossbar),tog:()=>{ s.bossbar=!s.bossbar; }},
+      {n:'Çarpışma kutuları',v:onoff(s.hitbox),tog:()=>{ s.hitbox=!s.hitbox; }},
+      {n:'Sunucu sesi',v:onoff(s.voice),tog:()=>{ s.voice=!s.voice; if(s.voice&&RR.say) RR.say('Motor!'); }},
+      {n:'Kol titreşimi',v:onoff(s.rumble),tog:()=>{ s.rumble=!s.rumble; if(s.rumble) In.rumbleAll(0.6,250); }},
+      {n:'Çubuk ölü bölgesi',bar:Math.round(((s.dead||0.45)-0.15)/0.05),adj:d=>{ s.dead=U.clamp(Math.round(((s.dead||0.45)+d*0.05)*100)/100,0.15,0.65); A.sfx('move'); }},
+      {n:'Kol tuşları',v:'Ayarla ›',ok:()=>{ A.sfx('select'); RR.go('padmap'); }},
+      {n:'Tam ekran',v:document.fullscreenElement?'Açık':'Kapalı',tog:()=>{ RR.toggleFull(); }},
+      {n:'Kaydı sıfırla',v:this.confirm?'EMİN MİSİN?':'',ok:()=>{ if(me.confirm){ const keep=Object.assign({},s); RR.Save.reset(); RR.Save.d.set=keep; RR.Save.save(); me.confirm=false; A.sfx('boom'); UI.toast('Kayıt sıfırlandı.'); } else { me.confirm=true; A.sfx('deny'); } }},
+      {n:'Geri',v:'',ok:()=>{ A.sfx('back'); RR.Save.save(); RR.go(me.back); }}
+    ];
+  },
+  update(dt){
+    this.t+=dt; const rows=this.rows(), prev=this.sel; this.sel=UI.nav(this.sel,rows.length); if(prev!==this.sel) this.confirm=false;
     if(In.m('back')){ A.sfx('back'); RR.Save.save(); RR.go(this.back); return; }
-    switch(this.sel){
-      case 0: if(d){ s.music=U.clamp(Math.round(s.music*10+d)/10,0,1); A.applyVol(); A.sfx('move'); } break;
-      case 1: if(d){ s.sfx=U.clamp(Math.round(s.sfx*10+d)/10,0,1); A.applyVol(); A.sfx('coin'); } break;
-      case 2: if(d||ok){ s.filter=!s.filter; A.sfx('move'); } break;
-      case 3: if(d||ok){ s.shake=!s.shake; A.sfx('move'); } break;
-      case 4: if(d||ok){ s.bossbar=!s.bossbar; A.sfx('move'); } break;
-      case 5: if(d||ok){ s.hitbox=!s.hitbox; A.sfx('move'); } break;
-      case 6: if(d||ok){ s.voice=!s.voice; A.sfx('move'); if(s.voice&&RR.say) RR.say('Motor!'); } break;
-      case 7: if(d||ok){ RR.toggleFull(); A.sfx('move'); } break;
-      case 8: if(ok){ if(this.confirm){ const keep=Object.assign({},s); RR.Save.reset(); RR.Save.d.set=keep; RR.Save.save(); this.confirm=false; A.sfx('boom'); UI.toast('Kayıt sıfırlandı.'); } else { this.confirm=true; A.sfx('deny'); } } break;
-      case 9: if(ok){ A.sfx('back'); RR.Save.save(); RR.go(this.back); } break;
+    const r=rows[this.sel], d=(In.m('right')?1:0)-(In.m('left')?1:0), ok=In.m('ok');
+    if(r.adj&&d){ r.adj(d); RR.Save.save(); }
+    else if(r.tog&&(d||ok)){ r.tog(); A.sfx('move'); RR.Save.save(); }
+    else if(r.ok&&ok){ r.ok(); RR.Save.save(); }
+  },
+  draw(c){ UI.stage(c,this.t); Art.curtains(c,1,this.t); Art.panel(c,W/2-340,62,680,616);
+    Art.text(c,'AYARLAR',W/2,104,42,{title:true,color:'#d8343a'});
+    this.rows().forEach((r,i)=>{ const y=150+i*39, on=i===this.sel;
+      if(on){ c.save(); c.fillStyle='rgba(216,52,58,0.12)'; c.fillRect(W/2-310,y-18,620,36); c.restore(); }
+      Art.text(c,r.n,W/2-290,y,23,{title:true,align:'left',color:on?'#d8343a':'#2a1d14'});
+      if(r.bar!=null){ for(let k=0;k<10;k++) Art.rrect(c,W/2+60+k*22,y-11,16,22,3,k<r.bar?'#d8343a':'#fffaf0',2.5); }
+      else Art.text(c,r.v,W/2+290,y,20,{bold:true,align:'right',color:r.v==='EMİN MİSİN?'?'#d8343a':'#2a1d14'}); });
+    UI.hint(c,'←→: değiştir  •  Z: seç  •  Esc: geri',H-22); }
+};
+
+/* ---------- gamepad button mapping ---------- */
+const PADROWS=[['jump','Zıpla / Savuştur'],['shoot','Ateş'],['ex','EX / Süper'],['dash','Atılma'],['lock','Sabitle & nişan'],['swap','Silah değiştir']];
+RR.Scenes.padmap = {
+  enter(){ this.sel=0; this.wait=false; this.wt=0; this.t=0; },
+  update(dt){
+    this.t+=dt; const n=PADROWS.length+2;
+    if(this.wait){
+      this.wt+=dt; const e=In.btnEdge;
+      if(In.key('Escape')||this.wt>6){ this.wait=false; A.sfx('back'); In.eat(); return; }
+      if(e>=0&&this.wt>0.2){
+        if(e===8||e===9||(e>=12&&e<=15)){ A.sfx('deny'); UI.toast('Start, Select ve D-pad menü ve hareket için ayrılmış.'); }
+        else {
+          const s=RR.Save.d.set, pm=In.padMap(), old=pm[this.act].filter(x=>x!==e);
+          for(const k in pm){ if(k===this.act||!pm[k].includes(e)) continue; pm[k]=pm[k].filter(x=>x!==e); if(!pm[k].length) pm[k]=old.length?[old[0]]:[]; }
+          pm[this.act]=[e];
+          s.padmap=pm; RR.Save.save(); A.sfx('select'); In.rumbleAll(0.4,120);
+        }
+        this.wait=false; In.eat();
+      }
+      return;
     }
-    if(d||ok) RR.Save.save(); },
-  draw(c){ UI.stage(c,this.t); Art.curtains(c,1,this.t); Art.panel(c,W/2-340,70,680,600);
-    Art.text(c,'AYARLAR',W/2,118,46,{title:true,color:'#d8343a'});
-    this.rows().forEach((r,i)=>{ const y=172+i*48, on=i===this.sel;
-      if(on){ c.save(); c.fillStyle='rgba(216,52,58,0.12)'; c.fillRect(W/2-310,y-22,620,44); c.restore(); }
-      Art.text(c,r[0],W/2-290,y,26,{title:true,align:'left',color:on?'#d8343a':'#2a1d14'});
-      if(typeof r[1]==='number'){ for(let k=0;k<10;k++) Art.rrect(c,W/2+60+k*22,y-12,16,24,3,k<r[1]?'#d8343a':'#fffaf0',2.5); }
-      else Art.text(c,r[1],W/2+290,y,22,{bold:true,align:'right',color:r[1]==='EMİN MİSİN?'?'#d8343a':'#2a1d14'}); });
-    UI.hint(c,'←→: değiştir  •  Z: seç  •  Esc: geri'); }
+    this.sel=UI.nav(this.sel,n);
+    if(In.m('back')){ A.sfx('back'); RR.go('settings',{keepSel:true}); return; }
+    if(In.m('ok')){
+      if(this.sel<PADROWS.length){ if(!In.padCount()){ A.sfx('deny'); UI.toast('Önce kolu bağla ve bir tuşuna bas.'); return; } this.act=PADROWS[this.sel][0]; this.wait=true; this.wt=0; A.sfx('tele'); }
+      else if(this.sel===PADROWS.length){ RR.Save.d.set.padmap=null; RR.Save.save(); A.sfx('coin'); UI.toast('Kol tuşları varsayılana döndü.'); }
+      else { A.sfx('back'); RR.go('settings',{keepSel:true}); }
+    }
+  },
+  draw(c){ UI.stage(c,this.t); Art.curtains(c,1,this.t); Art.panel(c,W/2-360,80,720,560);
+    Art.text(c,'KOL TUŞLARI',W/2,128,42,{title:true,color:'#d8343a'});
+    const pads=In.padList();
+    Art.text(c,pads.length?('🎮 '+pads.length+' kol bağlı · '+(In.padStyle==='ps'?'PlayStation':'Xbox')+' düzeni'):'Kol bağlı değil — koldaki bir tuşa bas',W/2,168,17,{bold:true,color:pads.length?'#3a7a4a':'#8a1820'});
+    PADROWS.forEach((r,i)=>{ const y=218+i*50, on=i===this.sel;
+      if(on){ c.save(); c.fillStyle='rgba(216,52,58,0.12)'; c.fillRect(W/2-330,y-22,660,44); c.restore(); }
+      Art.text(c,r[1],W/2-300,y,25,{title:true,align:'left',color:on?'#d8343a':'#2a1d14'});
+      if(this.wait&&on) Art.text(c,Math.floor(this.t*3)%2?'Bir tuşa bas…':'',W/2+300,y,20,{bold:true,align:'right',color:'#d8343a'});
+      else UI.rich(c,UI.actTok(r[0]),W/2+300,y,18,{align:'right',color:'#2a1d14'}); });
+    const yb=218+PADROWS.length*50;
+    [['Varsayılana dön',PADROWS.length],['Geri',PADROWS.length+1]].forEach(([t,i],k)=>{ const on=this.sel===i; Art.text(c,t,W/2,yb+k*46,26,{title:true,color:on?'#d8343a':'#2a1d14'}); });
+    UI.hint(c,this.wait?'Atamak istediğin tuşa bas  •  Esc: vazgeç':'↑↓: seç  •  Z: tuş ata  •  Esc: geri',H-22); }
 };
 
 /* ---------- how to play ---------- */
 const HOW=[
   ['KLAVYE (Tek Oyuncu)',[['Hareket','Yön tuşları / WASD'],['Zıpla','Z  /  Boşluk  /  J'],['Ateş','X  /  K (basılı tut)'],['EX / Süper','C  /  I'],['Atılma (dash)','Shift  /  L'],['Sabitle & 8 yöne nişan','V  /  U'],['Silah değiştir','Tab  /  Q  /  O'],['Duraklat','Esc  /  P'],['Tam ekran','F']]],
   ['YEREL 2 OYUNCU',[['P1 hareket','W A S D'],['P1 zıpla/ateş/atıl','J / K / L'],['P1 EX / sabitle / silah','I / U / O'],['P2 hareket','Yön tuşları'],['P2 zıpla/ateş/atıl','Num1 , / Num2 . / Num3 /'],['P2 EX / sabitle / silah','Num0 \' / Num4 ; / Num5 \\'],['Gamepad','Takılı gamepad\'ler otomatik atanır']]],
-  ['GAMEPAD',[['Hareket','Sol çubuk / D-pad'],['Zıpla','A'],['Ateş','X  /  RT'],['EX / Süper','B'],['Atılma','RB'],['Sabitle','LB  /  LT'],['Silah değiştir','Y'],['Duraklat','Start']]],
+  ['GAMEPAD',[['Hareket','Sol çubuk / D-pad'],['Zıpla','A'],['Ateş','X  /  RT'],['EX / Süper','B'],['Atılma','RB'],['Sabitle','LB  /  LT'],['Silah değiştir','Y'],['Duraklat','Start'],['Tuşlar, titreşim, ölü bölge','Ayarlar menüsünden değişir']]],
   ['UÇAK BÖLÜMLERİ',[['Uçuş','8 yöne serbest hareket'],['Ateş','Ateş tuşu (basılı tut)'],['Makineli / Bomba','Silah değiştir tuşu'],['Küçül','Atılma tuşunu BASILI tut: küçük, hızlı, zor vurulur'],['Savuştur','Zıpla tuşu (pembe nesnelere)'],['EX torpido','EX tuşu (1 kart)'],['Dev mermi','5 kart dolunca EX tuşu']]],
   ['KOŞU BÖLÜMLERİ',[['Amaç','Sağdaki ÇIKIŞ çadırına ulaş'],['Çukurlar','Düşersen 1 can kaybedip geri dönersin'],['Jeton','Her bölümde 5 gizli jeton var'],['Pembe balonlar','Savuştur, süper kart kazan'],['Not','Süre, can, savuşturma ve jetonlar']]],
   ['OYUN KURALLARI',[['Pembe nesneler','Havadayken tekrar zıpla tuşuna bas: savuştur!'],['Süper bar','Hasar vererek ve savuşturarak kart doldur'],['EX atış','1 kart harcar, güçlü özel atış'],['Süper','5 kart dolunca EX tuşu: süper hareket'],['Ortak oyun','Düşen arkadaşının hayaletindeki kalbi savuştur'],['Not','Süre, can, savuşturma ve süper kullanımı'],['Jeton','Kazandıkça al, Bilet Gişesi\'nde harca']]]

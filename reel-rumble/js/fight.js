@@ -26,6 +26,7 @@ const BU = RR.BU = {
 F.sfx=(G,n)=>{ if(G.mode!=='client') RR.Audio.sfx(n); if(G.mode==='host') G.ev.push(['s',n]); };
 F.fx=(G,k,x,y,o)=>{ Art.fxSpawn(G.fx,k,x,y,o); if(G.mode==='host') G.ev.push(['f',k,Math.round(x),Math.round(y),o||0]); };
 F.shake=(G,a)=>{ G.shake=Math.max(G.shake,a); if(G.mode==='host') G.ev.push(['k',a]); };
+F.rumble=(G,pid,s,ms)=>{ if(G.mode==='client') return; const c=G.ctrls[pid]; if(c&&c.pad!=null) RR.Input.rumble(c.pad,s,ms); if(G.mode==='host'&&pid===1) G.ev.push(['r',s,ms]); };
 F.ps=(G,o)=>{ const s=Object.assign({t:0,a:0},o); s._hits={}; s.hitN=0; G.ps.push(s); return s; };
 F.banner=(G,txt,dur,o)=>{ G.banner={txt,t:0,dur:dur||1.6,o:o||{}}; };
 
@@ -70,10 +71,10 @@ F.update = function(G,dt){
   }
   if(G.state==='fight'&&b.hp<=0&&!def.noDeath){
     b.hp=0; G.state='ko'; G.st=0; G.hitstop=0.35; G.es.forEach(e=>e.dead=true); G.mn.forEach(m=>m.dead=true);
-    F.sfx(G,'ko'); F.shake(G,20); F.banner(G,'KES! FİLM BİTTİ!',2.6,{size:92}); say('Kes! Film bitti!'); if(def.onKO) def.onKO(b,G);
+    F.sfx(G,'ko'); F.shake(G,20); F.banner(G,'KES! FİLM BİTTİ!',2.6,{size:92}); say('Kes! Film bitti!'); G.players.forEach(p=>F.rumble(G,p.id,1,700)); if(def.onKO) def.onKO(b,G);
   }
   if(G.state==='ko'){ G.slow=G.st<1.2?0.45:1; if(Math.random()<0.25){ const hb=(def.hurt(b)[0])||{x:b.x-50,y:b.y-50,w:100,h:100}; F.fx(G,'boom',hb.x+Math.random()*hb.w,hb.y+Math.random()*hb.h,{s:U.rnd(0.6,1.4)}); if(Math.random()<0.4) F.sfx(G,'small'); } if(G.st>3.4){ G.state='done'; G.over={won:true}; } }
-  if(G.state==='fight'&&G.players.every(p=>p.dead)){ G.state='lost'; G.st=0; F.banner(G,'YENİLDİN!',2.5,{size:100,color:'#ff9a8a'}); F.sfx(G,'ko'); say('Yenildin!'); }
+  if(G.state==='fight'&&G.players.every(p=>p.dead)){ G.state='lost'; G.st=0; F.banner(G,'YENİLDİN!',2.5,{size:100,color:'#ff9a8a'}); F.sfx(G,'ko'); say('Yenildin!'); G.players.forEach(p=>F.rumble(G,p.id,0.6,500)); }
   if(G.state==='lost'&&G.st>2.2){ G.state='done'; G.over={won:false}; }
   updShots(G,dt); updEnemy(G,dt); updMinions(G,dt); collide(G,dt);
   G.ps=G.ps.filter(s=>!s.dead); G.es=G.es.filter(e=>!e.dead); G.mn=G.mn.filter(m=>!m.dead);
@@ -248,7 +249,7 @@ F.snap = function(G){
 };
 F.apply = function(G,m){
   G.state=m.st; G.st=m.ss; G.t=m.tt; G.time=m.tm; G.banner=m.bn; G.players=m.p; G.boss=m.b; G.ps=m.ps; G.es=m.es; G.mn=m.mn; G.plats=m.pl||G.plats; G.camX=m.cx||0; G.coins=m.co||[]; G.coinsGot=m.cg||0;
-  (m.ev||[]).forEach(e=>{ if(e[0]==='s') RR.Audio.sfx(e[1]); else if(e[0]==='f') Art.fxSpawn(G.fx,e[1],e[2],e[3],e[4]||undefined); else if(e[0]==='k') G.shake=Math.max(G.shake,e[1]); });
+  (m.ev||[]).forEach(e=>{ if(e[0]==='s') RR.Audio.sfx(e[1]); else if(e[0]==='f') Art.fxSpawn(G.fx,e[1],e[2],e[3],e[4]||undefined); else if(e[0]==='k') G.shake=Math.max(G.shake,e[1]); else if(e[0]==='r') RR.Input.rumble(0,e[1],e[2]); });
 };
 F.clientStep = function(G,dt){ Art.fxStep(G.fx,dt); G.shake=Math.max(0,G.shake-dt*40); };
 })();

@@ -41,18 +41,18 @@ PL.update=function(p,G,ctrl,dt){
     if(p.sup>=5) PL.super(p,G);
     else { const m=PL.muzzle(p); p.sup-=1; p.st.supUsed+=1; p.tf|=32; p.exT=0.3;
       F().ps(G,{k:'ptorp',x:m.x,y:m.y,vx:500,vy:0,r:26,dmg:9,o:p.id,life:2.6,pierce:true,hitcd:0.1,maxHits:4,ex:true,upd:'accel'});
-      p.vx-=220; F().sfx(G,'ex'); F().fx(G,'puff',m.x,m.y,{n:2}); F().shake(G,4); }
+      p.vx-=220; F().sfx(G,'ex'); F().rumble(G,p.id,0.3,80); F().fx(G,'puff',m.x,m.y,{n:2}); F().shake(G,4); }
   }
   if(p.charm==='coffee') p.sup=Math.min(5,p.sup+dt*0.045);
 };
 PL.super=function(p,G){
   const f=F(); p.sup=0; p.st.supUsed+=5; p.tf|=256; p.superT=0.5; p.starT=1.6;
   f.ps(G,{k:'pmega',x:p.x+60,y:p.y,vx:620,vy:0,r:80,dmg:24,o:p.id,life:3.2,pierce:true,hitcd:0.1,sup:true,keep:true});
-  f.sfx(G,'super'); f.shake(G,14); f.fx(G,'ring',p.x,p.y,{col:'#ffd23a',s:2.5,life:0.6}); G.hitstop=Math.max(G.hitstop,0.15);
+  f.sfx(G,'super'); f.shake(G,14); f.rumble(G,p.id,0.9,400); f.fx(G,'ring',p.x,p.y,{col:'#ffd23a',s:2.5,life:0.6}); G.hitstop=Math.max(G.hitstop,0.15);
 };
 PL.hurt=function(p,G){ const r=RR.PlayerSys.hurt(p,G); if(r){ p.vy=0; p.vx=-260; p.onGround=false; } return r; };
 PL.parry=function(p,G){ const f=F(); p.parryT=0; p.parryCD=0; p.sup=Math.min(5,p.sup+1); p.st.parries++; p.tf|=16; p.invT=Math.max(p.invT,0.3);
-  G.hitstop=Math.max(G.hitstop,0.12); f.sfx(G,'parry'); f.fx(G,'ring',p.x,p.y,{s:1.4}); f.fx(G,'spark',p.x,p.y,{n:6,col:'#ff9ccc'}); };
+  G.hitstop=Math.max(G.hitstop,0.12); f.sfx(G,'parry'); f.rumble(G,p.id,0.35,90); f.fx(G,'ring',p.x,p.y,{s:1.4}); f.fx(G,'spark',p.x,p.y,{n:6,col:'#ff9ccc'}); };
 PL.revive=function(p,o,G){ RR.PlayerSys.revive(p,o,G); o.vy=0; o.parryCD=0; };
 RR.PUPD.accel=(s,G,dt)=>{ s.vx=Math.min(1500,s.vx+1100*dt); if(Math.random()<0.5) RR.Art.fxSpawn(G.fx,'dust',s.x-s.r*1.4,s.y,{life:0.35}); };
 

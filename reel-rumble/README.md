@@ -24,6 +24,8 @@ Klasörün tamamını herhangi bir statik barındırmaya yükle: **itch.io** (HT
 | Duraklat | Esc / P | Start |
 | Tam ekran | F | – |
 
+**Gamepad:** Xbox, PlayStation ve genel kollar desteklenir. Kol bağlanınca ekrandaki ipuçları kol tuşlarına döner; Ayarlar'dan tuşları yeniden atayabilir, titreşimi ve çubuk ölü bölgesini ayarlayabilirsin. Dövüşte kol çıkarsa oyun duraklar. Tarayıcı kolu görmek için önce bir tuşa basılmasını bekler.
+
 **Yerel 2 oyuncu:** P1 = WASD + J/K/L/I/U/O, P2 = yön tuşları + Num1/2/3/0/4/5 (veya , . / ' ; \\). Takılı gamepad'ler otomatik atanır.
 
 ## İçerik

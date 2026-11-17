@@ -65,7 +65,7 @@ function defSave(){
     coins:0, own:{w:['ink'],c:[]},
     load:[{char:'bobbin',w:['ink',null],sup:'beam',charm:null},{char:'bolt',w:['ink',null],sup:'beam',charm:null}],
     grades:{}, beaten:{}, paid:{}, seenStory:false, ending:false,
-    set:{music:0.55,sfx:0.8,filter:true,shake:true,bossbar:false,hitbox:false,voice:true},
+    set:{music:0.55,sfx:0.8,filter:true,shake:true,bossbar:false,hitbox:false,voice:true,rumble:true,dead:0.45,padmap:null},
     stats:{deaths:0,parries:0,wins:0}, ach:{}, runCoins:{}, best:{}, rushBest:null
   };
 }
@@ -93,7 +93,7 @@ const PREVENT = new Set(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space',
 const isTyping = () => { const a=document.activeElement; return a && (a.tagName==='INPUT'||a.tagName==='TEXTAREA'); };
 addEventListener('keydown', e=>{
   if(isTyping()) return;
-  keys[e.code] = true; In.any = true; In.lastKey = e.code;
+  keys[e.code] = true; In.any = true; In.lastKey = e.code; In.device = 'kb';
   if(PREVENT.has(e.code)) e.preventDefault();
   if(RR.Audio) RR.Audio.unlock();
 });
@@ -114,13 +114,27 @@ const BIND = {
 };
 function pads(){ try{ return navigator.getGamepads ? navigator.getGamepads() : []; }catch(e){ return []; } }
 function padList(){ const r=[]; const p=pads(); for(let i=0;i<p.length;i++) if(p[i]&&p[i].connected) r.push(p[i]); return r; }
+/* gamepad: remappable action buttons (standard mapping indices), adjustable dead zone, rumble */
+const PADACT=['jump','shoot','ex','dash','lock','swap'];
+const PADDEF={jump:[0],shoot:[2,7],ex:[1],dash:[5],lock:[4,6],swap:[3]};
+function padMap(){ const m=RR.Save.d.set.padmap, out={}; PADACT.forEach(k=>{ out[k]=(m&&Array.isArray(m[k]))?m[k].slice():PADDEF[k].slice(); }); return out; }
+function deadzone(){ const v=+RR.Save.d.set.dead; return v>=0.1&&v<=0.8?v:0.45; }
+function padStyleOf(g){ return /054c|playstation|dualshock|dualsense|sony|ps4|ps5/i.test((g&&g.id)||'')?'ps':'xbox'; }
+function padName(g){ return ((g&&g.id)||'Gamepad').replace(/\(.*?\)/g,'').replace(/vendor:.*$/i,'').trim().slice(0,30)||'Gamepad'; }
+let padPrev={};
+function rumble(idx,s,ms){
+  try{ if(!RR.Save.d.set.rumble||idx==null) return; const g=padList()[idx]; if(!g) return; const va=g.vibrationActuator;
+    if(va&&va.playEffect){ const r=va.playEffect('dual-rumble',{startDelay:0,duration:ms,weakMagnitude:Math.min(1,s*0.7),strongMagnitude:Math.min(1,s)}); if(r&&r.catch) r.catch(()=>{}); }
+    else if(g.hapticActuators&&g.hapticActuators[0]&&g.hapticActuators[0].pulse) g.hapticActuators[0].pulse(Math.min(1,s),ms);
+  }catch(e){}
+}
+function rumbleAll(s,ms){ padList().forEach((g,i)=>rumble(i,s,ms)); }
 function padBits(idx){
   const g = padList()[idx]; if(!g) return 0;
-  const b=g.buttons, a=g.axes; const B=k=>b[k]&&b[k].pressed; let m=0;
-  if(a[0]<-0.45||B(14)) m|=BITS.left; if(a[0]>0.45||B(15)) m|=BITS.right;
-  if(a[1]<-0.5||B(12)) m|=BITS.up; if(a[1]>0.5||B(13)) m|=BITS.down;
-  if(B(0)) m|=BITS.jump; if(B(2)||B(7)) m|=BITS.shoot; if(B(1)) m|=BITS.ex;
-  if(B(5)) m|=BITS.dash; if(B(4)||B(6)) m|=BITS.lock; if(B(3)) m|=BITS.swap;
+  const b=g.buttons, a=g.axes, B=k=>b[k]&&b[k].pressed, d=deadzone(); let m=0;
+  if(a[0]<-d||B(14)) m|=BITS.left; if(a[0]>d||B(15)) m|=BITS.right;
+  if(a[1]<-d-0.05||B(12)) m|=BITS.up; if(a[1]>d+0.05||B(13)) m|=BITS.down;
+  const pm=padMap(); for(const act of PADACT){ const l=pm[act]; for(let i=0;i<l.length;i++) if(B(l[i])){ m|=BITS[act]; break; } }
   return m;
 }
 class Ctrl{
@@ -149,16 +163,20 @@ const MKEYS = {up:['ArrowUp','KeyW'],down:['ArrowDown','KeyS'],left:['ArrowLeft'
 let mcur=0, mprev=0, rep={}, padPrevAny=0;
 const In = RR.Input = {
   BITS, keys, Ctrl, RemoteCtrl, padList, any:false, lastKey:null, mp:0,
+  device:'kb', padStyle:'xbox', btnEdge:-1, PADACT, PADDEF, padMap, rumble, rumbleAll,
   update(dt){
     mprev=mcur; let m=0;
     if(!isTyping()) for(const k in MKEYS){ const l=MKEYS[k]; for(let i=0;i<l.length;i++) if(keys[l[i]]){ m|=MB[k]; break; } }
-    let anyBtn=0;
+    let anyBtn=0; const d=deadzone()+0.05; In.btnEdge=-1;
     padList().forEach(g=>{
       const b=g.buttons,a=g.axes; const B=k=>b[k]&&b[k].pressed;
-      if(a[1]<-0.5||B(12)) m|=MB.up; if(a[1]>0.5||B(13)) m|=MB.down;
-      if(a[0]<-0.5||B(14)) m|=MB.left; if(a[0]>0.5||B(15)) m|=MB.right;
+      if(a[1]<-d||B(12)) m|=MB.up; if(a[1]>d||B(13)) m|=MB.down;
+      if(a[0]<-d||B(14)) m|=MB.left; if(a[0]>d||B(15)) m|=MB.right;
       if(B(0)) m|=MB.ok; if(B(1)) m|=MB.back; if(B(9)) m|=MB.pause; if(B(3)) m|=MB.alt; if(B(2)) m|=MB.alt2;
-      for(let i=0;i<b.length;i++) if(b[i].pressed) anyBtn++;
+      const prev=padPrev[g.index]||[]; let active=Math.abs(a[0]||0)>d||Math.abs(a[1]||0)>d;
+      for(let i=0;i<b.length;i++){ const on=!!b[i].pressed; if(on){ anyBtn++; active=true; if(!prev[i]&&In.btnEdge<0) In.btnEdge=i; } prev[i]=on; }
+      padPrev[g.index]=prev;
+      if(active){ In.device='pad'; In.padStyle=padStyleOf(g); }
     });
     if(anyBtn>padPrevAny){ In.any=true; if(RR.Audio) RR.Audio.unlock(); }
     padPrevAny=anyBtn;
@@ -176,4 +194,6 @@ const In = RR.Input = {
   key(code){ return !!keys[code]; },
   padCount(){ return padList().length; }
 };
+addEventListener('gamepadconnected', e=>{ In.device='pad'; In.padStyle=padStyleOf(e.gamepad); if(RR.UI) RR.UI.toast('🎮 Kol bağlandı: '+padName(e.gamepad),2600); if(RR.Audio&&RR.Audio.ok) RR.Audio.sfx('select'); });
+addEventListener('gamepaddisconnected', e=>{ if(!padList().length) In.device='kb'; if(RR.UI) RR.UI.toast('🎮 Kol çıkarıldı',2600); if(RR.onPadLost) RR.onPadLost(e.gamepad.index); });
 })();

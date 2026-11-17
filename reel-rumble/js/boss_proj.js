@@ -107,7 +107,7 @@ function drawProj(c,b,t){
 }
 
 /* ---------- tutorial dummy ---------- */
-const TUT=[[1,'Hareket','←→ / A D'],[2,'Zıpla','Z / Boşluk'],[64,'Eğil','↓'],[4,'Atıl','Shift'],[8,'Ateş et','X (basılı tut)'],[128,'Sabitle & nişan','V + yön'],[16,'Pembeyi savuştur','Havada tekrar Z'],[32,'EX atış','C (1 kart)'],[256,'Süper','C (5 kart)']];
+const TUT=[[1,'Hareket','←→ / A D','{LS} / {DPAD}'],[2,'Zıpla','Z / Boşluk','{@jump}'],[64,'Eğil','↓','{DPAD} aşağı'],[4,'Atıl','Shift','{@dash}'],[8,'Ateş et','X (basılı tut)','{@shoot} basılı'],[128,'Sabitle & nişan','V + yön','{@lock} + yön'],[16,'Pembeyi savuştur','Havada tekrar Z','havada {@jump}'],[32,'EX atış','C (1 kart)','{@ex} (1 kart)'],[256,'Süper','C (5 kart)','{@ex} (5 kart)']];
 const D = RR.BOSS.dummy = {
   id:'dummy', name:'Antrenman Kuklası', title:'Prova Sahnesi', hp:999999, noScale:true, noDeath:true, tutorial:true, bg:'stage', music:'tutorial', par:999,
   phases:[], plats:[{x:330,y:450,w:170},{x:620,y:380,w:170}], quotes:['...'], introTxt:'PROVA!', goTxt:'BAŞLA!',
@@ -133,9 +133,9 @@ const D = RR.BOSS.dummy = {
     c.save(); c.globalAlpha=0.93; Art.panel(c,16,70,300,40+TUT.length*30); c.restore();
     Art.text(c,'ANTRENMAN LİSTESİ',166,96,18,{title:true});
     TUT.forEach((x,i)=>{ const y=128+i*30, ok=!!(p.tf&x[0]); Art.rrect(c,32,y-10,20,20,4,ok?'#58c47c':'#fffaf0',2.5); if(ok) Art.text(c,'✓',42,y,16,{bold:true,color:'#fff'});
-      Art.text(c,x[1],60,y,16,{align:'left',bold:true,color:ok?'#3a7a4a':'#2a1d14'}); Art.text(c,x[2],300,y,13,{align:'right',color:'#6a5a4a'}); });
+      Art.text(c,x[1],60,y,16,{align:'left',bold:true,color:ok?'#3a7a4a':'#2a1d14'}); RR.UI.rich(c,RR.Input.device==='pad'?x[3]:x[2],300,y,13,{align:'right',color:'#6a5a4a',bold:false}); });
     Art.text(c,'Toplam hasar: '+Math.round(p.st.dmg),RR.W/2,100,20,{bold:true,color:'#fff3d6',stroke:OL,sw:5});
-    Art.text(c,'ESC → Haritaya dön',RR.W-20,100,16,{align:'right',bold:true,color:'#fff3d6',stroke:OL,sw:4});
+    RR.UI.rich(c,RR.Input.device==='pad'?'{START} → Haritaya dön':'ESC → Haritaya dön',RR.W-20,100,16,{align:'right',color:'#fff3d6',stroke:OL,sw:4});
   },
   portrait(c,x,y,s){ c.save(); c.translate(x,y); c.scale(s,s); Art.rrect(c,-40,-60,80,160,30,'#d8343a',4); c.restore(); }
 };

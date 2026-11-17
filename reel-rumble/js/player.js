@@ -85,7 +85,7 @@ P.update = function(p,G,ctrl,dt){
 
 P.startSuper = function(p,G){
   const f=F(); p.sup=0; p.st.supUsed+=5; p.tf|=256; p.parryT=0; p.dashT=0;
-  f.sfx(G,'super'); f.shake(G,14); f.fx(G,'ring',p.x,p.y-50,{col:'#ffd23a',s:2.5,life:0.6}); G.hitstop=Math.max(G.hitstop,0.15);
+  f.sfx(G,'super'); f.shake(G,14); f.rumble(G,p.id,0.9,400); f.fx(G,'ring',p.x,p.y-50,{col:'#ffd23a',s:2.5,life:0.6}); G.hitstop=Math.max(G.hitstop,0.15);
   if(p.supId==='star'){ p.superT=0.5; p.starT=6; }
   else if(p.supId==='reel'){ p.superT=0.6; f.ps(G,{k:'reel',x:p.x-p.face*30,y:GY-92,vx:p.face*720,vy:0,r:92,dmg:30,o:p.id,life:6,pierce:true,hitcd:0.1,sup:true,turns:1,keep:true}); }
   else { p.superT=1.35; f.ps(G,{k:'beam',x:p.x,y:p.y-56,x0:p.x,x1:p.x,h:110,vx:0,vy:0,r:1,dmg:26,o:p.id,life:1.35,pierce:true,hitcd:0.1,sup:true,beam:true,keep:true}); f.sfx(G,'beam'); }
@@ -97,19 +97,19 @@ P.hurt = function(p,G){
   if(p.dashT>0&&p.charm==='smoke') return false;
   if(p.shield){ p.shield=false; p.invT=1.4; f.fx(G,'ring',p.x,p.y-40,{col:'#b8bcc2',s:1.5}); f.fx(G,'debris',p.x,p.y-50,{n:5,col:'#b8bcc2'}); f.sfx(G,'tink'); return true; }
   p.st.hits++; p.invT=2; p.hurtT=0.35; p.vy=-520; p.vx=-p.face*220; p.dashT=0; p.parryT=0; p.onGround=false; p.charge=0; p.chargeFull=false;
-  f.sfx(G,'hurt'); f.shake(G,10); f.fx(G,'hit',p.x,p.y-40,{s:2,col:'#ff8a8a'}); G.hitstop=Math.max(G.hitstop,0.08);
+  f.sfx(G,'hurt'); f.shake(G,10); f.fx(G,'hit',p.x,p.y-40,{s:2,col:'#ff8a8a'}); G.hitstop=Math.max(G.hitstop,0.08); f.rumble(G,p.id,0.75,220);
   if(G.noDeath&&p.hp<=1) return true;
   p.hp--;
-  if(p.hp<=0){ p.dead=true; p.vx=p.vy=0; p.y-=30; f.sfx(G,'boom'); f.fx(G,'puff',p.x,p.y-30,{n:6,s:1.4}); }
+  if(p.hp<=0){ p.dead=true; p.vx=p.vy=0; p.y-=30; f.sfx(G,'boom'); f.rumble(G,p.id,1,450); f.fx(G,'puff',p.x,p.y-30,{n:6,s:1.4}); }
   return true;
 };
 P.parry = function(p,G){
   const f=F(); p.vy=-900; p.jumpHeld=false; p.canParry=true; p.parryT=0; p.airDash=false; p.sup=Math.min(5,p.sup+1); p.st.parries++; p.tf|=16;
-  p.invT=Math.max(p.invT,0.25); G.hitstop=Math.max(G.hitstop,0.12); f.sfx(G,'parry'); f.fx(G,'ring',p.x,p.y-40,{s:1.4}); f.fx(G,'spark',p.x,p.y-40,{n:6,col:'#ff9ccc'});
+  p.invT=Math.max(p.invT,0.25); G.hitstop=Math.max(G.hitstop,0.12); f.sfx(G,'parry'); f.rumble(G,p.id,0.35,90); f.fx(G,'ring',p.x,p.y-40,{s:1.4}); f.fx(G,'spark',p.x,p.y-40,{n:6,col:'#ff9ccc'});
 };
 P.revive = function(p,o,G){
   const f=F(); p.dead=false; p.gone=false; p.hp=1; p.invT=2.5; p.vy=0; p.vx=0; p.revivable=false; G.revives=(G.revives||0)+1;
-  o.vy=-900; o.canParry=true; o.parryT=0; o.jumpHeld=false; f.sfx(G,'revive'); f.fx(G,'ring',p.x,p.y-40,{s:2,col:'#ff9ccc'}); f.fx(G,'conf',p.x,p.y-40,{n:12,col:'#ff5fa8'});
+  o.vy=-900; o.canParry=true; o.parryT=0; o.jumpHeld=false; f.sfx(G,'revive'); f.rumble(G,p.id,0.5,200); f.rumble(G,o.id,0.4,150); f.fx(G,'ring',p.x,p.y-40,{s:2,col:'#ff9ccc'}); f.fx(G,'conf',p.x,p.y-40,{n:12,col:'#ff5fa8'});
 };
 
 /* ---------- weapons ---------- */
@@ -141,6 +141,6 @@ Wp.ex = function(p,G){
     case 'boomer': [0,Math.PI].forEach(a0=>S({k:'xring',x:p.x,y:p.y-50,vx:0,vy:0,orbit:true,oa:a0,r:22,dmg:7,pierce:true,hitcd:0.15,life:2.4,blocks:true})); break;
     default: S({k:'xink',vx:ax*900,vy:ay*900,r:34,dmg:9,pierce:true,hitcd:0.08,maxHits:4,life:1.6});
   }
-  f.sfx(G,'ex'); f.fx(G,'puff',m.x,m.y,{n:2}); f.shake(G,4);
+  f.sfx(G,'ex'); f.fx(G,'puff',m.x,m.y,{n:2}); f.shake(G,4); f.rumble(G,p.id,0.3,80);
 };
 })();

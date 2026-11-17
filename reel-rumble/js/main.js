@@ -25,6 +25,7 @@ RR.go=function(name,args){
   trans={phase:'close',t:0,next:name,args};
 };
 RR.onBlur=()=>{ if(curName==='fight'&&cur&&!cur.paused&&!cur.ended&&(cur.mode==='solo'||cur.mode==='local')) cur.setPause(true); };
+RR.onPadLost=()=>{ if(curName==='fight'&&cur&&!cur.paused&&!cur.ended&&cur.mode!=='client') cur.setPause(true); };
 
 function step(dt){
   RR.time=(RR.time||0)+dt; In.update(dt);
