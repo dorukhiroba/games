@@ -26,8 +26,12 @@ const U = RR.U = {
 /* ---------------- data ---------------- */
 RR.CHARS = {
   bobbin:{name:'Bobbin',color:'#d8343a',dark:'#8e1b20',desc:'Makara kafalı, iplik gibi esnek.'},
-  bolt:{name:'Bolt',color:'#2f6fd6',dark:'#18407f',desc:'Ampul kafalı, fikirleri hep parlak.'}
+  bolt:{name:'Bolt',color:'#2f6fd6',dark:'#18407f',desc:'Ampul kafalı, fikirleri hep parlak.'},
+  dugme:{name:'Düğme',color:'#2fa36b',dark:'#17603e',desc:'Dört delikli düğme kafa; ekibi bir arada tutar.'},
+  kibrit:{name:'Kibrit',color:'#e08a1e',dark:'#8a4a0a',desc:'Kibrit çöpü kafa; tek kıvılcımla alev alır.'}
 };
+RR.PCOL = ['#d8343a','#2f6fd6','#2fa36b','#e08a1e']; // P1..P4 marker colours
+RR.MAXP = 4;
 RR.WEAPONS = {
   ink:{name:'Mürekkep Atar',price:0,desc:'Dengeli, hızlı ve uzun menzilli.',ex:'EX: Delip geçen dev mürekkep damlası.'},
   spread:{name:'Saçma Tabanca',price:4,desc:'Yakından çok güçlü, menzili kısa.',ex:'EX: Geniş yelpaze patlaması.'},
@@ -63,7 +67,7 @@ const SKEY = 'reelrumble_save_v1';
 function defSave(){
   return {
     coins:0, own:{w:['ink'],c:[]},
-    load:[{char:'bobbin',w:['ink',null],sup:'beam',charm:null},{char:'bolt',w:['ink',null],sup:'beam',charm:null}],
+    load:['bobbin','bolt','dugme','kibrit'].map(ch=>({char:ch,w:['ink',null],sup:'beam',charm:null})),
     grades:{}, beaten:{}, paid:{}, seenStory:false, ending:false,
     set:{music:0.55,sfx:0.8,filter:true,shake:true,bossbar:false,hitbox:false,voice:true,rumble:true,dead:0.45,padmap:null},
     stats:{deaths:0,parries:0,wins:0}, ach:{}, runCoins:{}, best:{}, rushBest:null
@@ -77,7 +81,8 @@ RR.Save = {
     catch(e){ this.d = def; }
     this.d.set = Object.assign(defSave().set, this.d.set||{});
     this.d.stats = Object.assign(defSave().stats, this.d.stats||{});
-    if(!Array.isArray(this.d.load)||this.d.load.length<2) this.d.load = defSave().load;
+    if(!Array.isArray(this.d.load)) this.d.load = defSave().load;
+    const dl=defSave().load; while(this.d.load.length<4) this.d.load.push(dl[this.d.load.length]);
   },
   save(){ try{ localStorage.setItem(SKEY, JSON.stringify(this.d)); }catch(e){} },
   reset(){ this.d = defSave(); this.save(); },

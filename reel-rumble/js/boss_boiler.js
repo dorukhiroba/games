@@ -5,7 +5,7 @@ const U=RR.U, Art=RR.Art, OL=Art.OL, GY=RR.GROUND, BU=RR.BU, F=RR.Fight;
 
 const B = RR.BOSS.boiler = {
   id:'boiler', name:'Baron Kazan', title:'Buharlı Demiryolu Baronu', hp:3900, bg:'depot', music:'boiler', par:130,
-  phases:[0.66,0.33], plats:[{x:290,y:460,w:140},{x:560,y:430,w:140}],
+  phases:[0.66,0.33], plats:[{x:200,y:460,w:140},{x:440,y:430,w:140},{x:680,y:460,w:130}],
   quotes:['Basıncımı kaldıramadın, ufaklık!','Tren kalkıyor, sen yine perondasın!','Kömürü bol, sabrı az bir baronum ben.'],
   cool:[1.0,0.85,0.6],
   pattern:[['coal','steam','jet'],['punch','gears','bolts'],['pillars','fireballs','coal']],

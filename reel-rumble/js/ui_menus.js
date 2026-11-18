@@ -78,12 +78,13 @@ RR.Scenes.title = {
 
 /* ---------- main menu ---------- */
 RR.Scenes.menu = {
-  base:[{label:'Tek Oyuncu',id:'solo'},{label:'Yerel 2 Oyuncu',id:'local'},{label:'Çevrimiçi 2 Oyuncu',id:'online'},{label:'Boss Maratonu',id:'rush'},{label:'Başarımlar',id:'ach'},{label:'Nasıl Oynanır',id:'howto'},{label:'Ayarlar',id:'settings'}],
+  base:[{label:'Tek Oyuncu',id:'solo'},{label:'Yerel Çok Oyunculu (2-4)',id:'local'},{label:'Çevrimiçi (2-4 Kişi)',id:'online'},{label:'Boss Maratonu',id:'rush'},{label:'Başarımlar',id:'ach'},{label:'Nasıl Oynanır',id:'howto'},{label:'Ayarlar',id:'settings'}],
   enter(){ this.t=0; this.items=this.base.concat(window.KQuit&&KQuit.onSite?[{label:'Oyunlardan Çık',id:'quit'}]:[]); this.sel=Math.min(this.sel||0,this.items.length-1); A.playMusic('menu'); if(RR.Net&&RR.Net.connected) RR.Net.close(); RR.S.mode='solo'; RR.S.role=null; },
   update(dt){ this.t+=dt; this.sel=UI.nav(this.sel,this.items.length);
     if(In.m('back')){ A.sfx('back'); RR.go('title'); return; }
     if(In.m('ok')){ const id=this.items[this.sel].id; A.sfx('select');
-      if(id==='solo'||id==='local'){ RR.S.mode=id; RR.S.role=null; RR.go(RR.Save.d.seenStory?'map':'story'); }
+      if(id==='solo'){ RR.S.mode='solo'; RR.S.role=null; RR.S.mapPos=null; RR.go(RR.Save.d.seenStory?'map':'story'); }
+      else if(id==='local') RR.go('join');
       else if(id==='online') RR.go('online'); else if(id==='quit') KQuit.go(); else RR.go(id,{back:'menu'}); } },
   draw(c){ const t=this.t; UI.stage(c,t); Art.curtains(c,1,t); UI.logo(c,W/2,170,0.62,t);
     Art.panel(c,W/2-260,262,520,30+this.items.length*44); UI.list(c,this.items,this.sel,W/2,298,{gap:44,size:27});
@@ -201,7 +202,7 @@ RR.Scenes.padmap = {
 /* ---------- how to play ---------- */
 const HOW=[
   ['KLAVYE (Tek Oyuncu)',[['Hareket','Yön tuşları / WASD'],['Zıpla','Z  /  Boşluk  /  J'],['Ateş','X  /  K (basılı tut)'],['EX / Süper','C  /  I'],['Atılma (dash)','Shift  /  L'],['Sabitle & 8 yöne nişan','V  /  U'],['Silah değiştir','Tab  /  Q  /  O'],['Duraklat','Esc  /  P'],['Tam ekran','F']]],
-  ['YEREL 2 OYUNCU',[['P1 hareket','W A S D'],['P1 zıpla/ateş/atıl','J / K / L'],['P1 EX / sabitle / silah','I / U / O'],['P2 hareket','Yön tuşları'],['P2 zıpla/ateş/atıl','Num1 , / Num2 . / Num3 /'],['P2 EX / sabitle / silah','Num0 \' / Num4 ; / Num5 \\'],['Gamepad','Takılı gamepad\'ler otomatik atanır']]],
+  ['YEREL ÇOK OYUNCULU (2-4)',[['Katılma','Katılma ekranında ZIPLA tuşuna bas'],['Klavye 1','WASD + J zıpla / K ateş / L atıl'],['Klavye 1 diğer','I EX / U sabitle / O silah'],['Klavye 2','Yön tuşları + Num1 / Num2 / Num3'],['Klavye 2 diğer','Num0 EX / Num4 sabitle / Num5 silah'],['Kollar','Her kol bir oyuncu, en fazla 4 kişi'],['Karakter / ayrılma','◀ ▶ karakter, atılma tuşu ayrılır'],['Haritada','Herkes yürür; yanına gidip zıpla: gir']]],
   ['GAMEPAD',[['Hareket','Sol çubuk / D-pad'],['Zıpla','A'],['Ateş','X  /  RT'],['EX / Süper','B'],['Atılma','RB'],['Sabitle','LB  /  LT'],['Silah değiştir','Y'],['Duraklat','Start'],['Tuşlar, titreşim, ölü bölge','Ayarlar menüsünden değişir']]],
   ['UÇAK BÖLÜMLERİ',[['Uçuş','8 yöne serbest hareket'],['Ateş','Ateş tuşu (basılı tut)'],['Makineli / Bomba','Silah değiştir tuşu'],['Küçül','Atılma tuşunu BASILI tut: küçük, hızlı, zor vurulur'],['Savuştur','Zıpla tuşu (pembe nesnelere)'],['EX torpido','EX tuşu (1 kart)'],['Dev mermi','5 kart dolunca EX tuşu']]],
   ['KOŞU BÖLÜMLERİ',[['Amaç','Sağdaki ÇIKIŞ çadırına ulaş'],['Çukurlar','Düşersen 1 can kaybedip geri dönersin'],['Jeton','Her bölümde 5 gizli jeton var'],['Pembe balonlar','Savuştur, süper kart kazan'],['Not','Süre, can, savuşturma ve jetonlar']]],

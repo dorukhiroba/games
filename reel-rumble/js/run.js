@@ -48,7 +48,7 @@ const D = RR.BOSS.luna = {
     const k=U.clamp((G.camX||0)/(LEN-W),0,1), x=W/2-220, y=20;
     Art.rrect(c,x,y,440,16,8,'rgba(0,0,0,0.35)',3); c.fillStyle='#ffd23a'; c.fillRect(x+3,y+3,434*k,10);
     c.save(); c.translate(x+440*k,y+8); Art.circ(c,0,0,10,'#d8343a',3); c.restore();
-    Art.text(c,'Jeton: '+(G.coinsGot||0)+' / 5',W-24,30,22,{title:true,align:'right',color:'#ffd23a',stroke:OL,sw:5});
+    Art.text(c,'Jeton: '+(G.coinsGot||0)+' / 5',W-24,G.players.length>=4?96:30,22,{title:true,align:'right',color:'#ffd23a',stroke:OL,sw:5});
   },
   portrait(c,x,y,s,t){ c.save(); c.translate(x,y); c.scale(s,s); ferris(c,0,0,150,t||0); c.restore(); }
 };

@@ -6,7 +6,7 @@ const lens=b=>({x:b.x-150,y:b.y});
 
 const B = RR.BOSS.proj = {
   id:'proj', name:'Projeksiyoncu', title:'Lanetli Makinist', hp:4500, bg:'cinema', music:'proj', par:150,
-  phases:[0.66,0.33], plats:[{x:190,y:440,w:150},{x:470,y:390,w:150}],
+  phases:[0.66,0.33], plats:[{x:150,y:440,w:150},{x:400,y:390,w:150},{x:650,y:440,w:140}],
   quotes:['Bu film benim, sonunu da ben yazarım!','Perde kapandı... senin için.','Makarayı başa sar ve tekrar izle!'],
   cool:[0.95,0.8,0.55],
   pattern:[['frames','lensbeam','ghosts'],['reels','stars','frames'],['spiral2','sandbags','lensbeam']],

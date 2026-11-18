@@ -17,7 +17,7 @@ function hopAtk(b,G,a,count){
 }
 const B = RR.BOSS.corn = {
   id:'corn', name:'Albay Mısır', title:'Tarla Generali', hp:3200, bg:'farm', music:'corn', par:110,
-  phases:[0.66,0.33], plats:[{x:290,y:470,w:130},{x:560,y:440,w:130}],
+  phases:[0.66,0.33], plats:[{x:170,y:470,w:120},{x:420,y:430,w:130},{x:670,y:470,w:120}],
   quotes:['Bu tarlada emirleri ben veririm, er!','Patlamaya hazır ol, asker!','Sıraya gir ve bir daha dene!'],
   cool:[1.0,0.85,0.6],
   pattern:[['volley','troops','cannon'],['rain','butter','ring'],['hop','hop3','spit']],

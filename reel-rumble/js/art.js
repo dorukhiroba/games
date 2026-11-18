@@ -55,7 +55,22 @@ Art.banner = (c,s,t,o)=>{
 /* ---------- heroes (original characters: Bobbin the spool, Bolt the bulb) ---------- */
 function drawHead(c,p,t,mood){
   const blink=((t*0.45+p.id*0.37)%3.2)<0.09;
-  if(p.char==='bolt'){
+  if(p.char==='dugme'){
+    c.save(); Art.rrect(c,-6,-76,12,14,3,'#f3e4c2',3);
+    Art.ell(c,0,-103,32,31,'#2f9d6c',4); Art.ell(c,2,-103,25,24,'#5fd6a2',3);
+    const holes=[[-13,-121],[17,-122],[-15,-85],[19,-84]]; holes.forEach(h=>Art.circ(c,h[0],h[1],3.8,'#17603e',2));
+    c.beginPath(); c.moveTo(-13,-121); c.quadraticCurveTo(2,-132,17,-122); c.moveTo(-15,-85); c.quadraticCurveTo(2,-74,19,-84); c.lineWidth=2.5; c.strokeStyle='#d8343a'; c.stroke();
+    c.beginPath(); c.arc(-10,-112,9,Math.PI*1.1,Math.PI*1.5); c.lineWidth=3; c.strokeStyle='rgba(255,255,255,0.7)'; c.stroke();
+    faceAt(c,1,-106,mood,blink,p); c.restore();
+  } else if(p.char==='kibrit'){
+    c.save(); Art.rrect(c,-7,-84,14,24,3,'#e8c38a',3);
+    c.beginPath(); c.moveTo(-2,-82); c.lineTo(-2,-62); c.moveTo(3,-80); c.lineTo(3,-64); c.lineWidth=1.5; c.strokeStyle='rgba(120,80,30,0.5)'; c.stroke();
+    const hot=p.shootT>0||p.starT>0||p.superT>0, fl=hot?1.45:1, fk=Math.sin(t*22+p.id)*3;
+    c.beginPath(); c.moveTo(-12,-128); c.bezierCurveTo(-19,-144,-6,-150,1,-130-26*fl-fk); c.bezierCurveTo(9,-148,19,-142,12,-128); c.closePath(); c.fillStyle='#ffb02e'; c.fill(); c.lineWidth=3; c.strokeStyle=Art.OL; c.stroke();
+    c.beginPath(); c.moveTo(-6,-128); c.quadraticCurveTo(-6,-140,1,-128-16*fl-fk*0.6); c.quadraticCurveTo(7,-140,6,-128); c.closePath(); c.fillStyle='#fff3a0'; c.fill();
+    Art.ell(c,0,-104,26,29,'#c8402a',4); Art.ell(c,-9,-116,7,5,'rgba(255,255,255,0.45)',0);
+    faceAt(c,1,-104,mood,blink,p); c.restore();
+  } else if(p.char==='bolt'){
     c.save(); Art.rrect(c,-12,-80,24,16,4,'#a7adb4',3);
     c.beginPath(); for(let i=0;i<3;i++){ c.moveTo(-12,-76+i*5); c.lineTo(12,-73+i*5);} c.lineWidth=2; c.stroke();
     Art.ell(c,0,-62,6,3,OL,0);
@@ -139,6 +154,13 @@ Art.player = function(c,p,t){
   c.restore();
 };
 Art.head = drawHead;
+// P1..P4 tag above each hero in multiplayer
+Art.marker = function(c,p,i,t){
+  if(p.gone) return; const col=RR.PCOL[i%4]; const y=p.plane?p.y-(p.small?36:58):(p.dead?p.y-140:p.y-(p.duck?118:166));
+  c.save(); c.translate(p.x,y+Math.sin(t*4+i)*3);
+  c.beginPath(); c.moveTo(-9,0); c.lineTo(9,0); c.lineTo(0,11); c.closePath(); c.fillStyle=col; c.fill(); c.lineWidth=2.5; c.strokeStyle=OL; c.stroke();
+  Art.text(c,'P'+(i+1),0,-11,16,{title:true,color:col,stroke:OL,sw:4}); c.restore();
+};
 Art.ghost = function(c,p,t){
   c.save(); c.translate(p.x,p.y+Math.sin(t*3)*6); c.globalAlpha=0.75;
   c.beginPath(); c.moveTo(-26,-20); c.quadraticCurveTo(-30,-90,0,-100); c.quadraticCurveTo(30,-90,26,-20);
@@ -284,7 +306,7 @@ Art.icon = function(c,kind,id,x,y,s){
 Art.hud = function(c,G){
   const t=G.t;
   G.players.forEach((p,i)=>{
-    const right=i===1, x=right?RR.W-24-230:24, y=RR.H-58;
+    const POS=[[24,RR.H-58],[RR.W-254,RR.H-58],[24,14],[RR.W-254,14]], x=POS[i%4][0], y=POS[i%4][1];
     c.save();
     const low=!p.dead&&p.hp===1&&Math.floor(t*4)%2===0;
     Art.rrect(c,x,y,78,40,8,p.dead?'#777':low?'#d8343a':'#fffaf0',3.5);
@@ -295,7 +317,7 @@ Art.hud = function(c,G){
       else { Art.rrect(c,cx,y+4,22,28,4,'rgba(255,250,240,0.35)',2.5); if(fill>0){ c.fillStyle='#ffd23a'; c.fillRect(cx+3,y+4+28*(1-fill)+1,16,28*fill-3); } }
     }
     Art.icon(c,'w',p.weapons[p.wslot],x+222,y+20,26);
-    if(G.players.length>1) Art.text(c,'P'+(i+1),x+39,y-14,18,{title:true,color:'#fff3d6',stroke:OL,sw:4});
+    if(G.players.length>1) Art.text(c,'P'+(i+1),x+39,i>=2?y+58:y-14,18,{title:true,color:RR.PCOL[i%4],stroke:OL,sw:4});
     c.restore();
   });
   const b=G.boss;

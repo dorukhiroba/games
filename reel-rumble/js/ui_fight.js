@@ -4,7 +4,7 @@
 const U=RR.U, Art=RR.Art, OL=Art.OL, In=RR.Input, A=RR.Audio, W=RR.W, H=RR.H, UI=RR.UI;
 
 RR.startFight = function(boss,diff){
-  if(RR.S.mode==='online'&&RR.S.role==='host') RR.Net.send({t:'fight',boss,diff,loads:[RR.Save.d.load[0],RR.S.remoteLoad||RR.defaultLoad(1)]});
+  if(RR.S.mode==='online'&&RR.S.role==='host'){ const order=[0].concat(RR.Net.slots()); const loads=order.map(s=>s===0?RR.Save.d.load[0]:((RR.S.remoteLoads||{})[s]||RR.defaultLoad(s))); RR.S.order=order; RR.Net.send({t:'fight',boss,diff,loads,order}); }
   RR.go('fight',{boss,diff});
 };
 
@@ -13,12 +13,13 @@ RR.Scenes.fight = {
     this.a=a; this.paused=false; this.psel=0; this.ended=false; this.t=0;
     const S=RR.S, Ctrl=In.Ctrl, D=RR.Save.d; let mode, ctrls=[], loads;
     mode = S.mode==='online' ? S.role : (S.mode==='local'?'local':'solo');
-    if(mode==='local'){ const pc=In.padCount(); ctrls=[new Ctrl('p1',pc>=2?0:null),new Ctrl('p2',pc>=2?1:(pc===1?0:null))]; loads=[D.load[0],D.load[1]]; }
-    else if(mode==='host'){ this.rc=new In.RemoteCtrl(); ctrls=[new Ctrl('solo',0),this.rc]; loads=[D.load[0],S.remoteLoad||RR.defaultLoad(1)]; }
-    else if(mode==='client'){ this.lc=new Ctrl('solo',0); loads=a.loads||[RR.defaultLoad(0),D.load[0]]; }
+    if(mode==='local'){ const L=(S.locals&&S.locals.length)?S.locals:[{scheme:'solo',pad:0}]; ctrls=L.map(d=>new Ctrl(d.scheme,d.pad)); loads=L.map((d,i)=>D.load[i]); }
+    else if(mode==='host'){ const order=(S.order&&S.order[0]===0)?S.order:[0].concat(RR.Net.slots()); this.order=order; this.rc={}; ctrls=order.map(s=>s===0?new Ctrl('solo',0):(this.rc[s]=new In.RemoteCtrl())); loads=order.map(s=>s===0?D.load[0]:((S.remoteLoads||{})[s]||RR.defaultLoad(s))); }
+    else if(mode==='client'){ this.lc=new Ctrl('solo',0); this.order=a.order||[0,RR.Net.slot]; loads=a.loads||[RR.defaultLoad(0),D.load[0]]; }
     else { ctrls=[new Ctrl('solo',0)]; loads=[D.load[0]]; }
     this.mode=mode;
     this.G=RR.Fight.create({boss:a.boss,diff:a.diff||0,loads,mode,ctrls});
+    this.G.myIdx=mode==='client'?Math.max(0,this.order.indexOf(RR.Net.slot)):0;
     A.playMusic(RR.BOSS[a.boss].music);
   },
   leave(){ },
@@ -47,8 +48,9 @@ RR.Scenes.fight = {
     if(this.mode==='host') RR.Net.send({t:'end',res});
     RR.go(res.won?'results':'dead',{res});
   },
-  onNet(m){
-    if(this.mode==='host'){ if(m.t==='in'){ this.rc.feed(m.h,m.p); return true; } if(m.t==='pausereq'){ if(!this.ended) this.setPause(!this.paused); return true; } }
+  onLeave(slot){ if(this.mode!=='host') return; const i=(this.order||[]).indexOf(slot), p=i>0&&this.G.players[i]; if(p){ p.dead=true; p.gone=true; p.hp=0; } },
+  onNet(m,slot){
+    if(this.mode==='host'){ if(m.t==='in'){ const r=this.rc&&this.rc[slot]; if(r) r.feed(m.h,m.p); return true; } if(m.t==='pausereq'){ if(!this.ended) this.setPause(!this.paused); return true; } }
     if(this.mode==='client'){ if(m.t==='s'){ RR.Fight.apply(this.G,m); return true; } if(m.t==='pause'){ this.paused=m.on; return true; } }
     return false;
   },

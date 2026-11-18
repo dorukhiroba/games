@@ -9,7 +9,7 @@
 ## İnternette yayınlamak (arkadaşınla çevrimiçi oynamak için)
 Klasörün tamamını herhangi bir statik barındırmaya yükle: **itch.io** (HTML5 oyun olarak zip), **GitHub Pages**, **Netlify** veya **Cloudflare Pages**. Sunucu kodu gerekmez; çevrimiçi bağlantı WebRTC (PeerJS) ile doğrudan iki tarayıcı arasında kurulur.
 
-Çevrimiçi oynamak için: Ana menü → **Çevrimiçi 2 Oyuncu** → biri **Oda Kur** der ve 5 harfli kodu paylaşır, diğeri kodu yazıp **Katıl** der. Ev sahibi haritada bossu seçer; dövüş ev sahibinin bilgisayarında hesaplanır, misafir girdisini gönderir.
+Çevrimiçi oynamak için (2-4 kişi): Ana menü → **Çevrimiçi (2-4 Kişi)** → biri **Oda Kur** der, odası açılır ve haritaya geçer; diğerleri 5 harfli kodu yazıp **Katıl** der (ev sahibi haritadayken). Herkes haritada birlikte yürür, bölüme ev sahibi girer; dövüş ev sahibinin bilgisayarında hesaplanır, misafirler girdilerini gönderir. Ayrılan oyuncu hayalete dönüşür, oyun diğerleriyle sürer.
 
 ## Kontroller
 | Eylem | Klavye (tek oyuncu) | Gamepad |
@@ -26,7 +26,7 @@ Klasörün tamamını herhangi bir statik barındırmaya yükle: **itch.io** (HT
 
 **Gamepad:** Xbox, PlayStation ve genel kollar desteklenir. Kol bağlanınca ekrandaki ipuçları kol tuşlarına döner; Ayarlar'dan tuşları yeniden atayabilir, titreşimi ve çubuk ölü bölgesini ayarlayabilirsin. Dövüşte kol çıkarsa oyun duraklar. Tarayıcı kolu görmek için önce bir tuşa basılmasını bekler.
 
-**Yerel 2 oyuncu:** P1 = WASD + J/K/L/I/U/O, P2 = yön tuşları + Num1/2/3/0/4/5 (veya , . / ' ; \\). Takılı gamepad'ler otomatik atanır.
+**Yerel çok oyunculu (2-4):** Katılma ekranında her oyuncu kendi cihazında ZIPLA tuşuna basar: Klavye 1 = WASD + J/K/L/I/U/O, Klavye 2 = yön tuşları + Num1/2/3/0/4/5, her kol ayrı bir oyuncu. ◀ ▶ ile karakter seçilir, Enter veya Start ile başlanır.
 
 ## İçerik
 - 6 boss, her biri 3 fazlı:
@@ -43,7 +43,8 @@ Klasörün tamamını herhangi bir statik barındırmaya yükle: **itch.io** (HT
 - 6 silah, 7 tılsım (yeni: **Pembe Kurdele** – otomatik savuşturma), **Bilet Gişesi** dükkânı ve jeton ekonomisi
 - 3 zorluk (Basit / Normal / Uzman), **S'den D'ye not** sistemi, yenilgi ekranında ilerleme çubuğu
 - Ortak oyunda düşen arkadaşının hayaletini savuşturarak **dirilt**
-- Yerel ve **çevrimiçi** 2 oyunculu mod, gamepad desteği
+- **4 oyuncuya kadar** yerel ve çevrimiçi ortak oyun, 4 karakter (Bobbin, Bolt, Düğme, Kibrit), oyuncu sayısına göre boss canı, gamepad desteği
+- Herkesin birlikte yürüdüğü dünya haritası: nehir, köprüler, havaalanı ve 3 gizli jeton
 - Film greni / sepya / çizik efekti, ekran sarsıntısı, isteğe bağlı boss can barı ve çarpışma kutuları
 - Kodla üretilen swing/ragtime müzikler ve sentez ses efektleri
 - Otomatik kayıt (tarayıcı localStorage)

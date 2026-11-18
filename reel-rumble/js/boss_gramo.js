@@ -6,7 +6,7 @@ const mouth=b=>({x:b.x-170,y:b.y-318});
 
 const B = RR.BOSS.gramo = {
   id:'gramo', name:'Madam Gramofon', title:'Balo Salonunun Divası', hp:3600, bg:'ballroom', music:'gramo', par:120,
-  phases:[0.66,0.33], plats:[{x:200,y:450,w:170},{x:500,y:405,w:170}],
+  phases:[0.66,0.33], plats:[{x:150,y:450,w:150},{x:400,y:400,w:150},{x:640,y:450,w:140}],
   quotes:['Yüksek notalara dayanamadın, şekerim!','Sahnede tek yıldız benim!','Biraz daha prova et, tatlım.'],
   cool:[1.0,0.85,0.65],
   pattern:[['notes','records','aria'],['blast','dancers','notes2'],['spiral','fall','records']],

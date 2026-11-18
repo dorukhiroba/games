@@ -86,7 +86,7 @@ RR.Scenes.rush={
   draw(c){ const t=this.t; UI.stage(c,t); Art.curtains(c,1,t); Art.panel(c,W/2-360,110,720,500);
     Art.text(c,'BOSS MARATONU',W/2,165,46,{title:true,color:'#d8343a'});
     Art.wrap(c,'Altı bossla arka arkaya dövüş: kara, gökyüzü ve final. Toplam süren kaydedilir. Yenilirsen aynı bosstan devam edebilirsin.',W/2,215,600,24,18,{bold:true});
-    const rows=[['Oyuncu',this.mode?'Yerel 2 Oyuncu':'Tek Oyuncu'],['Zorluk',RR.DIFFS[this.diff].name],['BAŞLA','']];
+    const rows=[['Oyuncu',this.mode?('Yerel '+(((RR.S.locals||[]).length)||1)+' kişi'):'Tek Oyuncu'],['Zorluk',RR.DIFFS[this.diff].name],['BAŞLA','']];
     rows.forEach((r,i)=>{ const y=330+i*70, on=i===this.row; if(on){ c.save(); c.fillStyle='rgba(216,52,58,0.12)'; c.fillRect(W/2-300,y-28,600,56); c.restore(); }
       if(i===2) Art.text(c,r[0],W/2,y,36,{title:true,color:on?'#d8343a':'#2a1d14'});
       else { Art.text(c,r[0],W/2-270,y,28,{title:true,align:'left',color:on?'#d8343a':'#2a1d14'}); Art.text(c,(on?'◀  ':'')+r[1]+(on?'  ▶':''),W/2+270,y,24,{bold:true,align:'right'}); } });

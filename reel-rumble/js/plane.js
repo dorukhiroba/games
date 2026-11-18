@@ -7,7 +7,7 @@ const F=()=>RR.Fight;
 
 PL.create=function(id,load,x){
   const p=RR.PlayerSys.create(id,load,x);
-  return Object.assign(p,{plane:true,x:170,y:250+id*150,onGround:false,small:false,wasSmall:false,weapons:['ink','charge'],wslot:0,parryCD:0,prop:0,tilt:0,alt:false});
+  return Object.assign(p,{plane:true,x:170-(id%2)*30,y:150+id*125,onGround:false,small:false,wasSmall:false,weapons:['ink','charge'],wslot:0,parryCD:0,prop:0,tilt:0,alt:false});
 };
 PL.hb = p => p.small?{x:p.x-12,y:p.y-9,w:24,h:18}:{x:p.x-26,y:p.y-15,w:50,h:30};
 PL.muzzle = p => ({x:p.x+(p.small?20:44),y:p.y+(p.small?3:6)});
