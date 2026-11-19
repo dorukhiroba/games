@@ -124,11 +124,28 @@ function token(g,x,y,col,ring,num,name,hasBall,dim){
 
 /* ---------- viewer ---------- */
 MV.defSpots=defSpots;
+/* ---------- feeds: where the viewer gets its possessions from ----------
+   local: the engine runs right here. remote (online): the host runs the engine and streams events;
+   the viewer only needs a game-shaped mirror (sides with ids/on/energy/box/score/tac, q, clock, done). */
+const BOXK=['sec','pts','fgm','fga','tpm','tpa','ftm','fta','orb','drb','ast','stl','blk','tov','pf','pm'];
+MV.BOXK=BOXK;
+MV.applyCoach=function(g,k,cmd,to){ const s=g&&g[k]; if(!s||!cmd) return;
+  if(cmd.c==='tac'&&['def','pnrD','pace','three','press'].includes(cmd.k)) s.tac[cmd.k]=cmd.k==='press'?!!cmd.v:(cmd.k==='pace'||cmd.k==='three')?+cmd.v:String(cmd.v);
+  if(cmd.c==='play'&&typeof cmd.id==='string') s.tac.plays[cmd.id]=U.clamp(Math.round(+cmd.w||0),0,5);
+  if(cmd.c==='sub'){ const out=+cmd.out, inn=+cmd.inn, S=g.S||BM.S; if(s.on.includes(out)&&!s.on.includes(inn)&&s.ids.includes(inn)){ s.on=s.on.map(x=>x===out?inn:x).sort((x,y)=>POSORD[S.players[x].pos]-POSORD[S.players[y].pos]); s.hold=(g.elapsed||0)+240; } }
+  if(cmd.c==='timeout'&&to&&to[k]>0){ to[k]--; s.on.forEach(id=>{ s.energy[id]=Math.min(1,(s.energy[id]||1)+0.07); }); }
+};
+MV.localFeed=function(S,h,a){ const g=E.newGame(S,h,a), to={h:7,a:7};
+  return {g,to,next(cb){ cb(E.step(g)); },skip(untilQ,cb){ const evs=[]; let guard=0; while(!g.done&&guard++<900){ const ev=E.step(g); if(!ev) break; evs.push(ev); if(untilQ&&ev.endQ) break; } cb(evs); },coach(cmd,k){ MV.applyCoach(g,k,cmd,to); }}; };
+MV.snap=(g,to)=>({q:g.q,clock:g.clock,n:g.n,done:g.done,el:g.elapsed,to:to?[to.h,to.a]:null,s:['h','a'].map(k=>{ const s=g[k]; return {tid:s.tid,ids:s.ids,on:s.on,en:s.ids.map(id=>Math.round(s.energy[id]*100)),bx:s.ids.map(id=>BOXK.map(x=>s.box[id][x])),sc:s.score,qf:s.qfouls}; })});
+MV.mirror=function(S,h,a){ const mk=tid=>({tid,ids:[],on:[],energy:{},box:{},score:0,qfouls:0,tac:JSON.parse(JSON.stringify(S.teams[tid].tac))}); return {S,h:mk(h),a:mk(a),q:1,clock:720,n:0,done:false,elapsed:0}; };
+MV.applySnap=function(m,st,to){ if(!st) return; m.q=st.q; m.clock=st.clock; m.n=st.n; m.done=st.done; m.elapsed=st.el; if(to&&st.to){ to.h=st.to[0]; to.a=st.to[1]; }
+  ['h','a'].forEach((k,i)=>{ const x=st.s[i], s=m[k]; s.ids=x.ids; s.on=x.on; s.score=x.sc; s.qfouls=x.qf; s.energy={}; s.box={}; x.ids.forEach((id,j)=>{ s.energy[id]=x.en[j]/100; const b={}; BOXK.forEach((kk,q)=>{ b[kk]=x.bx[j][q]; }); s.box[id]=b; }); }); };
 MV.open=function(S,h,a,o){
-  o=o||{}; const g=E.newGame(S,h,a); const H0=S.teams[h], A0=S.teams[a];
+  o=o||{}; const feed=o.feed||MV.localFeed(S,h,a); const g=feed.g; const H0=S.teams[h], A0=S.teams[a];
   const colH=H0.c1, colA=cdist(A0.c1,H0.c1)<120?A0.c2:A0.c1, ringH=cdist(H0.c2,colH)<60?'#0b111a':H0.c2, ringA=colA===A0.c1?A0.c2:A0.c1;
-  const userK=h===S.user?'h':a===S.user?'a':null;
-  const v={S,g,pos:{},ball:[W/2,H/2],keys:null,t:0,ev:null,speed:o.speed||2,paused:false,alive:true,score:[0,0],q:1,clock:720,banner:null,fx:[],fired:0,names:true,tab:'pbp',timeouts:{h:7,a:7},sel:null,done:false};
+  const userK=o.userK!==undefined?o.userK:(h===S.user?'h':a===S.user?'a':null); const TO=feed.to||{h:7,a:7};
+  const v={S,g,pos:{},ball:[W/2,H/2],keys:null,t:0,ev:null,speed:o.speed||2,paused:false,alive:true,score:[0,0],q:1,clock:720,banner:null,fx:[],fired:0,names:true,tab:'pbp',sel:null,done:false,waiting:false,waitT:0};
   MV.cur=v;
   const el=document.createElement('div'); el.className='mv';
   const crest=t=>`<span class="crest" style="background:${t.c1};color:${lum(t.c1)>0.62?'#111':'#fff'}">${t.abbr}</span>`;
@@ -139,7 +156,7 @@ MV.open=function(S,h,a,o){
   <div class="mv-body"><div class="mv-court"><canvas width="${CW}" height="${CH}"></canvas>
     <div class="mv-ctrl"><button class="btn sm" data-a="pause">⏸ Duraklat</button>
       <span class="mv-speed">${[1,2,4,8,16].map(s=>`<button class="btn sm" data-speed="${s}">${s}x</button>`).join('')}</span>
-      <button class="btn sm" data-a="names">İsimler</button><span class="grow"></span>
+      <button class="btn sm" data-a="names">İsimler</button><span class="grow"></span>${o.closable?'<button class="btn sm danger" data-a="close">İzlemeyi bırak</button>':''}
       <button class="btn sm" data-a="quarter">Çeyrek sonuna ⏭</button><button class="btn sm" data-a="end">Maç sonuna ⏭⏭</button></div><div class="mv-last" data-last></div><div class="mv-strip"><div data-ln="h"></div><div data-ln="a"></div></div></div>
     <div class="mv-side"><div class="tabs"><button data-tab="pbp">Anlatım</button><button data-tab="box">Kutu skor</button>${userK?'<button data-tab="coach">Koçluk</button>':''}</div><div data-panel></div></div></div>`;
   document.body.appendChild(el);
@@ -172,6 +189,7 @@ MV.open=function(S,h,a,o){
       cx.beginPath(); cx.arc(v.ball[0]*SC,v.ball[1]*SC,5.5,0,Math.PI*2); cx.fillStyle='#ff8a2a'; cx.fill();
     }
     v.fx=v.fx.filter(x=>x.life>0); v.fx.forEach(x=>{ cx.save(); cx.globalAlpha=U.clamp(x.life,0,1); cx.font='700 26px "Barlow Condensed", sans-serif'; cx.textAlign='center'; cx.lineWidth=4; cx.strokeStyle='rgba(10,14,22,0.8)'; cx.strokeText(x.text,x.x*SC,x.y*SC-(1-x.life)*30); cx.fillStyle=x.col; cx.fillText(x.text,x.x*SC,x.y*SC-(1-x.life)*30); cx.restore(); });
+    if(v.waiting&&v.waitT>1.2&&!v.done&&!v.banner){ cx.save(); cx.fillStyle='rgba(8,12,20,0.7)'; cx.fillRect(CW/2-210,CH-46,420,34); cx.fillStyle='#ffd23a'; cx.font='600 16px Barlow, sans-serif'; cx.textAlign='center'; cx.textBaseline='middle'; cx.fillText(feed.waitText||'Bekleniyor…',CW/2,CH-29); cx.restore(); }
     if(v.banner){ cx.save(); cx.fillStyle='rgba(8,12,20,0.78)'; cx.fillRect(0,CH/2-48,CW,96); cx.fillStyle='#fff'; cx.font='700 40px "Barlow Condensed", sans-serif'; cx.textAlign='center'; cx.textBaseline='middle'; cx.fillText(v.banner.text,CW/2,CH/2-10); cx.font='600 18px Barlow, sans-serif'; cx.fillStyle='#ffb36b'; cx.fillText(v.banner.sub||'',CW/2,CH/2+24); cx.restore(); }
     // header
     $('[data-hs]').textContent=v.score[0]; $('[data-as]').textContent=v.score[1];
@@ -184,10 +202,12 @@ MV.open=function(S,h,a,o){
     if(k.fx==='ft') fx('+1',at,'#ffd23a'); if(k.fx==='out') fx('TOP KAYBI',at,'#ff9a9a'); if(k.fx==='oreb') fx('Hücum ribaundu',at,'#c8ffde'); }
   function addPbp(ev){ const t=side(ev.off); const txt=U.esc(ev.text||'')+(ev.bonus?' · bonus serbest atış '+ev.bonus[1]+'/2':''); pbp.unshift(`<div class="${ev.pts?'sc':''}"><span class="tm">${qName(ev.q)} ${clockStr(ev.clock)}</span><span class="ab" style="background:${t.c1};color:${lum(t.c1)>0.62?'#111':'#fff'}">${t.abbr}</span>${txt}${ev.pts?` <b>${ev.score[0]}-${ev.score[1]}</b>`:''}</div>`);
     if(ev.endQ) pbp.unshift(`<div class="qe">${qName(ev.endQ)} sonu · ${H0.abbr} ${ev.score[0]} - ${ev.score[1]} ${A0.abbr}</div>`); if(pbp.length>120) pbp.length=120; if(v.tab==='pbp') panelRender(); }
-  function next(){
-    const ev=E.step(g); if(!ev){ finish(); return; }
-    v.ev=ev; v.keys=build(v,ev); v.t=0; v.fired=1; v.clock0=v.clock;
+  function next(){ if(v.waiting) return; v.waiting=true; v.waitT=0;
+    feed.next(ev=>{ v.waiting=false; if(!v.alive||v.done) return; if(!ev){ finish(); return; } v.ev=ev; v.keys=build(v,ev); v.t=0; v.fired=1; v.clock0=v.clock; });
   }
+  function batch(evs){ v.banner=null; v.waiting=false; if(v.keys) endEvent(); if(v.done) return; evs.forEach(ev=>{ v.ev=ev; v.score=ev.score.slice(); addPbp(ev); }); v.clock=g.clock; v.q=g.q; v.pos={}; v.keys=null;
+    if(g.done) finish(); else if(evs.length){ v.banner={text:qName(Math.max(1,g.q-1))+' SONU',sub:H0.abbr+' '+g.h.score+' - '+g.a.score+' '+A0.abbr,t:1.4}; } strip(); panelRender(); }
+  feed.onBatch=evs=>{ if(v.alive) batch(evs); };
   function strip(){ ['h','a'].forEach(k=>{ const s=g[k], t=side(k); const box=el.querySelector('[data-ln="'+k+'"]'); if(!box) return; box.innerHTML='<b>'+t.abbr+' sahada</b> <span class="dim">faul '+s.qfouls+(s.qfouls>=5?' · bonus':'')+'</span><div class="ln">'+s.on.map(id=>{ const p=P(id), e=s.energy[id], b=s.box[id]; return '<div class="pc"><span>'+p.num+' '+U.esc(lastName(p.name))+'</span><span class="dim">'+b.pts+' sy · '+(b.orb+b.drb)+' rb · '+b.ast+' as</span><span class="bar"><i style="width:'+Math.round(e*100)+'%;background:'+(e<0.6?'var(--bad)':e<0.8?'var(--warn)':'var(--good)')+'"></i></span></div>'; }).join('')+'</div>'; });
     const ls=el.querySelector('[data-last]'); if(ls&&v.lastTxt) ls.innerHTML=v.lastTxt; }
   function endEvent(){
@@ -203,8 +223,7 @@ MV.open=function(S,h,a,o){
     const win=g.h.score>g.a.score?H0:A0; v.banner={text:'MAÇ SONU · '+H0.abbr+' '+g.h.score+' - '+g.a.score+' '+A0.abbr,sub:win.city+' '+win.name+' kazandı'+(g.q>4?' (uzatma)':''),t:1e9};
     $('.mv-ctrl').innerHTML=`<button class="btn sm" data-tab-go="box">Kutu skor</button><span class="grow"></span><button class="btn pri" data-a="close">Devam ›</button>`;
     el.classList.add('final'); strip(); v.tab='box'; panelRender(); render(); }
-  function skip(untilQ){ v.banner=null; if(v.keys) endEvent(); let guard=0; while(!g.done&&guard++<900){ const ev=E.step(g); if(!ev) break; v.ev=ev; v.score=ev.score.slice(); v.clock=g.clock; v.q=g.q; addPbp(ev); if(untilQ&&ev.endQ) break; }
-    v.pos={}; v.keys=null; if(g.done) finish(); else { v.banner={text:qName(g.q-1)+' SONU',sub:H0.abbr+' '+g.h.score+' - '+g.a.score+' '+A0.abbr,t:1.4}; } panelRender(); }
+  function skip(untilQ){ if(v.done) return; if(v.keys) endEvent(); if(v.done) return; feed.skip(untilQ,evs=>batch(evs)); }
 
   /* ---------- side panel ---------- */
   function boxTable(k){ const s=g[k], t=side(k);
@@ -216,8 +235,8 @@ MV.open=function(S,h,a,o){
     const on=s.on.map(id=>{ const p=P(id); return `<div class="mv-pl${v.sel===id?' on':''}" data-pl="${id}"><span>${p.num} ${U.esc(lastName(p.name))} <span class="dim">${p.pos}</span></span><span class="bar" style="width:60px"><i style="width:${Math.round(s.energy[id]*100)}%;background:${s.energy[id]<0.6?'var(--bad)':s.energy[id]<0.8?'var(--warn)':'var(--good)'}"></i></span><span class="dim">${s.box[id].pts}sy ${s.box[id].pf}f</span></div>`; }).join('');
     const bench=s.ids.filter(id=>!s.on.includes(id)).map(id=>{ const p=P(id); return `<div class="mv-pl${v.sel===id?' on':''}" data-pl="${id}"><span>${p.num} ${U.esc(lastName(p.name))} <span class="dim">${p.pos} · ${p.ovr}</span></span><span class="bar" style="width:60px"><i style="width:${Math.round(s.energy[id]*100)}%"></i></span><span class="dim">${Math.round(s.box[id].sec/60)}dk ${s.box[id].pf}f</span></div>`; }).join('');
     return `<div class="grid" style="gap:8px">
-      <div class="row"><button class="btn sm pri" data-a="timeout"${v.timeouts[userK]?'':' disabled'}>Mola (${v.timeouts[userK]})</button><span class="dim" style="font-size:12px">Mola maçı durdurur, sahadakilere nefes aldırır.</span></div>
-      <label>Savunma <select data-tac="def">${opt(T.allDefs(S).map(d=>[d.id,d.name]),tac.def)}</select></label>
+      <div class="row"><button class="btn sm pri" data-a="timeout"${TO[userK]?'':' disabled'}>Mola (${TO[userK]})</button><span class="dim" style="font-size:12px">Mola maçı durdurur, sahadakilere nefes aldırır.</span></div>
+      <label>Savunma <select data-tac="def">${opt(T.myDefs(S).map(d=>[d.id,d.name]),tac.def)}</select></label>
       <label>Pick & roll savunması <select data-tac="pnrD">${opt([['drop','Geride bekle (drop)'],['hedge','Hedge / öne çık'],['blitz','İkili sıkıştır (blitz)']],tac.pnrD||'drop')}</select></label>
       <div class="row"><label>Tempo <select data-tac="pace">${opt([[0.9,'Yavaş'],[1,'Normal'],[1.12,'Hızlı']],tac.pace)}</select></label><label>Üçlük <select data-tac="three">${opt([[0.75,'Az'],[1,'Dengeli'],[1.3,'Çok']],tac.three)}</select></label><label class="row" style="gap:4px"><input type="checkbox" data-tac="press"${tac.press?' checked':''}> Pres</label></div>
       <div><b style="font-size:13px">Setler</b><div class="mv-plays">${Object.keys(tac.plays).map(id=>{ const pl=T.getPlay(S,id); return `<label>${U.esc(pl.name)} <select data-play="${id}">${[0,1,2,3,4,5].map(n=>`<option${tac.plays[id]===n?' selected':''}>${n}</option>`).join('')}</select></label>`; }).join('')}</div></div>
@@ -233,27 +252,28 @@ MV.open=function(S,h,a,o){
     const tb=e.target.closest('[data-tab],[data-tab-go]'); if(tb){ v.tab=tb.dataset.tab||tb.dataset.tabGo; panelRender(); return; }
     const sp=e.target.closest('[data-speed]'); if(sp){ v.speed=+sp.dataset.speed; v.paused=false; syncSpeed(); return; }
     const pl=e.target.closest('[data-pl]'); if(pl&&userK){ const id=+pl.dataset.pl, s=g[userK];
-      if(v.sel&&v.sel!==id){ const aOn=s.on.includes(v.sel), bOn=s.on.includes(id); if(aOn!==bOn){ const out=aOn?v.sel:id, inn=aOn?id:v.sel; s.on=s.on.map(x=>x===out?inn:x).sort((x,y)=>POSORD[P(x).pos]-POSORD[P(y).pos]); s.hold=g.elapsed+240; BM.UI&&BM.UI.toast(P(inn).name+' oyuna girdi, '+P(out).name+' kenara.'); } v.sel=null; }
+      if(v.sel&&v.sel!==id){ const aOn=s.on.includes(v.sel), bOn=s.on.includes(id); if(aOn!==bOn){ const out=aOn?v.sel:id, inn=aOn?id:v.sel; feed.coach({c:'sub',out,inn},userK); BM.UI&&BM.UI.toast(P(inn).name+' oyuna girdi, '+P(out).name+' kenara.'); } v.sel=null; }
       else v.sel=v.sel===id?null:id; panelRender(); return; }
     const b=e.target.closest('[data-a]'); if(!b) return; const a2=b.dataset.a;
     if(a2==='pause'){ v.paused=!v.paused; syncSpeed(); }
     if(a2==='names'){ v.names=!v.names; }
     if(a2==='quarter') skip(true);
     if(a2==='end') skip(false);
-    if(a2==='timeout'&&userK&&v.timeouts[userK]>0){ v.timeouts[userK]--; const s=g[userK]; s.on.forEach(id=>{ s.energy[id]=Math.min(1,s.energy[id]+0.07); }); v.paused=true; v.tab='coach'; syncSpeed(); panelRender(); BM.UI&&BM.UI.toast('Mola alındı. Ayarları yap, sonra ▶ Devam.'); }
+    if(a2==='timeout'&&userK&&TO[userK]>0){ feed.coach({c:'timeout'},userK); v.paused=true; v.tab='coach'; syncSpeed(); panelRender(); BM.UI&&BM.UI.toast('Mola alındı. Ayarları yap, sonra ▶ Devam.'); }
     if(a2==='close') close();
   });
-  el.addEventListener('change',e=>{ if(!userK) return; const s=g[userK], k=e.target.dataset.tac, pk=e.target.dataset.play;
-    if(k){ s.tac[k]=k==='press'?e.target.checked:(k==='pace'||k==='three')?+e.target.value:e.target.value; }
-    if(pk){ s.tac.plays[pk]=+e.target.value; } });
-  function close(){ v.alive=false; el.remove(); MV.cur=null; if(o.onDone) o.onDone(g); }
+  el.addEventListener('change',e=>{ if(!userK) return; const k=e.target.dataset.tac, pk=e.target.dataset.play;
+    if(k) feed.coach({c:'tac',k,v:k==='press'?e.target.checked:(k==='pace'||k==='three')?+e.target.value:e.target.value},userK);
+    if(pk) feed.coach({c:'play',id:pk,w:+e.target.value},userK); });
+  function close(){ if(!v.alive) return; v.alive=false; el.remove(); MV.cur=null; if(feed.close) feed.close(); if(o.onDone) o.onDone(g); }
+  v.close=close; v.feed=feed;
   let lastT=performance.now();
   function tick(dt){
-    v.fx.forEach(x=>x.life-=dt/1000);
+    v.fx.forEach(x=>x.life-=dt/1000); if(v.waiting) v.waitT+=dt/1000;
     if(v.banner&&!v.done){ v.banner.t-=dt/1000; if(v.banner.t<=0) v.banner=null; render(); return; }
     if(!v.paused&&!v.done){
       if(!v.keys) next();
-      if(v.keys){ v.t+=dt/1000*v.speed; while(v.fired<v.keys.length&&v.keys[v.fired].t<=v.t){ fire(v.keys[v.fired],v.ev); v.fired++; } if(v.t>=v.keys[v.keys.length-1].t) endEvent(); }
+      if(v.keys){ v.t+=dt/1000*v.speed*(feed.backlog&&feed.backlog()>2?5:1); while(v.fired<v.keys.length&&v.keys[v.fired].t<=v.t){ fire(v.keys[v.fired],v.ev); v.fired++; } if(v.t>=v.keys[v.keys.length-1].t) endEvent(); }
     }
     render();
   }

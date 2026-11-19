@@ -134,3 +134,9 @@ canvas.court{width:100%;height:auto;display:block;border-radius:8px;touch-action
 .mv.final .mv-body{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
 @media(max-width:1000px){.mv-strip{grid-template-columns:1fr}.mv.final .mv-body{grid-template-columns:1fr}}
 @media(max-width:600px){.mv-strip .ln{grid-template-columns:repeat(3,minmax(0,1fr))}.mv-top{padding:8px}.mv-team b{font-size:14px}.mv-team .crest{width:32px;height:32px}.mv-score{font-size:26px;gap:8px}}
+/* ---------- online ---------- */
+#app{grid-template-rows:auto 1fr}
+.top{min-height:56px;flex-wrap:wrap;row-gap:6px;padding:6px 14px}
+.top .cont{flex-wrap:wrap;justify-content:flex-end;row-gap:6px}
+.top .chip{padding:2px 8px;font-size:12px}
+.top select{padding:4px 6px;font-size:13px}

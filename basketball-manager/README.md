@@ -8,6 +8,33 @@ Saf HTML + JavaScript ile yazıldı, kurulum gerektirmez. Kariyerler tarayıcıy
 - `index.html` dosyasını aç. Arcade'in içinden açarsan **Oyunlardan çık** düğmesi ana sayfaya döner.
 - Yeni kariyer: menajer adını yaz, takımını seç, **Kariyere başla**.
 - **Devam ▶** (veya Boşluk tuşu): bir sonraki maça ya da önemli bir olaya kadar ilerler. **+1 gün**, **+1 hafta** ve **Aşama sonuna** düğmeleri maçları otomatik oynatır.
+- **Başlangıç noktası:** yeni kariyerde üç seçenek var:
+  - **Draft öncesi (1 Haziran 2010, önerilen):** 2010 draftını, yaz transferlerini, hazırlık kampını ve sezonu baştan yaşarsın.
+  - **Serbest oyuncu dönemi (1 Temmuz 2010):** draft bitmiş, piyasa açılıyor.
+  - **Sezona 2 ay kala (26 Ağustos 2010):** piyasanın büyük kısmı tamamlanmış; kamp ve sezon kalıyor.
+
+## Arkadaşlarla çevrimiçi oyun
+Sunucu ya da hesap gerekmez; tarayıcılar birbirine doğrudan (WebRTC) bağlanır.
+
+1. **Kur:** ana menüde takımını seç ve **🌐 Çevrimiçi kur**'a bas. Kayıtlı bir kariyeri de **🌐 Çevrimiçi aç** ile paylaşabilirsin. Ekranda 5 haneli bir **oyun kodu** çıkar.
+2. **Katıl:** arkadaşların aynı sayfayı açar, adını ve kodu yazıp **Katıl**'a basar (ya da "Açık oyunlar" listesinden seçer). Her menajer **farklı bir boş takım** seçer.
+3. **Zaman:**
+   - Herkes **Hazırım**'a basınca gün ilerler.
+   - Herkesin seçtiği süreden (Devam / +1 gün / +1 hafta / Aşama sonuna) en kısası geçerli olur.
+   - Ev sahibi **Zorla** ile beklemeden ilerletebilir.
+4. **Maç günü:**
+   - Maçı olan herkes kendi maçını **2D canlı izler** ya da **sonucu alır**. İzleyen hız, mola, oyuncu değişikliği ve taktikle maçı yönetir.
+   - Diğer menajerlerin maçlarını **seyirci** olarak açabilirsin.
+   - **İki menajer karşılaşırsa** maç iki ekranda aynı anda ilerler ve iki taraf da kendi takımına koçluk yapar.
+   - Gün, tüm menajer maçları bitince tamamlanır.
+5. **Menajerler arası işlemler:**
+   - Takas teklifi gönderebilirsin; teklif karşı tarafın gelen kutusuna düşer ve orada kabul ya da reddedilir.
+   - Aynı serbest oyuncuya iki menajer teklif verirse oyuncu ikisini karşılaştırır.
+   - **Menajerler** ekranında herkesin durumu ve sohbet vardır.
+6. **Kopma ve geri dönüş:**
+   - Bağlantısı kopan menajerin takımını yardımcı antrenör yönetir: kadroyu tamamlar, draftta seçer, maçları otomatik oynar.
+   - Aynı kod ve **aynı adla** tekrar katılan menajer takımını geri alır.
+   - Lig ev sahibinin tarayıcısında kaydedilir. Ev sahibi kariyeri daha sonra aynı kodla yeniden açabilir.
 
 ## Neler var
 - **Sezon takvimi:** 1 Temmuz'da serbest oyuncu dönemi açılır. Hazırlık kampı 1 Ekim'de, normal sezon 26 Ekim'de başlar. Her takım 82 maç oynar, 41'i iç sahada. Takas son günü 24 Şubat'tır. Ardından her konferanstan 8 takımla playoff oynanır; her tur 7 maç üzerinden, 2-2-1-1-1 iç saha düzeniyle. Draft 24 Haziran'da, sezon geçişi 30 Haziran'dadır.

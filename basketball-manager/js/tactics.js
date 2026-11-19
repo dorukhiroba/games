@@ -42,6 +42,8 @@ T.DEFS = [
 ];
 
 T.allPlays=S=>T.PLAYS.concat((S&&S.customPlays)||[]);
+T.myPlays=S=>T.allPlays(S).filter(p=>!p.custom||p.own==null||p.own===S.user);
+T.myDefs=S=>T.allDefs(S).filter(d=>!d.custom||d.own==null||d.own===S.user);
 T.getPlay=(S,id)=>T.allPlays(S).find(p=>p.id===id)||T.PLAYS[0];
 T.allDefs=S=>T.DEFS.concat(((S||BM.S)&&(S||BM.S).customDefs)||[]);
 T.getDef=(id,S)=>T.allDefs(S).find(d=>d.id===id)||T.DEFS[0];
@@ -100,7 +102,7 @@ function dot(g,x,y,txt,col,ring){ g.beginPath(); g.arc(x,y,13,0,Math.PI*2); g.fi
 function arrow(g,a,b,col,dash){ g.save(); g.strokeStyle=col; g.fillStyle=col; g.lineWidth=2.5; if(dash) g.setLineDash([6,5]); g.beginPath(); g.moveTo(a[0],a[1]); g.lineTo(b[0],b[1]); g.stroke(); g.setLineDash([]); const an=Math.atan2(b[1]-a[1],b[0]-a[0]); g.beginPath(); g.moveTo(b[0],b[1]); g.lineTo(b[0]-10*Math.cos(an-0.4),b[1]-10*Math.sin(an-0.4)); g.lineTo(b[0]-10*Math.cos(an+0.4),b[1]-10*Math.sin(an+0.4)); g.closePath(); g.fill(); g.restore(); }
 
 T.editor=function(root,S,onSave){
-  const plays=T.allPlays(S); let play=JSON.parse(JSON.stringify(plays[0])); let tool='move', sel=null, anim=null, def=T.DEFS[0];
+  const plays=T.myPlays(S); let play=JSON.parse(JSON.stringify(plays[0])); let tool='move', sel=null, anim=null, def=T.DEFS[0];
   root.innerHTML=`<div class="split"><div><div class="court-wrap"><canvas class="court" width="${CW}" height="${CH}"></canvas></div>
     <div class="row" style="margin-top:8px">${[['move','Yerleştir'],['run','Hareket'],['screen','Perde'],['pass','Pas'],['shot','Şut']].map(([k,l])=>`<button class="btn sm tool" data-tool="${k}">${l}</button>`).join('')}
     <button class="btn sm" data-a="undo">Son adımı sil</button><button class="btn sm" data-a="clear">Adımları temizle</button><button class="btn sm pri" data-a="play">▶ Oynat</button></div>
@@ -147,7 +149,7 @@ T.editor=function(root,S,onSave){
     if(a==='new'){ play={id:'c'+Date.now().toString(36),name:'Yeni set',desc:'Kendi çizdiğin set.',spots:T.PLAYS[0].spots.map(s=>s.slice()),steps:[],custom:true}; $('[data-name]').value=play.name; draw(); }
     if(a==='save'){ play.name=($('[data-name]').value||play.name).slice(0,28); if(!play.steps.some(s=>s.shot)) play.steps.push({t:0.6,shot:cur().holder});
       if(!play.custom){ play=Object.assign(JSON.parse(JSON.stringify(play)),{id:'c'+Date.now().toString(36),custom:true}); if(!/\(kopya\)$/.test(play.name)) play.name+=' (kopya)'; }
-      S.customPlays=(S.customPlays||[]).filter(p=>p.id!==play.id).concat([JSON.parse(JSON.stringify(play))]); onSave&&onSave(play); BM.UI.toast('Set kaydedildi: '+play.name+'. Taktik sekmesinden kullanım ağırlığını ver.'); }
+      onSave&&onSave(JSON.parse(JSON.stringify(play))); }
     if(a==='play'){ if(anim) return; const tl=T.timeline(play); const t0=performance.now();
       const stepA=()=>{ const t=(performance.now()-t0)/1000; let i=1; while(i<tl.frames.length-1&&tl.frames[i].t<t) i++; const f1=tl.frames[i], f0=tl.frames[i-1]; const k=U.clamp((t-f0.t)/Math.max(0.01,f1.t-f0.t),0,1);
         anim={frame:{pos:f0.pos.map((p,j)=>[p[0]+(f1.pos[j][0]-p[0])*k,p[1]+(f1.pos[j][1]-p[1])*k]),holder:k<0.5?f0.holder:f1.holder}}; draw();
