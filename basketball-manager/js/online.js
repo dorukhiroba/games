@@ -10,9 +10,17 @@ const L=()=>BM.League, UI=()=>BM.UI, App=()=>BM.App, MV=()=>BM.MatchView, E=()=>
 const O = BM.Online = {mode:null,code:null,game:null,lobby:null,roster:{},status:null,md:null,chat:[],feeds:{},pend:{},seq:0,unsubs:[],games:[]};
 const rid=n=>{ const a='abcdefghjkmnpqrstuvwxyz23456789'; let s=''; for(let i=0;i<n;i++) s+=a[Math.floor(Math.random()*a.length)]; return s; };
 const ls=(k,v)=>{ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); }catch(e){ return null; } };
-/* one id per browser tab, so two tabs on one computer are two managers; a manager who comes back in a new tab reclaims their club by name */
+/* identity: one id per league code, kept in this browser, so a manager who closes the page and comes back is
+   still the same manager. A second tab of the same browser in the same league gets its own temporary id. */
 const ss=(k,v)=>{ try{ if(v===undefined) return sessionStorage.getItem(k); sessionStorage.setItem(k,v); }catch(e){ return null; } };
-O.me={cid:ss('bm-cid')||(()=>{ const c='u'+rid(10); ss('bm-cid',c); return c; })(),name:ls('bm-name')||'Menajer'};
+const TAB=ss('bm-tab')||(()=>{ const t='t'+rid(8); ss('bm-tab',t); return t; })();
+O.me={cid:'u'+rid(10),name:ls('bm-name')||'Menajer'};
+O.idFor=function(code){ const k='bm-id-'+code; let id=ls(k); if(!id){ id='u'+rid(10); ls(k,id); }
+  try{ const l=JSON.parse(localStorage.getItem('bm-lock-'+id)||'null'); if(l&&l.tab!==TAB&&Date.now()-l.at<6000){ let tmp=ss('bm-tmp-'+code); if(!tmp){ tmp='u'+rid(10); ss('bm-tmp-'+code,tmp); } return tmp; } }catch(e){}
+  return id; };
+const lockNow=()=>{ try{ if(O.game) localStorage.setItem('bm-lock-'+O.me.cid,JSON.stringify({tab:TAB,at:Date.now()})); }catch(e){} };
+setInterval(lockNow,2000);
+const norm=s=>String(s||'').trim().toLocaleLowerCase('tr');
 O.setName=n=>{ O.me.name=String(n||'Menajer').slice(0,24); ls('bm-name',O.me.name); };
 O.isHost=()=>O.mode==='host'; O.isGuest=()=>O.mode==='guest'; O.active=()=>!!O.mode;
 const MODES={day:0,game:1,week:2,phase:3};
@@ -37,31 +45,36 @@ const TOPICS=['hb','ck','hello','welcome','snap','patch','act','res','ready','ne
 /* ---------- rooms ---------- */
 async function lobbyRoom(){ if(O.lobby) return O.lobby; try{ if(window.claude&&typeof window.claude.use==='function') O.lobby=await window.claude.use('room'); else if(window.KNet) O.lobby=await window.KNet.use('room'); }catch(e){ O.lobby=null; } return O.lobby; }
 O.listGames=async function(cb){ const r=await lobbyRoom(); if(!r){ cb(null); return; } const list=()=>r.peers().filter(p=>p.presence&&p.presence.bm&&p.presence.bm.c).map(p=>p.presence.bm); cb(list()); O.lobbyUnsub&&O.lobbyUnsub(); O.lobbyUnsub=r.onPeers(()=>cb(list()),()=>{}); };
-async function enter(code){ const r=await lobbyRoom(); if(!r) throw new Error('Çevrimiçi bağlantı kurulamadı.'); const g=await r.join('bm-'+code);
-  O.game=g; O.code=code; O.unsubs.forEach(u=>{ try{ u(); }catch(e){} }); O.unsubs=TOPICS.map(t=>g.on(t,onMsg)); O.unsubs.push(g.onPeers(onPeers,()=>{}));
+async function enter(code){ const r=await lobbyRoom(); if(!r) throw new Error('Çevrimiçi bağlantı kurulamadı.'); O.me.cid=O.idFor(code); const g=await r.join('bm-'+code);
+  O.game=g; O.code=code; lockNow(); O.unsubs.forEach(u=>{ try{ u(); }catch(e){} }); O.unsubs=TOPICS.map(t=>g.on(t,onMsg)); O.unsubs.push(g.onPeers(onPeers,()=>{}));
   g.presence({cid:O.me.cid,name:O.me.name,host:O.mode==='host'?1:0}).catch(()=>{});
   O.lastSeen={}; clearInterval(O.hbT); O.hbT=setInterval(()=>{ if(O.game) send('hb',{h:O.mode==='host'?1:0}); },3000); return g; }
 function onPeers(){ if(!O.game) return; const ps=O.game.peers(); const ro={}; ps.forEach(p=>{ const pr=p.presence||{}; if(pr.cid) ro[pr.cid]={peer:p.peer,name:pr.name,host:pr.host}; }); ro[O.me.cid]={peer:'me',name:O.me.name,host:O.mode==='host'?1:0};
   const before=O.roster; O.roster=ro;
   if(O.isHost()){ const gone=Object.keys(before).filter(c=>!ro[c]); gone.forEach(c=>dropWatcher(c)); hostStatus(); maybeAdvance(); }
-  else { const hostOn=Object.values(ro).some(p=>p.host); if(hostOn!==O.hostOn){ O.hostOn=hostOn; if(hostOn&&O.mode==='guest') send('hello',{name:O.me.name}); App().renderTop(); } } }
+  else if(O.mode==='guest'){ const hostOn=Object.values(ro).some(p=>p.host); if(hostOn!==O.hostOn){ O.hostOn=hostOn; if(hostOn&&O.mode==='guest') send('hello',{name:O.me.name}); App().renderTop(); } } }
 O.online=cid=>!!O.roster[cid];
 setInterval(()=>{ if(!O.game) return; const now=Date.now();
   if(O.isHost()){ let ch=false; Object.keys(O.roster).forEach(c=>{ if(c===O.me.cid) return; const t=O.lastSeen[c]; if(t&&now-t>10000){ delete O.roster[c]; dropWatcher(c); ch=true; } }); if(ch){ hostStatus(); maybeAdvance(); } }
   else if(O.mode==='guest'){ const on=!!O.hostSeen&&now-O.hostSeen<10000; if(on!==O.hostOn){ O.hostOn=on; if(on) send('hello',{name:O.me.name}); App().renderTop(); } } },2000);
 O.leave=function(silent){ if(O.game){ if(!silent) send('bye',{}); const g=O.game; setTimeout(()=>{ g.leave().catch(()=>{}); },300); }
   O.unsubs.forEach(u=>{ try{ u(); }catch(e){} }); O.unsubs=[]; if(O.lobby) O.lobby.presence({bm:null}).catch(()=>{});
-  Object.assign(O,{mode:null,code:null,game:null,roster:{},status:null,md:null,feeds:{},pend:{},hostOn:false}); outQ=[]; clearInterval(O.helloT); };
-window.addEventListener('pagehide',()=>{ if(O.game) try{ O.game.emit('bye',{to:'*',f:O.me.cid,d:{}}); }catch(e){} });
+  Object.assign(O,{mode:null,code:null,game:null,roster:{},status:null,md:null,mdInfo:null,feeds:{},pend:{},hostOn:false,hostSeen:0,gotSnap:false,myTid:null,ver:0}); outQ=[]; clearInterval(O.helloT); clearInterval(O.presT); };
+window.addEventListener('pagehide',()=>{ if(O.game) try{ O.game.emit('bye',{to:'*',f:O.me.cid,d:{}}); }catch(e){} try{ localStorage.removeItem('bm-lock-'+O.me.cid); }catch(e){} });
 
 /* =================== HOST =================== */
 O.host=async function(S){
-  L().migrate(S); O.mode='host'; const code=(S.mp&&S.mp.code)||rid(5); S.mp={code};
+  L().migrate(S); const code=(S.mp&&S.mp.code)||rid(5);
+  if(S.mp&&S.mp.code){ O.mode='probe'; O.hostSeen=0; await enter(code);
+    const other=await new Promise(res=>{ const t0=Date.now(); const iv=setInterval(()=>{ const pres=O.game&&O.game.peers().some(p=>p.presence&&p.presence.host&&p.presence.cid!==O.me.cid); if(pres||O.hostSeen){ clearInterval(iv); res(true); } else if(Date.now()-t0>3500){ clearInterval(iv); res(false); } },250); });
+    if(other){ O.mode='guest'; O.myTid=null; O.ver=0; O.gotSnap=false; send('hello',{name:O.me.name}); startHello(); return {code,joined:true}; } }
+  O.mode='host'; S.mp={code};
+  if(!O.game) await enter(code); else O.game.presence({cid:O.me.cid,name:O.me.name,host:1}).catch(()=>{});
   const me=S.humans.find(h=>h.tid===S.user); if(me){ me.cid=O.me.cid; me.name=O.me.name; }
-  O.ready={}; O.modes={}; O.seen={}; O.snapAt={};
-  await enter(code); O.sig=null; O.sync(true);
+  O.ready={}; O.modes={}; O.seen={}; O.snapAt={}; O.roster[O.me.cid]={peer:'me',name:O.me.name,host:1};
+  O.sig=null; O.sync(true);
   const pres=()=>{ if(O.lobby&&O.mode==='host') O.lobby.presence({bm:{c:code,h:O.me.name,n:S.humans.length,s:U.seasonName(S.season),t:S.teams[S.user].abbr}}).catch(()=>{}); }; pres(); O.presT=setInterval(pres,15000);
-  hostStatus(); return code;
+  hostStatus(); return {code};
 };
 const humanByCid=cid=>(BM.S.humans||[]).find(h=>h.cid===cid);
 const onlineHumans=()=>(BM.S.humans||[]).filter(h=>h.cid===O.me.cid||O.online(h.cid));
@@ -90,7 +103,7 @@ function hostAct(cid,q,type,p){ const S=BM.S, h=humanByCid(cid); let r;
   else r=Act().run(S,h.tid,type,p);
   O.sync(false); send('res',{q,r},cid); hostStatus(); App().save(); App().refresh(); }
 function claim(cid,p){ const S=BM.S, tid=+p.tid, name=String(p.name||'Menajer').slice(0,24); const ex=humanByCid(cid); if(ex) return {ok:true,tid:ex.tid};
-  const back=(S.humans||[]).find(h=>h.tid===tid&&h.cid!==O.me.cid&&!O.online(h.cid)&&String(h.name).toLocaleLowerCase('tr')===name.toLocaleLowerCase('tr'));
+  const back=(S.humans||[]).find(h=>h.tid===tid&&h.cid!==O.me.cid&&!O.online(h.cid)&&norm(h.name)===norm(name));
   if(back){ back.cid=cid; L().tell(S,tid,'Tekrar hoş geldin','<p>'+U.esc(name)+', '+L().tname(S,tid)+' seni bekliyordu.</p>','board',{quiet:true}); return {ok:true,tid}; }
   if(!S.teams[tid]||L().isHuman(S,tid)) return {err:'Bu takım artık müsait değil.'};
   S.humans.push({tid,name,cid}); S.scout=S.scout||{}; S.scout[tid]=3; BM.Gen.autoRotation(S.teams[tid],S);
@@ -169,16 +182,19 @@ setInterval(()=>{ if(!O.isHost()||!O.md) return; O.md.ses.forEach(s=>{ if(s.live
 
 /* =================== GUEST =================== */
 O.join=async function(code){ code=String(code||'').trim().toLowerCase(); if(!/^[a-z0-9]{5}$/.test(code)) throw new Error('Oyun kodu 5 harf/rakamdır.');
-  O.mode='guest'; O.myTid=null; O.ver=0; await enter(code); send('hello',{name:O.me.name});
-  clearInterval(O.helloT); O.helloT=setInterval(()=>{ if(O.mode==='guest'&&!O.gotSnap) send('hello',{name:O.me.name}); else clearInterval(O.helloT); },3000); return code; };
+  if(O.game) O.leave(true); O.mode='guest'; O.myTid=null; O.ver=0; O.gotSnap=false; O.hostSeen=0; O.hostOn=false; await enter(code); send('hello',{name:O.me.name}); startHello(); return code; };
+function startHello(){ clearInterval(O.helloT); O.helloT=setInterval(()=>{ if(O.mode==='guest'&&!O.gotSnap) send('hello',{name:O.me.name}); else clearInterval(O.helloT); },3000); }
 function guestState(S2,ver){ S2.user=O.myTid!=null?O.myTid:S2.humans[0].tid; BM.S=S2; O.ver=ver; BM.Engine.clearCache(); }
 O.act=function(type,p){ return new Promise(res=>{ if(!O.game){ res({err:'Ev sahibine bağlı değilsin.'}); return; } const q=++O.seq; O.pend[q]=res; send('act',{q,type,p}); setTimeout(()=>{ if(O.pend[q]){ delete O.pend[q]; res({err:'Ev sahibinden yanıt gelmedi.'}); } },15000); }); };
 
 /* ---------- message handling ---------- */
 function handle(t,from,d,peer){ const host=O.isHost(), S=BM.S;
+  if(O.mode==='probe'&&t!=='hb') return;
   if(t==='hb'){ if(host){ O.lastSeen[from]=Date.now(); if(!O.roster[from]){ O.roster[from]={peer,name:(humanByCid(from)||{}).name}; hostStatus(); } } else if(d&&d.h){ O.hostSeen=Date.now(); if(!O.hostOn){ O.hostOn=true; App().renderTop(); } } return; }
   if(host){
-    if(t==='hello'){ O.roster[from]=O.roster[from]||{peer,name:d.name}; O.lastSeen[from]=Date.now(); const h=humanByCid(from); if(h&&d.name){ h.name=String(d.name).slice(0,24); }
+    if(t==='hello'){ O.roster[from]=O.roster[from]||{peer,name:d.name}; O.lastSeen[from]=Date.now(); let h=humanByCid(from);
+      if(!h&&d.name){ const c=(S.humans||[]).filter(x=>x.cid!==O.me.cid&&!O.online(x.cid)&&norm(x.name)===norm(d.name)); if(c.length===1){ h=c[0]; h.cid=from; O.changed(); } }
+      if(h&&d.name){ h.name=String(d.name).slice(0,24); }
       send('welcome',{code:O.code,tid:h?h.tid:null,host:O.me.name},from); const now=Date.now(); if(!O.snapAt[from]||now-O.snapAt[from]>2500){ O.snapAt[from]=now; send('snap',{ver:S.ver,S:Object.assign({},S,{user:null})},from); }
       if(O.mdInfo) send('md',O.mdInfo,from); hostStatus(); return; }
     if(t==='act'){ hostAct(from,d.q,d.type,d.p||{}); return; }
@@ -196,9 +212,9 @@ function handle(t,from,d,peer){ const host=O.isHost(), S=BM.S;
   }
   // guest
   if(t==='welcome'){ O.myTid=d.tid; O.hostName=d.host; O.hostOn=true; return; }
-  if(t==='snap'){ const first=!O.gotSnap; O.gotSnap=true; guestState(d.S,d.ver); if(first) App().enterOnline(); else App().refresh(); if(O.myTid==null) App().pickTeam(); return; }
+  if(t==='snap'){ const first=!O.gotSnap; O.gotSnap=true; const me=(d.S.humans||[]).find(h=>h.cid===O.me.cid); if(me) O.myTid=me.tid; guestState(d.S,d.ver); if(first) App().enterOnline(); else App().refresh(); if(O.myTid==null) App().pickTeam(); App().saveBackup&&App().saveBackup(); return; }
   if(t==='patch'){ if(!BM.S||d.base!==O.ver){ send('need',{}); return; } const p=d.p; for(const id in p.players){ if(p.players[id]===null) delete S.players[id]; else S.players[id]=p.players[id]; } for(const i in p.teams) S.teams[i]=p.teams[i]; for(const k in p.k) S[k]=p.k[k];
-    O.ver=d.ver; S.user=O.myTid!=null?O.myTid:S.user; const me=(S.humans||[]).find(h=>h.cid===O.me.cid); if(me&&me.tid!==O.myTid){ O.myTid=me.tid; S.user=me.tid; } App().refresh(); return; }
+    O.ver=d.ver; S.user=O.myTid!=null?O.myTid:S.user; const me=(S.humans||[]).find(h=>h.cid===O.me.cid); if(me&&me.tid!==O.myTid){ O.myTid=me.tid; S.user=me.tid; } App().refresh(); App().saveBackup&&App().saveBackup(); return; }
   if(t==='res'){ const f=O.pend[d.q]; if(f){ delete O.pend[d.q]; if(d.r&&d.r.tid!=null&&d.r.ok){ O.myTid=d.r.tid; if(BM.S) BM.S.user=d.r.tid; } if(d.r&&d.r.newTid!=null){ O.myTid=d.r.newTid; if(BM.S) BM.S.user=d.r.newTid; } f(d.r||{}); } return; }
   if(t==='st'){ O.status=d; App().renderTop(); if(App().screen==='managers') App().render(); return; }
   if(t==='chat'){ O.chat.push(d); if(O.chat.length>60) O.chat.shift(); App().onChat&&App().onChat(d); return; }

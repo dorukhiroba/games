@@ -33,8 +33,14 @@ Sunucu ya da hesap gerekmez; tarayıcılar birbirine doğrudan (WebRTC) bağlan�
    - **Menajerler** ekranında herkesin durumu ve sohbet vardır.
 6. **Kopma ve geri dönüş:**
    - Bağlantısı kopan menajerin takımını yardımcı antrenör yönetir: kadroyu tamamlar, draftta seçer, maçları otomatik oynar.
-   - Aynı kod ve **aynı adla** tekrar katılan menajer takımını geri alır.
-   - Lig ev sahibinin tarayıcısında kaydedilir. Ev sahibi kariyeri daha sonra aynı kodla yeniden açabilir.
+   - Tarayıcı, her lig için menajeri hatırlar. Aynı cihazdan dönen menajer doğrudan kendi takımına girer. Başka bir cihazdan **aynı adla** katılan da takımını geri alır.
+7. **Kayıt ve sonraki oturum:**
+   - Lig ev sahibinin tarayıcısına kaydedilir. Her misafirin tarayıcısında da güncel bir kopyası tutulur.
+   - Ana menüdeki **Kariyerlerin** listesinde çevrimiçi lig iki şekilde görünür:
+     - **Ev sahibinde:** **Devam et** ligi aynı kodla yeniden çevrimiçi açar. **Tek başına aç** ise arkadaşlar olmadan açar.
+     - **Misafirde:** **Devam et** aynı takımla yeniden katılır. Ev sahibi henüz açmadıysa sayfa bekler ve açtığı anda otomatik bağlanır.
+   - **Ev sahibi gelemiyorsa** bir misafir **Ev sahibi yoksa sen aç** ile ligi kendi kopyasından açabilir, diğerleri ona bağlanır.
+   - O lig açıkken ev sahibi kendi kaydıyla **Devam et** derse ikinci bir lig açılmaz; açık olan lige bağlanır ve en güncel hal kullanılır.
 
 ## Neler var
 - **Sezon takvimi:** 1 Temmuz'da serbest oyuncu dönemi açılır. Hazırlık kampı 1 Ekim'de, normal sezon 26 Ekim'de başlar. Her takım 82 maç oynar, 41'i iç sahada. Takas son günü 24 Şubat'tır. Ardından her konferanstan 8 takımla playoff oynanır; her tur 7 maç üzerinden, 2-2-1-1-1 iç saha düzeniyle. Draft 24 Haziran'da, sezon geçişi 30 Haziran'dadır.
