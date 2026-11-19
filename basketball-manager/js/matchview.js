@@ -145,19 +145,20 @@ MV.open=function(S,h,a,o){
   o=o||{}; const feed=o.feed||MV.localFeed(S,h,a); const g=feed.g; const H0=S.teams[h], A0=S.teams[a];
   const colH=H0.c1, colA=cdist(A0.c1,H0.c1)<120?A0.c2:A0.c1, ringH=cdist(H0.c2,colH)<60?'#0b111a':H0.c2, ringA=colA===A0.c1?A0.c2:A0.c1;
   const userK=o.userK!==undefined?o.userK:(h===S.user?'h':a===S.user?'a':null); const TO=feed.to||{h:7,a:7};
-  const v={S,g,pos:{},ball:[W/2,H/2],keys:null,t:0,ev:null,speed:o.speed||2,paused:false,alive:true,score:[0,0],q:1,clock:720,banner:null,fx:[],fired:0,names:true,tab:'pbp',sel:null,done:false,waiting:false,waitT:0};
+  const SY=!!feed.sync; /* online: shared clock, speed and pauses for every live game of the day */
+  const v={S,g,pos:{},ball:[W/2,H/2],keys:null,t:0,ev:null,speed:o.speed||2,paused:false,alive:true,score:[0,0],q:1,clock:720,banner:null,fx:[],fired:0,names:true,tab:'pbp',sel:null,done:false,waiting:false,waitT:0,rp:null,rpAt:0,info:null};
   MV.cur=v;
   const el=document.createElement('div'); el.className='mv';
   const crest=t=>`<span class="crest" style="background:${t.c1};color:${lum(t.c1)>0.62?'#111':'#fff'}">${t.abbr}</span>`;
   el.innerHTML=`<div class="mv-top">
     <div class="mv-team">${crest(H0)}<div><b>${U.esc(H0.city+' '+H0.name)}</b><small>${H0.w}-${H0.l} · ev sahibi</small></div></div>
     <div class="mv-score"><span data-hs>0</span><div><b data-clock>1Ç 12:00</b><small data-sub>${o.title?U.esc(o.title):''}</small></div><span data-as>0</span></div>
-    <div class="mv-team r"><div><b>${U.esc(A0.city+' '+A0.name)}</b><small>${A0.w}-${A0.l} · deplasman</small></div>${crest(A0)}</div></div>
+    <div class="mv-team r"><div><b>${U.esc(A0.city+' '+A0.name)}</b><small>${A0.w}-${A0.l} · deplasman</small></div>${crest(A0)}</div><div class="mv-others" data-others style="display:none"></div></div>
   <div class="mv-body"><div class="mv-court"><canvas width="${CW}" height="${CH}"></canvas>
-    <div class="mv-ctrl"><button class="btn sm" data-a="pause">⏸ Duraklat</button>
-      <span class="mv-speed">${[1,2,4,8,16].map(s=>`<button class="btn sm" data-speed="${s}">${s}x</button>`).join('')}</span>
+    <div class="mv-ctrl">${SY&&!userK?'':'<button class="btn sm" data-a="pause">⏸ Duraklat</button>'}
+      <span class="mv-speed">${[1,2,4,8,16].map(s=>`<button class="btn sm" data-speed="${s}">${s}x</button>`).join('')}</span><span class="dim" data-spd style="font-size:12px"></span>
       <button class="btn sm" data-a="names">İsimler</button><span class="grow"></span>${o.closable?'<button class="btn sm danger" data-a="close">İzlemeyi bırak</button>':''}
-      <button class="btn sm" data-a="quarter">Çeyrek sonuna ⏭</button><button class="btn sm" data-a="end">Maç sonuna ⏭⏭</button></div><div class="mv-last" data-last></div><div class="mv-strip"><div data-ln="h"></div><div data-ln="a"></div></div></div>
+      ${SY&&!userK?'':'<button class="btn sm" data-a="quarter">Çeyrek sonuna ⏭</button><button class="btn sm" data-a="end">Maç sonuna ⏭⏭</button>'}</div><div class="mv-last" data-last></div><div class="mv-strip"><div data-ln="h"></div><div data-ln="a"></div></div></div>
     <div class="mv-side"><div class="tabs"><button data-tab="pbp">Anlatım</button><button data-tab="box">Kutu skor</button>${userK?'<button data-tab="coach">Koçluk</button>':''}</div><div data-panel></div></div></div>`;
   document.body.appendChild(el);
   const cv=el.querySelector('canvas'), cx=cv.getContext('2d'), $=s=>el.querySelector(s), panel=$('[data-panel]');
@@ -189,13 +190,26 @@ MV.open=function(S,h,a,o){
       cx.beginPath(); cx.arc(v.ball[0]*SC,v.ball[1]*SC,5.5,0,Math.PI*2); cx.fillStyle='#ff8a2a'; cx.fill();
     }
     v.fx=v.fx.filter(x=>x.life>0); v.fx.forEach(x=>{ cx.save(); cx.globalAlpha=U.clamp(x.life,0,1); cx.font='700 26px "Barlow Condensed", sans-serif'; cx.textAlign='center'; cx.lineWidth=4; cx.strokeStyle='rgba(10,14,22,0.8)'; cx.strokeText(x.text,x.x*SC,x.y*SC-(1-x.life)*30); cx.fillStyle=x.col; cx.fillText(x.text,x.x*SC,x.y*SC-(1-x.life)*30); cx.restore(); });
-    if(v.waiting&&v.waitT>1.2&&!v.done&&!v.banner){ cx.save(); cx.fillStyle='rgba(8,12,20,0.7)'; cx.fillRect(CW/2-210,CH-46,420,34); cx.fillStyle='#ffd23a'; cx.font='600 16px Barlow, sans-serif'; cx.textAlign='center'; cx.textBaseline='middle'; cx.fillText(feed.waitText||'Bekleniyor…',CW/2,CH-29); cx.restore(); }
+    if(v.waiting&&v.waitT>1.2&&!v.done&&!v.banner&&!v.rp){ const wt=(typeof feed.waitText==='function'?feed.waitText():feed.waitText)||'Bekleniyor…'; cx.save(); cx.font='600 16px Barlow, sans-serif'; const ww=Math.max(420,cx.measureText(wt).width+40); cx.fillStyle='rgba(8,12,20,0.7)'; cx.fillRect(CW/2-ww/2,CH-46,ww,34); cx.fillStyle='#ffd23a'; cx.textAlign='center'; cx.textBaseline='middle'; cx.fillText(wt,CW/2,CH-29); cx.restore(); }
+    if(v.rp&&!v.done&&!v.banner) drawPause();
     if(v.banner){ cx.save(); cx.fillStyle='rgba(8,12,20,0.78)'; cx.fillRect(0,CH/2-48,CW,96); cx.fillStyle='#fff'; cx.font='700 40px "Barlow Condensed", sans-serif'; cx.textAlign='center'; cx.textBaseline='middle'; cx.fillText(v.banner.text,CW/2,CH/2-10); cx.font='600 18px Barlow, sans-serif'; cx.fillStyle='#ffb36b'; cx.fillText(v.banner.sub||'',CW/2,CH/2+24); cx.restore(); }
     // header
     $('[data-hs]').textContent=v.score[0]; $('[data-as]').textContent=v.score[1];
     let clk=v.clock, q=v.q; if(v.keys&&v.ev){ const tot=v.keys[v.keys.length-1].t||1; clk=v.clock0+(v.ev.clock-v.clock0)*U.clamp(v.t/tot,0,1); q=v.ev.q; }
     $('[data-clock]').textContent=v.done?'MAÇ SONU':qName(q)+' '+clockStr(clk);
   }
+  /* someone paused or took a timeout: every live game waits for them (the host ends it after 90 s at most) */
+  function iHold(){ return !!(v.rp&&v.rp.some(p=>p.cid===feed.me)); }
+  function pzLeft(){ return Math.max(0,Math.round(Math.max(...v.rp.map(p=>p.left))-(performance.now()-v.rpAt)/1000)); }
+  function holdLocal(on,why){ const now=performance.now(), rest=(v.rp||[]).filter(p=>p.cid!==feed.me).map(p=>Object.assign({},p,{left:Math.max(0,p.left-(now-v.rpAt)/1000)}));
+    if(on) rest.push({cid:feed.me,name:'Sen',why,left:90}); v.rp=rest.length?rest:null; v.rpAt=now; }
+  function drawPause(){ const mine=iHold(), left=pzLeft(), mm=Math.floor(left/60)+':'+String(left%60).padStart(2,'0');
+    const others=v.rp.filter(p=>p.cid!==feed.me).map(p=>p.name), tmo=v.rp.some(p=>p.why==='timeout');
+    const t1='⏸ '+(tmo?'MOLA':'DURAKLATILDI')+' · '+v.rp.map(p=>p.cid===feed.me?'Sen':p.name).join(', ');
+    const t2=mine?'Bütün maçlar seni bekliyor. Hazır olunca ▶ Devam (en geç '+mm+')':others.join(', ')+' taktik yapıyor; bütün maçlar durdu. En geç '+mm+' sonra devam.';
+    cx.save(); cx.fillStyle='rgba(8,12,20,0.84)'; cx.fillRect(0,CH/2-48,CW,96); cx.textAlign='center'; cx.textBaseline='middle';
+    cx.fillStyle='#ffd23a'; cx.font='700 36px "Barlow Condensed", sans-serif'; cx.fillText(t1,CW/2,CH/2-12);
+    cx.fillStyle='#e8eef7'; cx.font='600 17px Barlow, sans-serif'; cx.fillText(t2,CW/2,CH/2+24); cx.restore(); }
   function fx(text,p,col){ v.fx.push({text,x:p[0],y:p[1],col:col||'#fff',life:1.2}); }
   function fire(k,ev){ if(!k.fx) return; const at=k.B;
     if(k.fx==='made') fx('+'+(k.pts||2),at,'#ffd23a'); if(k.fx==='block') fx('BLOK!',at,'#7fd0ff'); if(k.fx==='steal') fx('TOP ÇALINDI',at,'#ff9a9a');
@@ -205,9 +219,9 @@ MV.open=function(S,h,a,o){
   function next(){ if(v.waiting) return; v.waiting=true; v.waitT=0;
     feed.next(ev=>{ v.waiting=false; if(!v.alive||v.done) return; if(!ev){ finish(); return; } v.ev=ev; v.keys=build(v,ev); v.t=0; v.fired=1; v.clock0=v.clock; });
   }
-  function batch(evs){ v.banner=null; v.waiting=false; if(v.keys) endEvent(); if(v.done) return; evs.forEach(ev=>{ v.ev=ev; v.score=ev.score.slice(); addPbp(ev); }); v.clock=g.clock; v.q=g.q; v.pos={}; v.keys=null;
-    if(g.done) finish(); else if(evs.length){ v.banner={text:qName(Math.max(1,g.q-1))+' SONU',sub:H0.abbr+' '+g.h.score+' - '+g.a.score+' '+A0.abbr,t:1.4}; } strip(); panelRender(); }
-  feed.onBatch=evs=>{ if(v.alive) batch(evs); };
+  function batch(evs,quiet){ v.banner=null; v.waiting=false; if(v.keys) endEvent(); if(v.done) return; evs.forEach(ev=>{ v.ev=ev; v.score=ev.score.slice(); addPbp(ev); }); v.clock=g.clock; v.q=g.q; v.pos={}; v.keys=null;
+    if(g.done) finish(); else if(evs.length&&!quiet){ v.banner={text:qName(Math.max(1,g.q-1))+' SONU',sub:H0.abbr+' '+g.h.score+' - '+g.a.score+' '+A0.abbr,t:1.4}; } strip(); panelRender(); }
+  feed.onBatch=(evs,quiet)=>{ if(v.alive) batch(evs,quiet); };
   function strip(){ ['h','a'].forEach(k=>{ const s=g[k], t=side(k); const box=el.querySelector('[data-ln="'+k+'"]'); if(!box) return; box.innerHTML='<b>'+t.abbr+' sahada</b> <span class="dim">faul '+s.qfouls+(s.qfouls>=5?' · bonus':'')+'</span><div class="ln">'+s.on.map(id=>{ const p=P(id), e=s.energy[id], b=s.box[id]; return '<div class="pc"><span>'+p.num+' '+U.esc(lastName(p.name))+'</span><span class="dim">'+b.pts+' sy · '+(b.orb+b.drb)+' rb · '+b.ast+' as</span><span class="bar"><i style="width:'+Math.round(e*100)+'%;background:'+(e<0.6?'var(--bad)':e<0.8?'var(--warn)':'var(--good)')+'"></i></span></div>'; }).join('')+'</div>'; });
     const ls=el.querySelector('[data-last]'); if(ls&&v.lastTxt) ls.innerHTML=v.lastTxt; }
   function endEvent(){
@@ -247,37 +261,52 @@ MV.open=function(S,h,a,o){
     if(v.tab==='box') panel.innerHTML=boxTable('h')+boxTable('a');
     if(v.tab==='coach'&&userK) panel.innerHTML=coachPanel();
   }
-  function syncSpeed(){ el.querySelectorAll('[data-speed]').forEach(b=>b.classList.toggle('tool',true)); el.querySelectorAll('[data-speed]').forEach(b=>b.classList.toggle('on',+b.dataset.speed===v.speed)); const pb=$('[data-a="pause"]'); if(pb) pb.textContent=v.paused?'▶ Devam':'⏸ Duraklat'; }
+  function syncSpeed(){ const my=SY?(feed.mySpeed||2):v.speed; el.querySelectorAll('[data-speed]').forEach(b=>{ b.classList.add('tool'); b.classList.toggle('on',+b.dataset.speed===my); });
+    const pb=$('[data-a="pause"]'); if(pb){ pb.textContent=SY?(iHold()?'▶ Devam':'⏸ Durdur'):(v.paused?'▶ Devam':'⏸ Duraklat'); if(SY) pb.title=iHold()?'Bütün maçlar seni bekliyor':'Bütün canlı maçları durdurur (en çok 90 sn)'; }
+    const sl=$('[data-spd]'); if(sl&&SY){ const sp=(v.info&&v.info.sp)||[]; sl.textContent=sp.length>1?'Ortak hız '+v.speed+'x'+(my!==v.speed?' (en yavaş seçim)':''):''; sl.title=sp.map(x=>x.name+' '+x.v+'x').join(' · '); } }
   el.addEventListener('click',e=>{
+    const sw=e.target.closest('[data-sw]'); if(sw){ if(o.onSwitch) o.onSwitch(sw.dataset.sw); return; }
     const tb=e.target.closest('[data-tab],[data-tab-go]'); if(tb){ v.tab=tb.dataset.tab||tb.dataset.tabGo; panelRender(); return; }
-    const sp=e.target.closest('[data-speed]'); if(sp){ v.speed=+sp.dataset.speed; v.paused=false; syncSpeed(); return; }
+    const sp=e.target.closest('[data-speed]'); if(sp){ if(SY){ feed.setSpeed(+sp.dataset.speed); syncSpeed(); return; } v.speed=+sp.dataset.speed; v.paused=false; syncSpeed(); return; }
     const pl=e.target.closest('[data-pl]'); if(pl&&userK){ const id=+pl.dataset.pl, s=g[userK];
       if(v.sel&&v.sel!==id){ const aOn=s.on.includes(v.sel), bOn=s.on.includes(id); if(aOn!==bOn){ const out=aOn?v.sel:id, inn=aOn?id:v.sel; feed.coach({c:'sub',out,inn},userK); BM.UI&&BM.UI.toast(P(inn).name+' oyuna girdi, '+P(out).name+' kenara.'); } v.sel=null; }
       else v.sel=v.sel===id?null:id; panelRender(); return; }
     const b=e.target.closest('[data-a]'); if(!b) return; const a2=b.dataset.a;
-    if(a2==='pause'){ v.paused=!v.paused; syncSpeed(); }
+    if(a2==='pause'){ if(SY){ const on=!iHold(); feed.pause(on,'pause'); holdLocal(on,'pause'); } else v.paused=!v.paused; syncSpeed(); }
     if(a2==='names'){ v.names=!v.names; }
     if(a2==='quarter') skip(true);
     if(a2==='end') skip(false);
-    if(a2==='timeout'&&userK&&TO[userK]>0){ feed.coach({c:'timeout'},userK); v.paused=true; v.tab='coach'; syncSpeed(); panelRender(); BM.UI&&BM.UI.toast('Mola alındı. Ayarları yap, sonra ▶ Devam.'); }
+    if(a2==='timeout'&&userK&&TO[userK]>0){ feed.coach({c:'timeout'},userK); if(SY){ feed.pause(true,'timeout'); holdLocal(true,'timeout'); } else v.paused=true; v.tab='coach'; syncSpeed(); panelRender(); BM.UI&&BM.UI.toast(SY?'Mola alındı: bütün maçlar durdu. Ayarları yap, sonra ▶ Devam.':'Mola alındı. Ayarları yap, sonra ▶ Devam.'); }
     if(a2==='close') close();
   });
   el.addEventListener('change',e=>{ if(!userK) return; const k=e.target.dataset.tac, pk=e.target.dataset.play;
     if(k) feed.coach({c:'tac',k,v:k==='press'?e.target.checked:(k==='pace'||k==='three')?+e.target.value:e.target.value},userK);
     if(pk) feed.coach({c:'play',id:pk,w:+e.target.value},userK); });
-  function close(){ if(!v.alive) return; v.alive=false; el.remove(); MV.cur=null; if(feed.close) feed.close(); if(o.onDone) o.onDone(g); }
+  function close(silent){ if(!v.alive) return; v.alive=false; el.remove(); MV.cur=null; if(feed.close) feed.close(); if(o.onDone&&silent!==true) o.onDone(g); }
   v.close=close; v.feed=feed;
+  /* online: the other live games of the day, with their score and clock; click one to watch it */
+  function renderOthers(info){ const box=$('[data-others]'); if(!box) return; const others=(info.ses||[]).filter(s=>s.key!==o.key);
+    if(!others.length){ box.style.display='none'; return; } box.style.display='';
+    box.innerHTML='<span class="dim">Diğer maçlar</span>'+others.map(s=>{ const Hh=S.teams[s.h], Aa=S.teams[s.a], mine=s.humans.includes(S.user), on=s.live&&!s.done&&!!o.onSwitch;
+      const st=s.done?'bitti':s.live?(s.q<=4?s.q+'Ç':'UZ')+' '+clockStr(s.clock):'karar bekleniyor';
+      return '<button class="mv-ot'+(mine?' mine':'')+'"'+(on?' data-sw="'+s.key+'"':' disabled')+' title="'+(mine?'Senin maçın':'İzlemek için tıkla')+'"><b>'+Hh.abbr+'</b> '+s.sc[0]+'-'+s.sc[1]+' <b>'+Aa.abbr+'</b> <span class="dim">'+st+'</span>'+(on?(mine?' · ↩ maçına dön':' · 👁 izle'):'')+'</button>'; }).join(''); }
+  v.onInfo=function(info){ if(!SY||!info||!v.alive) return; v.info=info; if(!v.done&&info.spd) v.speed=info.spd; const me=(info.ses||[]).find(s=>s.key===o.key); v.pf=me&&me.pf||1;
+    v.rp=info.pz&&info.pz.length?info.pz:null; v.rpAt=performance.now();
+    const qb=$('[data-a="quarter"]'); if(qb) qb.style.display=(info.ses||[]).some(s=>s.key!==o.key&&s.live&&!s.done)?'none':'';
+    renderOthers(info); syncSpeed(); };
   let lastT=performance.now();
+  /* online: keep up with the others while this tab is in the background or the browser stops sending animation frames */
+  if(SY){ const bg=setInterval(()=>{ if(!v.alive){ clearInterval(bg); return; } if(document.hidden||performance.now()-(v.rafAt||0)>600){ const now=performance.now(), dt=Math.min(1000,now-lastT); lastT=now; tick(dt); } },250); }
   function tick(dt){
     v.fx.forEach(x=>x.life-=dt/1000); if(v.waiting) v.waitT+=dt/1000;
     if(v.banner&&!v.done){ v.banner.t-=dt/1000; if(v.banner.t<=0) v.banner=null; render(); return; }
-    if(!v.paused&&!v.done){
+    if(!v.paused&&!v.rp&&!v.done){
       if(!v.keys) next();
-      if(v.keys){ v.t+=dt/1000*v.speed*(feed.backlog&&feed.backlog()>2?5:1); while(v.fired<v.keys.length&&v.keys[v.fired].t<=v.t){ fire(v.keys[v.fired],v.ev); v.fired++; } if(v.t>=v.keys[v.keys.length-1].t) endEvent(); }
+      if(v.keys){ v.t+=dt/1000*v.speed*(v.pf||1)*(feed.backlog&&feed.backlog()>2?5:1); while(v.fired<v.keys.length&&v.keys[v.fired].t<=v.t){ fire(v.keys[v.fired],v.ev); v.fired++; } if(v.t>=v.keys[v.keys.length-1].t) endEvent(); }
     }
     render();
   }
-  function loop(now){ if(!v.alive) return; const dt=Math.min(100,now-lastT); lastT=now; tick(dt); requestAnimationFrame(loop); }
+  function loop(now){ if(!v.alive) return; v.rafAt=performance.now(); const dt=Math.min(100,now-lastT); lastT=now; tick(dt); requestAnimationFrame(loop); }
   v.tick=tick; MV.debugTick=ms=>{ for(let i=0;i<ms;i+=50) tick(50); };
   panelRender(); syncSpeed(); strip(); render(); requestAnimationFrame(loop);
   return v;

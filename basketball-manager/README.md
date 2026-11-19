@@ -22,9 +22,16 @@ Sunucu ya da hesap gerekmez; tarayıcılar birbirine doğrudan (WebRTC) bağlan�
    - Çevrimiçi oyunda tek düğme vardır: herkes **Devam**'a basınca zaman bir sonraki maç gününe ya da bir menajerin kararını bekleyen olaya kadar ilerler. **+1 gün**, **+1 hafta** ve **Aşama sonuna** yalnızca tek oyunculuda vardır.
    - Bir arkadaş uzun süre yanıt vermezse ev sahibi **Menajerler** ekranındaki **Beklemeden ilerlet** ile devam edebilir.
 4. **Maç günü:**
-   - Maçı olan herkes kendi maçını **2D canlı izler** ya da **sonucu alır**. İzleyen hız, mola, oyuncu değişikliği ve taktikle maçı yönetir.
-   - Diğer menajerlerin maçlarını **seyirci** olarak açabilirsin.
+   - Maçı olan herkes kendi maçını **2D canlı izler** ya da **sonucu alır**. İzleyen mola, oyuncu değişikliği ve taktikle (tempo, savunma, pick-and-roll savunması, üçlük, pres, setler) maçı yönetir.
+   - **Canlı maçlar senkron oynanır:**
+     - Herkes kararını verince bütün canlı maçlar birlikte başlar.
+     - Maçlar aynı dakikada ilerler: önde olan maç biraz yavaş, geride olan biraz hızlı gösterilir; aradaki fark hiçbir zaman bir hücumdan fazla açılmaz.
+     - Çeyrek aralarında maçlar birbirini bekler.
+     - **Hız ortaktır:** herkes kendi hızını seçer, en yavaş seçilen geçerli olur. Hız düğmelerinin yanında ortak hız ve kimin neyi seçtiği görünür.
+     - **Mola ve duraklatma herkesi durdurur:** maçı olan bir menajer mola alır ya da **⏸ Durdur**'a basarsa bütün canlı maçlar durur ve ekranda kimin taktik yaptığı yazar. Mola sırasında herkes kendi takımında değişiklik yapabilir. Durduran **▶ Devam**'a basınca maçlar sürer; en geç 90 saniye sonra kendiliğinden devam eder.
+   - **Diğer maçlar:** maç ekranının üstünde o günkü diğer menajer maçlarının canlı skoru ve dakikası görünür. Birine tıklayınca o maçı seyirci olarak izlersin; kendi maçın bu sırada diğerleriyle birlikte oynanmaya devam eder ve **↩ maçına dön** ile geri dönersin.
    - **İki menajer karşılaşırsa** maç iki ekranda aynı anda ilerler ve iki taraf da kendi takımına koçluk yapar.
+   - Bağlantısı kopan ya da 45 saniye boyunca yanıt vermeyen izleyici maçı bekletmez; onun maçı diğerleriyle birlikte oynanmaya devam eder. Kimse izlemiyorsa kalan maçlar hemen sonuçlanır.
    - Gün, tüm menajer maçları bitince tamamlanır.
 5. **Menajerler arası işlemler:**
    - Takas teklifi gönderebilirsin; teklif karşı tarafın gelen kutusuna düşer ve orada kabul ya da reddedilir.

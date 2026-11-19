@@ -275,15 +275,20 @@ App.playUserDay=function(eg){
 };
 
 /* ---------- online match day ---------- */
-App.onMatchday=function(info){ App.renderTop(); if(!info) return; if(BM.MatchView.cur) return; App.matchdayModal(); };
+App.onMatchday=function(info){ App.renderTop(); if(!info) return; const v=BM.MatchView.cur; if(v){ v.onInfo&&v.onInfo(info); return; } App.matchdayModal(); };
+/* live scores, shared speed and pauses: update what is open, without reopening a match-day window the user closed */
+App.onMdTick=function(info){ const v=BM.MatchView.cur; if(v){ v.onInfo&&v.onInfo(info); return; } const box=document.querySelector('.modal .box[data-mdbox]'); if(!box||!info) return;
+  info.ses.forEach(s=>{ const st=box.querySelector('[data-st="'+s.key+'"]'); if(st) st.innerHTML=mdStatus(BM.S,s); }); };
+function mdStatus(S,s){ const c=Math.max(0,Math.round(s.clock||0)), cl=' '+Math.floor(c/60)+':'+String(c%60).padStart(2,'0');
+  return s.done?`<b>${s.sc[0]}-${s.sc[1]}</b> · bitti`:s.live?`<b>${s.sc[0]}-${s.sc[1]}</b> · ${s.q<=4?s.q+'Ç':'UZ'}${cl} · canlı${s.watch&&s.watch.length?' (izleyen: '+s.watch.map(t=>U.esc((L.human(S,t)||{}).name||'')).join(', ')+')':''}`:'karar bekleniyor'; }
 App.matchdayModal=function(){ const S=BM.S, info=ON.mdInfo; if(!info||!S) return; if(BM.MatchView.cur) return;
   const my=info.ses.find(s=>s.humans.includes(S.user));
   const row=s=>{ const H=S.teams[s.h], A0=S.teams[s.a], mine=s.humans.includes(S.user), ch=s.choice[S.user];
-    const status=s.done?`<b>${s.sc[0]}-${s.sc[1]}</b> · bitti`:s.live?`<b>${s.sc[0]}-${s.sc[1]}</b> · ${s.q<=4?s.q+'Ç':'UZ'} · canlı${s.watch&&s.watch.length?' (izleyen: '+s.watch.map(t=>U.esc((L.human(S,t)||{}).name||'')).join(', ')+')':''}`:'karar bekleniyor';
+    const status=mdStatus(S,s);
     const btns=mine&&!s.done?(!ch?`<button class="btn pri" data-w="${s.key}">▶ 2D izle</button><button class="btn" data-qk="${s.key}">Sonucu al</button>`:ch==='watch'&&s.live?`<button class="btn pri" data-w="${s.key}">İzlemeye dön</button>`:`<span class="dim">${ch==='quick'?'sonuç bekleniyor':'rakip bekleniyor'}</span>`):(s.live&&!s.done?`<button class="btn sm" data-sp="${s.key}">👁 Seyret</button>`:'');
-    return `<div class="asset" style="padding:10px"><span class="row">${UI.crest(H,30)} <b>${H.abbr}</b>${Sc.mgr(S,s.h)} <span class="dim">vs</span> ${UI.crest(A0,30)} <b>${A0.abbr}</b>${Sc.mgr(S,s.a)} <span class="dim" style="font-size:12px">${U.esc(s.title)}</span></span><span class="row">${status} ${btns}</span></div>`; };
+    return `<div class="asset" style="padding:10px"><span class="row">${UI.crest(H,30)} <b>${H.abbr}</b>${Sc.mgr(S,s.h)} <span class="dim">vs</span> ${UI.crest(A0,30)} <b>${A0.abbr}</b>${Sc.mgr(S,s.a)} <span class="dim" style="font-size:12px">${U.esc(s.title)}</span></span><span class="row"><span data-st="${s.key}">${status}</span> ${btns}</span></div>`; };
   const html=`${my?preview(S,my.h,my.a,my.title,S.teams[my.h===S.user?my.a:my.h]):'<h2>Maç günü · '+U.fdate(S.day)+'</h2>'}<h3 style="margin-top:12px">Menajerlerin bugünkü maçları</h3>${info.ses.map(row).join('')}
-    <p class="muted" style="font-size:13px">Tüm menajer maçları bitince gün tamamlanır. İzlediğin maçta hız, mola ve oyuncu değişikliği senin elinde; iki menajer karşılaşırsa maç ikinizin ekranında aynı anda ilerler.</p>
+    <p class="muted" style="font-size:13px">Canlı maçlar herkes için aynı anda başlar ve birlikte ilerler: hız en yavaş seçime göre ayarlanır, biri mola alırsa bütün maçlar durur. Maç ekranının üstündeki skorlardan diğer maçlara geçip izleyebilirsin. Tüm menajer maçları bitince gün tamamlanır.</p>
     <div class="row" style="justify-content:flex-end">${ON.isHost()&&info.ses.some(s=>!s.live&&!s.done)?'<button class="btn sm ghost" data-mforce title="Karar vermeyenlerin maçı otomatik oynansın">Bekleyenler için sonucu al</button>':''}<button class="btn" data-go="tactics">Taktiğe bak</button><button class="btn ghost" data-close>Kapat</button></div>`;
   let box=document.querySelector('.modal .box[data-mdbox]'); if(box) box.innerHTML='<button class="btn sm ghost" data-close style="float:right">✕</button>'+html; else { box=UI.modal(html,{w:860}); box.setAttribute('data-mdbox',''); }
   box.onclick=e=>{ const w=e.target.closest('[data-w]'), q=e.target.closest('[data-qk]'), sp=e.target.closest('[data-sp]'); if(e.target.closest('[data-mforce]')){ ON.mdForce(); return; }
@@ -293,7 +298,11 @@ App.matchdayModal=function(){ const S=BM.S, info=ON.mdInfo; if(!info||!S) return
 };
 function openLive(s,role){ const S=BM.S; const userK=role==='spec'?null:(s.h===S.user?'h':s.a===S.user?'a':null);
   const feed=ON.feed(s.key,s.h,s.a,role);
-  BM.MatchView.open(S,s.h,s.a,{feed,userK,title:s.title+(role==='spec'?' · seyirci':''),closable:role==='spec',onDone:()=>{ if(ON.mdInfo) setTimeout(App.matchdayModal,50); }}); }
+  const v=BM.MatchView.open(S,s.h,s.a,{feed,userK,key:s.key,onSwitch:App.switchLive,title:s.title+(role==='spec'?' · seyirci':''),closable:role==='spec',onDone:()=>{ if(ON.mdInfo) setTimeout(App.matchdayModal,50); }});
+  if(ON.mdInfo&&v.onInfo) v.onInfo(ON.mdInfo); }
+/* jump from the open game to another live game of the day; your own game keeps going with the others */
+App.switchLive=function(key){ const S=BM.S, info=ON.mdInfo, s=info&&info.ses.find(x=>x.key===key); if(!s||!s.live||s.done) return;
+  const cur=BM.MatchView.cur; if(cur) cur.close(true); const mine=s.humans.includes(S.user); if(mine) ON.choose(key,'watch'); openLive(s,mine?'player':'spec'); };
 App.onMatchdayEnd=function(res){ const S=BM.S; if(document.querySelector('.modal .box[data-mdbox]')) UI.close(); App.refresh();
   const r=(res||[]).find(x=>x.h===S.user||x.a===S.user); if(!r) return; const b=S.boxes.find(x=>(x.h===r.h&&x.a===r.a)&&x.day===S.day-1)||S.boxes.find(x=>x.h===S.user||x.a===S.user);
   if(BM.MatchView.cur){ const my=r.h===S.user?r.hs:r.as, op=r.h===S.user?r.as:r.hs; UI.toast((my>op?'Galibiyet ':'Mağlubiyet ')+my+'-'+op); return; } resultModal(S,b); };
