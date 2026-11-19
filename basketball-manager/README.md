@@ -19,9 +19,8 @@ Sunucu ya da hesap gerekmez; tarayıcılar birbirine doğrudan (WebRTC) bağlan�
 1. **Kur:** ana menüde takımını seç ve **🌐 Çevrimiçi kur**'a bas. Kayıtlı bir kariyeri de **🌐 Çevrimiçi aç** ile paylaşabilirsin. Ekranda 5 haneli bir **oyun kodu** çıkar.
 2. **Katıl:** arkadaşların aynı sayfayı açar, adını ve kodu yazıp **Katıl**'a basar (ya da "Açık oyunlar" listesinden seçer). Her menajer **farklı bir boş takım** seçer.
 3. **Zaman:**
-   - Herkes **Hazırım**'a basınca gün ilerler.
-   - Herkesin seçtiği süreden (Devam / +1 gün / +1 hafta / Aşama sonuna) en kısası geçerli olur.
-   - Ev sahibi **Zorla** ile beklemeden ilerletebilir.
+   - Çevrimiçi oyunda tek düğme vardır: herkes **Devam**'a basınca zaman bir sonraki maç gününe ya da bir menajerin kararını bekleyen olaya kadar ilerler. **+1 gün**, **+1 hafta** ve **Aşama sonuna** yalnızca tek oyunculuda vardır.
+   - Bir arkadaş uzun süre yanıt vermezse ev sahibi **Menajerler** ekranındaki **Beklemeden ilerlet** ile devam edebilir.
 4. **Maç günü:**
    - Maçı olan herkes kendi maçını **2D canlı izler** ya da **sonucu alır**. İzleyen hız, mola, oyuncu değişikliği ve taktikle maçı yönetir.
    - Diğer menajerlerin maçlarını **seyirci** olarak açabilirsin.

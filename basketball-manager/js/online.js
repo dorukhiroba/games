@@ -110,12 +110,12 @@ function claim(cid,p){ const S=BM.S, tid=+p.tid, name=String(p.name||'Menajer').
   L().welcome(S,tid); L().news(S,'Yeni menajer: '+name,'<p>'+U.esc(name)+' '+L().tname(S,tid)+' takımının başına geçti.</p>','league',{not:[tid]}); return {ok:true,tid}; }
 
 /* ---------- time ---------- */
-O.setReady=function(cid,ready,mode){ O.ready[cid]=!!ready; if(mode&&MODES[mode]!=null) O.modes[cid]=mode; hostStatus(); maybeAdvance(); };
+/* online there is a single step: Devam = until the next match day or something that needs a manager */
+O.setReady=function(cid,ready){ O.ready[cid]=!!ready; O.modes[cid]='game'; hostStatus(); maybeAdvance(); };
 O.force=function(){ onlineHumans().forEach(h=>{ O.ready[h.cid]=true; }); hostStatus(); maybeAdvance(true); };
 function maybeAdvance(force){ const S=BM.S; if(!O.isHost()||O.busy||O.md||!S) return;
   const hs=onlineHumans(); if(!hs.length) return; if(!force&&!hs.every(h=>O.ready[h.cid])) return;
-  const mode=hs.map(h=>O.modes[h.cid]||'game').sort((a,b)=>MODES[a]-MODES[b])[0];
-  runDays(mode); }
+  runDays('game'); }
 const awayTids=()=>(BM.S.humans||[]).filter(h=>!(h.cid===O.me.cid||O.online(h.cid))).map(h=>h.tid);
 function stopCheck(S,mode,days){
   // draft: wait for the manager on the clock (away managers get an automatic pick)
